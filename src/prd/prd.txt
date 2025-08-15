@@ -1,0 +1,272 @@
+# PRD – Baitussalam Laboratory Admin Panel (Ant Design + React)
+
+## 1. Objective
+Develop an **Admin Panel** for Baitussalam laboratory website to manage:
+1. **Doctors' availability** for patient appointment scheduling.
+2. **Laboratory tests** details available at each branch.
+
+The system must be built using **React** and **Ant Design**, providing an intuitive, responsive interface for administrators to manage data efficiently.
+
+---
+
+## 2. Scope
+
+### 2.1 In-Scope
+- **Authentiacation & Role-Permissions
+  - Authentication & role-based access control.
+- **Doctors Management**
+  - Add, edit, delete doctors.
+  - Set doctor specialties.
+  - Configure availability days and time slots.
+- **Tests Management**
+  - Add, edit, delete tests.
+  - Set test pricing, duration, and description.
+- **Dashboard Overview**
+  - Show total doctors, total tests, and a quick summary.
+
+### 2.2 Out-of-Scope
+- Patient-facing booking system.
+- Appointment booking logic (handled separately).
+
+---
+
+## 3. Target Users
+- **Lab Administrators**: Manage doctors and test details.
+- **Branch Managers**: Update availability for their branch’s doctors.
+
+---
+
+## 4. Functional Requirements
+
+### 4.1 Dashboard
+- Show 3 summary cards:
+  - **Total Doctors**
+  - **Total Tests**
+  - **Today's Appointments** (placeholder)
+- Use Ant Design **Card** + **Grid** layout.
+
+### 4.2 Doctors Management
+**Route:** `/doctors`
+
+**Features:**
+- **List View**:
+  - Table columns: `Name`, `Specialty`, `Available Days`, `Time Slots`, `Actions`
+  - Pagination enabled.
+- **Add/Edit Doctor**:
+  - Fields:
+    - `Name` (text, required)
+    - `Specialty` (text/select, required)
+    - `Available Days` (multi-select: Monday–Sunday, required)
+    - `Time Slots` (start + end time using `TimePicker.RangePicker`, required)
+  - Form validation on submit.
+- **Delete Doctor**:
+  - Confirmation prompt before deletion.
+- **Feedback**:
+  - Use Ant Design `message` for success/error notifications.
+
+### 4.3 Tests Management
+**Route:** `/tests`
+
+**Features:**
+- **List View**:
+  - Table columns: `Test Name`, `Price`, `Duration`, `Description`, `Actions`
+  - Pagination enabled.
+- **Add/Edit Test**:
+  - Fields:
+    - `Test Name` (text, required)
+    - `Price` (number input with currency symbol, required)
+    - `Duration` (number in minutes/hours, required)
+    - `Description` (textarea, optional)
+- **Delete Test**:
+  - Confirmation prompt before deletion.
+- **Feedback**:
+  - Use Ant Design `message` for success/error notifications.
+
+---
+
+## 5. Non-Functional Requirements
+- **Responsive Design**: Must work on desktop, tablet, and mobile.
+- **Maintainable Code**: Reusable components, clear folder structure.
+- **Performance**: Optimized rendering, minimal re-renders.
+- **API Integration**: Use Axios; abstract API calls in separate modules.
+
+---
+
+## 6. UI/UX Guidelines
+- Use Ant Design layout components (`Layout`, `Sider`, `Header`, `Content`).
+- Sidebar navigation with icons:
+  - Dashboard
+  - Doctors
+  - Tests
+- Consistent padding and spacing across all pages.
+- Use `Modal` for Add/Edit forms instead of navigating away.
+- Colors: Use Ant Design defaults unless specified.
+
+---
+
+## 7. API Specification (Placeholder URLs)
+
+### Doctors
+- `GET /api/doctors` → List all doctors.
+- `POST /api/doctors` → Add a doctor.
+- `PUT /api/doctors/:id` → Update a doctor.
+- `DELETE /api/doctors/:id` → Delete a doctor.
+
+### Tests
+- `GET /api/tests` → List all tests.
+- `POST /api/tests` → Add a test.
+- `PUT /api/tests/:id` → Update a test.
+- `DELETE /api/tests/:id` → Delete a test.
+
+---
+
+## 8. Implementation Plan
+
+### Step 1 – Setup
+- Initialize React project.
+- Install dependencies:
+  ```bash
+  npm install antd axios dayjs react-router-dom
+  npm install @hookform/resolvers react-hook-form
+  npm install @tanstack/react-query
+
+## Step 2 – Layout
+
+### Objective
+Set up the **AdminLayout** component that contains:
+- A **Sidebar** (navigation menu) for switching between pages.
+- A **Header** for page title and optional user menu.
+- A **Content** area where page content will be rendered.
+
+### Tasks
+1. Create `src/components/Layout/AdminLayout.jsx`
+2. Use Ant Design’s `Layout`, `Sider`, `Header`, and `Content`.
+3. Add navigation items for:
+   - Dashboard (`/`)
+   - Doctors (`/doctors`)
+   - Tests (`/tests`)
+4. Make the sidebar **collapsible** for mobile.
+5. Use `react-router-dom`’s `<Outlet />` in `Content` to render child routes.
+
+---
+
+## Step 3 – Dashboard Page
+
+### Objective
+Display a summary view for administrators.
+
+### Tasks
+1. Create `src/pages/Dashboard.jsx`
+2. Use Ant Design’s `Row` and `Col` with `Card` components.
+3. Create 3 cards:
+   - **Total Doctors**
+   - **Total Tests**
+   - **Today's Appointments** (placeholder for now)
+4. Fetch real counts from the API when available; for now, use static data.
+
+---
+
+## Step 4 – Doctors Module
+
+### Objective
+Manage CRUD for doctors' data and availability.
+
+### Tasks
+1. **List Component** (`DoctorsList.jsx`)
+   - Use Ant Design’s `Table` for listing.
+   - Columns:
+     - Name
+     - Specialty
+     - Available Days
+     - Time Slots
+     - Actions (Edit/Delete)
+   - Add pagination.
+
+2. **Form Component** (`DoctorsForm.jsx`)
+   - Use Ant Design’s `Form`, `Input`, `Select`, and `TimePicker.RangePicker`.
+   - Fields:
+     - Name (Input, required)
+     - Specialty (Input or Select, required)
+     - Available Days (Multi-select, required)
+     - Time Slots (RangePicker, required)
+   - Validation rules for required fields.
+   - On submit:
+     - Call API: POST (for add) or PUT (for edit).
+     - Show success/error messages.
+
+3. **Integration**
+   - Place `DoctorsList` in `pages/Doctors.jsx`.
+   - Add an "Add Doctor" button that opens `DoctorsForm` in a `Modal`.
+   - Implement Delete with Ant Design’s `Popconfirm`.
+
+---
+
+## Step 5 – Tests Module
+
+### Objective
+Manage CRUD for lab tests data.
+
+### Tasks
+1. **List Component** (`TestsList.jsx`)
+   - Use Ant Design’s `Table`.
+   - Columns:
+     - Test Name
+     - Price
+     - Duration
+     - Description
+     - Actions (Edit/Delete)
+   - Add pagination.
+
+2. **Form Component** (`TestsForm.jsx`)
+   - Use Ant Design’s `Form`, `Input`, `InputNumber`, and `TextArea`.
+   - Fields:
+     - Test Name (Input, required)
+     - Price (Number Input with currency, required)
+     - Duration (Number Input in minutes/hours, required)
+     - Description (TextArea, optional)
+   - Validation rules for required fields.
+   - On submit:
+     - Call API: POST (for add) or PUT (for edit).
+     - Show success/error messages.
+
+3. **Integration**
+   - Place `TestsList` in `pages/Tests.jsx`.
+   - Add an "Add Test" button that opens `TestsForm` in a `Modal`.
+   - Implement Delete with Ant Design’s `Popconfirm`.
+
+---
+
+## Step 6 – Routing
+
+### Objective
+Enable navigation between pages.
+
+### Tasks
+1. Install and configure `react-router-dom` (v6).
+2. In `App.jsx`, wrap the app in `<BrowserRouter>`.
+3. Define routes:
+   - `/` → `Dashboard`
+   - `/doctors` → `Doctors` page
+   - `/tests` → `Tests` page
+4. Wrap routes with `AdminLayout` so that sidebar and header persist.
+
+---
+
+## Step 7 – Validation & Feedback
+
+### Objective
+Ensure all forms have proper validation and user feedback.
+
+### Tasks
+1. Use Ant Design’s `Form.Item` `rules` for field validation.
+2. On successful form submission:
+   - Show `message.success('Record added successfully')`.
+3. On failure:
+   - Show `message.error('Failed to save data')`.
+4. Validate that:
+   - No required field is left empty.
+   - Price and Duration fields accept only numbers.
+   - Time slot selection requires both start and end times.
+5. Ensure delete actions require confirmation (`Popconfirm`).
+
+---
