@@ -59,4 +59,31 @@ export const testsAPI = {
   delete: (id) => USE_MOCK_DATA ? mockAPI.tests.delete(id) : api.delete(`/tests/${id}`),
 };
 
+// Users API
+export const usersAPI = {
+  getAll: () => USE_MOCK_DATA ? mockAPI.users.getAll() : api.get('/users'),
+  getById: (id) => USE_MOCK_DATA ? mockAPI.users.getById(id) : api.get(`/users/${id}`),
+  create: (data) => USE_MOCK_DATA ? mockAPI.users.create(data) : api.post('/users', data),
+  update: (id, data) => USE_MOCK_DATA ? mockAPI.users.update(id, data) : api.put(`/users/${id}`, data),
+  delete: (id) => USE_MOCK_DATA ? mockAPI.users.delete(id) : api.delete(`/users/${id}`),
+};
+
+
+export const rolesAPI = {
+  getAll: () => USE_MOCK_DATA ? mockAPI.roles.getAll() : api.get('/roles'),
+  create: (data) => USE_MOCK_DATA ? mockAPI.roles.create(data) : api.post('/roles', data),
+  update: (id, data) => USE_MOCK_DATA ? mockAPI.roles.update(id, data) : api.put(`/roles/${id}`, data),
+  delete: (id) => USE_MOCK_DATA ? mockAPI.roles.delete(id) : api.delete(`/roles/${id}`),
+};
+
+export const permissionsAPI = {
+  getAll: () => USE_MOCK_DATA ? mockAPI.permissions.getAll() : api.get('/permissions'),
+  getById: (id) => USE_MOCK_DATA ? mockAPI.permissions.getById(id) : api.get(`/permissions/${id}`),
+  create: (data) => USE_MOCK_DATA ? mockAPI.permissions.create(data) : api.post('/permissions', data),
+  update: (id, data) => USE_MOCK_DATA ? mockAPI.permissions.update(id, data) : api.put(`/permissions/${id}`, data),
+  delete: (id) => USE_MOCK_DATA ? mockAPI.permissions.delete(id) : api.delete(`/permissions/${id}`),
+};
+
+
+
 export default api; 

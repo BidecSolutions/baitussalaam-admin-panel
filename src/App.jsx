@@ -5,6 +5,9 @@ import AdminLayout from './components/Layout/AdminLayout';
 import Dashboard from './pages/Dashboard';
 import Doctors from './pages/Doctors';
 import Tests from './pages/Tests';
+import Users from './pages/Users';
+import Roles from './pages/Roles';
+import Permissions from './pages/Permissions';
 
 const App = () => {
   return (
@@ -22,6 +25,9 @@ const App = () => {
             <Route index element={<Dashboard />} />
             <Route path="doctors" element={<Doctors />} />
             <Route path="tests" element={<Tests />} />
+            <Route path="users" element={<Users/>} />
+            <Route path="roles" element={<Roles/>} />
+            <Route path="permissions" element={<Permissions/>} />
           </Route>
         </Routes>
       </Router>

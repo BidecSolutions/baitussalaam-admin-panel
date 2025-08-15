@@ -6,6 +6,9 @@ import {
   ExperimentOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  TeamOutlined,
+  IdcardOutlined,
+  SafetyCertificateOutlined
 } from '@ant-design/icons';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 
@@ -19,6 +22,7 @@ const AdminLayout = () => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
+  // Sidebar Menu Items
   const menuItems = [
     {
       key: '/',
@@ -35,30 +39,63 @@ const AdminLayout = () => {
       icon: <ExperimentOutlined />,
       label: 'Tests',
     },
+    {
+      key: 'user-management', // parent menu key
+      icon: <TeamOutlined />,
+      label: 'User Management',
+      children: [
+        {
+          key: '/users',
+          icon: <UserOutlined />,
+          label: 'Users',
+        },
+        {
+          key: '/roles',
+          icon: <IdcardOutlined />,
+          label: 'Roles',
+        },
+        {
+          key: '/permissions',
+          icon: <SafetyCertificateOutlined />,
+          label: 'Permissions',
+        },
+      ],
+    },
   ];
 
   const handleMenuClick = ({ key }) => {
+    // Parent menu click se navigation na ho, sirf child se ho
+    if (!key.startsWith('/')) return;
     navigate(key);
   };
 
   const getPageTitle = () => {
-    const currentItem = menuItems.find(item => item.key === location.pathname);
-    return currentItem ? currentItem.label : 'Dashboard';
+    const findLabel = (items) => {
+      for (const item of items) {
+        if (item.key === location.pathname) return item.label;
+        if (item.children) {
+          const childLabel = findLabel(item.children);
+          if (childLabel) return childLabel;
+        }
+      }
+      return null;
+    };
+    return findLabel(menuItems) || 'Dashboard';
   };
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider 
-        trigger={null} 
-        collapsible 
+      <Sider
+        trigger={null}
+        collapsible
         collapsed={collapsed}
         style={{
           background: colorBgContainer,
         }}
       >
-        <div style={{ 
-          height: 32, 
-          margin: 16, 
+        <div style={{
+          height: 32,
+          margin: 16,
           background: 'rgba(255, 255, 255, 0.2)',
           borderRadius: borderRadiusLG,
           display: 'flex',
@@ -70,6 +107,8 @@ const AdminLayout = () => {
         }}>
           {collapsed ? 'BS' : 'Baitussalam'}
         </div>
+
+        {/* Sidebar Menu */}
         <Menu
           theme="light"
           mode="inline"
@@ -78,7 +117,9 @@ const AdminLayout = () => {
           onClick={handleMenuClick}
         />
       </Sider>
+
       <Layout>
+        {/* Header */}
         <Header
           style={{
             padding: '0 16px',
@@ -104,10 +145,11 @@ const AdminLayout = () => {
             </h2>
           </div>
           <div>
-            {/* User menu can be added here later */}
             <span>Admin User</span>
           </div>
         </Header>
+
+        {/* Main Content */}
         <Content
           style={{
             margin: '24px 16px',
@@ -124,4 +166,4 @@ const AdminLayout = () => {
   );
 };
 
-export default AdminLayout; 
+export default AdminLayout;
