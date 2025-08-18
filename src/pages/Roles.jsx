@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, message } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, EyeOutlined } from "@ant-design/icons";
 import RolesList from "../components/Roles/RolesList";
 import RolesForm from "../components/Roles/RolesForm";
+import ViewList from "../components/Roles/ViewList"; // 👈 import view list
 import { rolesAPI } from "../services/api";
 import {
   DEFAULT_PAGE_SIZE,
@@ -14,7 +15,9 @@ const Roles = () => {
   const [loading, setLoading] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [viewModalVisible, setViewModalVisible] = useState(false); // 👈 for view modal
   const [editingRole, setEditingRole] = useState(null);
+  const [selectedRole, setSelectedRole] = useState(null); // 👈 store role for view
   const [pagination, setPagination] = useState({
     current: DEFAULT_CURRENT_PAGE,
     pageSize: DEFAULT_PAGE_SIZE,
@@ -52,6 +55,11 @@ const Roles = () => {
   const handleEditRole = (role) => {
     setEditingRole(role);
     setModalVisible(true);
+  };
+
+  const handleViewRole = (role) => {
+    setSelectedRole(role);
+    setViewModalVisible(true);
   };
 
   const handleDeleteRole = async (id) => {
@@ -123,6 +131,7 @@ const Roles = () => {
         loading={loading}
         onEdit={handleEditRole}
         onDelete={handleDeleteRole}
+        onView={handleViewRole} // 👈 new handler
         pagination={pagination}
         onTableChange={handleTableChange}
       />
@@ -143,6 +152,17 @@ const Roles = () => {
           initialValues={editingRole}
           loading={formLoading}
         />
+      </Modal>
+
+      {/* View Modal */}
+      <Modal
+        title="Role Details"
+        open={viewModalVisible}
+        onCancel={() => setViewModalVisible(false)}
+        footer={null}
+        width={700}
+      >
+        <ViewList role={selectedRole} />
       </Modal>
     </div>
   );

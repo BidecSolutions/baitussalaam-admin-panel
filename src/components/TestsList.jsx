@@ -28,16 +28,35 @@ const TestsList = ({
       sorter: true,
       render: (text) => <strong>{text}</strong>,
     },
+     {
+      title: 'Test Name',
+      dataIndex: `category.name`,
+      key: 'category.name',
+      sorter: true,
+      render: (text) => <strong>{text}</strong>,
+    },
+    
     {
       title: 'Price',
       dataIndex: 'price',
       key: 'price',
       sorter: true,
-      render: (price) => (
-        <Tag color="green" style={{ fontSize: '14px' }}>
-          PKR {price?.toFixed(2)}
-        </Tag>
-      ),
+     render: (price) => (
+  <Tag color="green" style={{ fontSize: '14px' }}>
+    PKR {Number(price)?.toFixed(2)}
+  </Tag>
+),
+    },
+     {
+      title: 'discounted_price',
+      dataIndex: 'discounted_price',
+      key: 'discounted_price',
+      sorter: true,
+     render: (price) => (
+  <Tag color="green" style={{ fontSize: '14px' }}>
+    PKR {Number(price)?.toFixed(2)}
+  </Tag>
+),
     },
     {
       title: 'Duration',

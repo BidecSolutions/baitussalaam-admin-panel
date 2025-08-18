@@ -6,12 +6,12 @@ export const mockDoctors = [
   { id: 3, name: 'Dr. Muhammad Hassan', specialty: ['Neurology'], availableDays: ['monday','tuesday','wednesday','thursday'], timeSlots: ['08:00','16:00'] },
 ];
 
-export const mockTests = [
-  { id: 1, name: 'Complete Blood Count (CBC)', price: 1500, duration: 30, description: 'Measures blood components.' },
-  { id: 2, name: 'Blood Glucose Test', price: 800, duration: 15, description: 'Measures blood sugar.' },
-  { id: 3, name: 'Lipid Profile', price: 1200, duration: 45, description: 'Measures cholesterol and fats.' },
-  { id: 4, name: 'Liver Function Test', price: 1800, duration: 60, description: 'Measures liver enzymes.' },
-];
+// export const mockTests = [
+//   { id: 1, name: 'Complete Blood Count (CBC)', price: 1500, duration: 30, description: 'Measures blood components.' },
+//   { id: 2, name: 'Blood Glucose Test', price: 800, duration: 15, description: 'Measures blood sugar.' },
+//   { id: 3, name: 'Lipid Profile', price: 1200, duration: 45, description: 'Measures cholesterol and fats.' },
+//   { id: 4, name: 'Liver Function Test', price: 1800, duration: 60, description: 'Measures liver enzymes.' },
+// ];
 
 export const mockUsers = [
   { id: 1, name: 'Ali Raza', email: 'ali@example.com', role: 'admin' },
@@ -33,6 +33,7 @@ export const mockPermissions = [
   { id: 5, module: 'Roles', permissionName: 'Edit', name: 'Edit Role' },
   { id: 6, module: 'Roles', permissionName: 'Delete', name: 'Delete Role' },
   { id: 7, module: 'Doctors', permissionName: 'View', name: 'View Doctors' },
+  { id: 8, module: 'Admin', permissionName: 'Selec All', name: 'Super master' },
 ];
 
 

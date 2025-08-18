@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Button, Modal, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import TestsList from '../components/TestsList';
 import TestsForm from '../components/TestsForm';
-import { testsAPI } from '../services/api';
+
 import { DEFAULT_PAGE_SIZE, DEFAULT_CURRENT_PAGE } from '../utils/constants';
+import { RoleContext } from '../Context/RolesContext';
 
 const Tests = () => {
   const [tests, setTests] = useState([]);
@@ -18,6 +19,9 @@ const Tests = () => {
     total: 0,
   });
 
+  const { getTests } = useContext(RoleContext);
+
+  // ✅ Fetch tests whenever page or pageSize changes
   useEffect(() => {
     fetchTests();
   }, [pagination.current, pagination.pageSize]);
@@ -25,8 +29,7 @@ const Tests = () => {
   const fetchTests = async () => {
     try {
       setLoading(true);
-      const response = await testsAPI.getAll();
-      const testsData = response.data || [];
+      const testsData = await getTests(); // ✅ Using context API
       setTests(testsData);
       setPagination(prev => ({
         ...prev,
@@ -53,8 +56,9 @@ const Tests = () => {
 
   const handleDeleteTest = async (id) => {
     try {
+      // Replace testsAPI with your context delete logic if exists
       await testsAPI.delete(id);
-      await fetchTests(); // Refresh the list
+      await fetchTests();
       return Promise.resolve();
     } catch (error) {
       console.error('Error deleting test:', error);
@@ -71,10 +75,10 @@ const Tests = () => {
         await testsAPI.create(values);
       }
       setModalVisible(false);
-      await fetchTests(); // Refresh the list
+      await fetchTests();
     } catch (error) {
       console.error('Error saving test:', error);
-      throw error; // Re-throw to let the form handle the error
+      throw error;
     } finally {
       setFormLoading(false);
     }
@@ -85,7 +89,7 @@ const Tests = () => {
     setEditingTest(null);
   };
 
-  const handleTableChange = (paginationInfo, filters, sorter) => {
+  const handleTableChange = (paginationInfo) => {
     setPagination(prev => ({
       ...prev,
       current: paginationInfo.current,
@@ -95,18 +99,9 @@ const Tests = () => {
 
   return (
     <div>
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        marginBottom: 16 
-      }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h1>Tests Management</h1>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={handleAddTest}
-        >
+        <Button type="primary" icon={<PlusOutlined />} onClick={handleAddTest}>
           Add Test
         </Button>
       </div>
@@ -126,7 +121,7 @@ const Tests = () => {
         onCancel={handleModalCancel}
         footer={null}
         width={600}
-        destroyOnClose
+        destroyOnHidden // ✅ replace deprecated destroyOnClose
       >
         <TestsForm
           visible={modalVisible}
@@ -140,4 +135,4 @@ const Tests = () => {
   );
 };
 
-export default Tests; 
+export default Tests;

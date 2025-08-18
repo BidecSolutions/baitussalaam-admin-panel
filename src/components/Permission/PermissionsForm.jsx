@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Input, Button, Select } from 'antd';
+
 
 const { Option } = Select;
 
-const moduleOptions = ['Users', 'Roles', 'Doctors']; // example modules, tum API se bhi fetch kar sakte ho
+// const moduleOptions = ['Users', 'Roles', 'Doctors']; // example modules, tum API se bhi fetch kar sakte ho
 
 const PermissionsForm = ({ visible, onCancel, onSubmit, initialValues = {}, loading = false }) => {
   const [form] = Form.useForm();
+
 
   const handleFinish = (values) => {
     onSubmit(values);
@@ -23,16 +25,10 @@ const PermissionsForm = ({ visible, onCancel, onSubmit, initialValues = {}, load
       {/* Module Name */}
       <Form.Item
         name="module"
-        label="Module Name"
-        rules={[{ required: true, message: 'Please select a module!' }]}
+        label="module Name"
+        rules={[{ required: true, message: 'Please enter permission name!' }]}
       >
-        <Select placeholder="Select Module">
-          {moduleOptions.map((mod) => (
-            <Option key={mod} value={mod}>
-              {mod}
-            </Option>
-          ))}
-        </Select>
+        <Input placeholder="Enter Permission Name" />
       </Form.Item>
 
       {/* Permission Name */}

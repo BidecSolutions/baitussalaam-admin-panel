@@ -8,7 +8,8 @@ import {
   MenuUnfoldOutlined,
   TeamOutlined,
   IdcardOutlined,
-  SafetyCertificateOutlined
+  SafetyCertificateOutlined,
+  SwapOutlined
 } from '@ant-design/icons';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 
@@ -59,12 +60,16 @@ const AdminLayout = () => {
           icon: <SafetyCertificateOutlined />,
           label: 'Permissions',
         },
+        {
+          key: '/AssignRole',
+          icon: <SwapOutlined />,
+          label: 'Assign-Role',
+        },
       ],
     },
   ];
 
   const handleMenuClick = ({ key }) => {
-    // Parent menu click se navigation na ho, sirf child se ho
     if (!key.startsWith('/')) return;
     navigate(key);
   };
@@ -83,15 +88,20 @@ const AdminLayout = () => {
     return findLabel(menuItems) || 'Dashboard';
   };
 
+  // ✅ Logout function
+  const handleLogout = () => {
+    localStorage.removeItem('token'); // remove token
+    message.success("Logged out successfully!");
+    navigate('/login'); // redirect to login page
+  };
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider
         trigger={null}
         collapsible
         collapsed={collapsed}
-        style={{
-          background: colorBgContainer,
-        }}
+        style={{ background: colorBgContainer }}
       >
         <div style={{
           height: 32,
@@ -108,7 +118,6 @@ const AdminLayout = () => {
           {collapsed ? 'BS' : 'Baitussalam'}
         </div>
 
-        {/* Sidebar Menu */}
         <Menu
           theme="light"
           mode="inline"
@@ -119,7 +128,6 @@ const AdminLayout = () => {
       </Sider>
 
       <Layout>
-        {/* Header */}
         <Header
           style={{
             padding: '0 16px',
@@ -134,22 +142,19 @@ const AdminLayout = () => {
               type="text"
               icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
               onClick={() => setCollapsed(!collapsed)}
-              style={{
-                fontSize: '16px',
-                width: 64,
-                height: 64,
-              }}
+              style={{ fontSize: '16px', width: 64, height: 64 }}
             />
-            <h2 style={{ margin: 0, marginLeft: 16 }}>
-              {getPageTitle()}
-            </h2>
+            <h2 style={{ margin: 0, marginLeft: 16 }}>{getPageTitle()}</h2>
           </div>
-          <div>
-            <span>Admin User</span>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            {/* <span>Admin User</span> */}
+            <Button type="primary" onClick={handleLogout}>
+              Logout
+            </Button>
           </div>
         </Header>
 
-        {/* Main Content */}
         <Content
           style={{
             margin: '24px 16px',
