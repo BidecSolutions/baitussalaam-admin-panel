@@ -18,7 +18,7 @@ const Doctors = () => {
     total: 0,
   });
 
-  const { getDoctors } = useContext(RoleContext);
+  // const { getDoctors } = useContext(RoleContext);
 
   useEffect(() => {
     fetchDoctors();
@@ -27,9 +27,10 @@ const Doctors = () => {
   const fetchDoctors = async () => {
     try {
       setLoading(true);
-      const doctorsData = await getDoctors(); // context se data
+      // const doctorsData = await getDoctors(); // context se data
+      const doctorsData = await doctorsAPI.getAll(); // context se data
       console.log("doctorsData", doctorsData);
-      setDoctors(doctorsData);
+      setDoctors(doctorsData?.data?.data);
       setPagination((prev) => ({
         ...prev,
         total: doctorsData.length,
@@ -49,6 +50,7 @@ const Doctors = () => {
   };
 
   const handleEditDoctor = (doctor) => {
+    console.log('doctor', doctor);
     setEditingDoctor(doctor);
     setModalVisible(true);
   };

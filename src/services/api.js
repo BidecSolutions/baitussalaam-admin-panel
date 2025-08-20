@@ -14,7 +14,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Add auth token if available
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -31,7 +31,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Handle unauthorized access
-      localStorage.removeItem('authToken');
+      localStorage.removeItem('token');
       window.location.href = '/login';
     }
     return Promise.reject(error);
@@ -45,7 +45,7 @@ const USE_MOCK_DATA = false; // Set to false when real API is available
 export const doctorsAPI = {
   getAll: () => USE_MOCK_DATA ? mockAPI.doctors.getAll() : api.get('/doctors'),
   getById: (id) => USE_MOCK_DATA ? mockAPI.doctors.getById(id) : api.get(`/doctors/${id}`),
-  create: (data) =>  api.post('https://baitussalam.datainovate.com/backend/api/admin', data),
+  create: (data) =>  api.post('/admin/doctors/store', data),
   update: (id, data) => USE_MOCK_DATA ? mockAPI.doctors.update(id, data) : api.put(`/doctors/${id}`, data),
   delete: (id) => USE_MOCK_DATA ? mockAPI.doctors.delete(id) : api.delete(`/doctors/${id}`),
 };
