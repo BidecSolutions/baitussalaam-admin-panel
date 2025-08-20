@@ -74,6 +74,17 @@ const TestCategoryForm = ({
       </Form.Item>
 
       <Form.Item
+        name="slug"
+        label="Slug"
+        rules={[
+          { required: true, message: "Please enter slug" },
+          { min: 2, message: "Slug must be at least 2 characters" },
+        ]}
+      >
+        <Input placeholder="Enter Slug" />
+      </Form.Item>
+
+      <Form.Item
         name="active"
         label="Active"
         valuePropName="checked"

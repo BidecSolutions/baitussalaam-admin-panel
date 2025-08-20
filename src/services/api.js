@@ -14,7 +14,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Add auth token if available
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -31,7 +31,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Handle unauthorized access
-      localStorage.removeItem('authToken');
+      localStorage.removeItem('token');
       window.location.href = '/login';
     }
     return Promise.reject(error);
@@ -62,7 +62,7 @@ export const testsAPI = {
 export const testCategoriesAPI = {
   getAll: () => api.get('/test-category'),
   getById: (id) => api.get(`/test-category/${id}`),
-  create: (data) => api.post('/test-category/store', data),
+  create: (data) => api.post('admin/test-category/store', data),
   update: (id, data) => api.put(`/test-category/${id}/update`, data),
   delete: (id) => api.delete(`/test-category/${id}`),
 };

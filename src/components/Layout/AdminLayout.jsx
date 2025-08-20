@@ -44,11 +44,6 @@ const {logout} = useContext(RoleContext)
       icon: <ExperimentOutlined />,
       label: 'Tests',
     },
-     {
-      key: '/testsCategory',
-      icon: <ExperimentOutlined />,
-      label: 'Tests Category',
-    },
     {
       key: 'settings', // parent menu key
       icon: <SettingOutlined />,

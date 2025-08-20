@@ -8,21 +8,22 @@ const Login = () => {
   const { login } = useContext(RoleContext); // login function
   const navigate = useNavigate();
 
-const handleLogin = async (values) => {
-  try {
-    const response = await login(values); // context se login call
-    if (response) {
-      if (response.role === "admin") {
-        navigate("/");
-      } else {
-        navigate("/user-dashboard");
-      }
+  const handleLogin = async (values) => {
+    try {
+      await login(values); // context se login call
+      navigate("/");
+      // const response = await login(values); // context se login call
+      // if (response) {
+      //   if (response.role === "admin") {
+      //     navigate("/");
+      //   } else {
+      //     navigate("/user-dashboard");
+      //   }
+      // }
+    } catch (error) {
+      message.error("Login failed. Please check your credentials.");
     }
-  } catch (error) {
-    message.error("Login failed. Please check your credentials.");
-  }
-};
-
+  };
 
   return (
     <div

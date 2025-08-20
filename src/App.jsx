@@ -51,8 +51,6 @@ const App = () => {
               <Route path="permissions" element={<Permissions />} />
               <Route path="assignRole" element={<AssignRole />} />
               <Route path="viewList" element={<ViewList />} />
-              <Route path="testsCategory" element={<TestsCategory/>} />
-              <Route path="testsList" element={<TestsCategory/>} />
 
               
             </Route>
