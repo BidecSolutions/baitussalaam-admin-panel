@@ -107,20 +107,20 @@ export const RoleProvider = ({ children }) => {
         }
       );
 
-      if (response.data.success) {
-        const tests = response.data.data || [];
-        console.log("Fetched Tests:", tests);
-        return tests; 
-      } else {
-        message.error(response.data.message || "Failed to fetch tests");
-        return [];
-      }
-    } catch (error) {
-      console.error("Error fetching tests:", error);
-      message.error("Something went wrong while fetching tests");
+    if (response.data.success) {
+      const tests = response.data.data || [];
+      console.log("Fetched Tests:", tests);
+      return tests; // return array of tests
+    } else {
+      message.error(response.data.message || "Failed to fetch tests");
       return [];
     }
-  };
+  } catch (error) {
+    console.error("Error fetching tests:", error);
+    message.error("Something went wrong while fetching tests");
+    return [];
+  }
+};
 
   // ✅ Create Test API
   const createTest = async (values) => {
@@ -195,10 +195,7 @@ export const RoleProvider = ({ children }) => {
     loading,
     register,
     login,
-    getTests,
-    getDoctors,
-    createTest,  // ✅ yahan add kiya
-    logout,
+    getTests
   };
 
   return <RoleContext.Provider value={value}>{children}</RoleContext.Provider>;
