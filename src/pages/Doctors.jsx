@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Modal, message, Spin } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import DoctorsList from '../components/DoctorsList';
-import DoctorsForm from '../components/DoctorsForm';
-import { doctorsAPI } from '../services/api';
-import { DEFAULT_PAGE_SIZE, DEFAULT_CURRENT_PAGE } from '../utils/constants';
-
+import React, { useState, useEffect, useContext } from "react";
+import { Button, Modal, message, Spin } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import DoctorsList from "../components/DoctorsList";
+import DoctorsForm from "../components/DoctorsForm";
+import { doctorsAPI } from "../services/api";
+import { DEFAULT_PAGE_SIZE, DEFAULT_CURRENT_PAGE } from "../utils/constants";
+import { RoleContext } from "../Context/RolesContext";
 const Doctors = () => {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -18,6 +18,8 @@ const Doctors = () => {
     total: 0,
   });
 
+  const { getDoctors } = useContext(RoleContext);
+
   useEffect(() => {
     fetchDoctors();
   }, [pagination.current, pagination.pageSize]);
@@ -25,16 +27,16 @@ const Doctors = () => {
   const fetchDoctors = async () => {
     try {
       setLoading(true);
-      const response = await doctorsAPI.getAll();
-      const doctorsData = response.data || [];
+      const doctorsData = await getDoctors(); // context se data
+      console.log("doctorsData", doctorsData);
       setDoctors(doctorsData);
-      setPagination(prev => ({
+      setPagination((prev) => ({
         ...prev,
         total: doctorsData.length,
       }));
     } catch (error) {
-      console.error('Error fetching doctors:', error);
-      message.error('Failed to fetch doctors. Please try again.');
+      console.error("Error fetching doctors:", error);
+      message.error("Failed to fetch doctors. Please try again.");
       setDoctors([]);
     } finally {
       setLoading(false);
@@ -57,7 +59,7 @@ const Doctors = () => {
       await fetchDoctors(); // Refresh the list
       return Promise.resolve();
     } catch (error) {
-      console.error('Error deleting doctor:', error);
+      console.error("Error deleting doctor:", error);
       return Promise.reject(error);
     }
   };
@@ -73,7 +75,7 @@ const Doctors = () => {
       setModalVisible(false);
       await fetchDoctors(); // Refresh the list
     } catch (error) {
-      console.error('Error saving doctor:', error);
+      console.error("Error saving doctor:", error);
       throw error; // Re-throw to let the form handle the error
     } finally {
       setFormLoading(false);
@@ -86,7 +88,7 @@ const Doctors = () => {
   };
 
   const handleTableChange = (paginationInfo, filters, sorter) => {
-    setPagination(prev => ({
+    setPagination((prev) => ({
       ...prev,
       current: paginationInfo.current,
       pageSize: paginationInfo.pageSize,
@@ -95,12 +97,14 @@ const Doctors = () => {
 
   return (
     <div>
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        marginBottom: 16 
-      }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16,
+        }}
+      >
         <h1>Doctors Management</h1>
         <Button
           type="primary"
@@ -121,7 +125,7 @@ const Doctors = () => {
       />
 
       <Modal
-        title={editingDoctor ? 'Edit Doctor' : 'Add New Doctor'}
+        title={editingDoctor ? "Edit Doctor" : "Add New Doctor"}
         open={modalVisible}
         onCancel={handleModalCancel}
         footer={null}
@@ -140,4 +144,4 @@ const Doctors = () => {
   );
 };
 
-export default Doctors; 
+export default Doctors;

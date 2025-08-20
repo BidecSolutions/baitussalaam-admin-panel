@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useState } from "react";
 import axios from "axios";
 import { message } from "antd";
 
@@ -9,7 +9,6 @@ export const RoleContext = createContext();
 export const RoleProvider = ({ children }) => {
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [doctors, setDoctors] = useState([]); // ✅ Store doctors
 
   // ✅ Register API (user register)
   const register = async (values) => {
@@ -95,46 +94,111 @@ export const RoleProvider = ({ children }) => {
     }
   };
 
- const getTests = async () => {
-  try {
-    const token = localStorage.getItem("token"); // agar auth required hai
-    const response = await axios.get(
-      "https://baitussalam.datainovate.com/backend/api/tests",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // agar token required hai
-        },
-      }
-    );
+  // ✅ Get Tests API
+  const getTests = async () => {
+    try {
+      const token = localStorage.getItem("token"); 
+      const response = await axios.get(
+        "https://baitussalam.datainovate.com/backend/api/tests",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+        }
+      );
 
-    if (response.data.success) {
-      const tests = response.data.data || [];
-      console.log("Fetched Tests:", tests);
-      return tests; // return array of tests
-    } else {
-      message.error(response.data.message || "Failed to fetch tests");
+      if (response.data.success) {
+        const tests = response.data.data || [];
+        console.log("Fetched Tests:", tests);
+        return tests; 
+      } else {
+        message.error(response.data.message || "Failed to fetch tests");
+        return [];
+      }
+    } catch (error) {
+      console.error("Error fetching tests:", error);
+      message.error("Something went wrong while fetching tests");
       return [];
     }
-  } catch (error) {
-    console.error("Error fetching tests:", error);
-    message.error("Something went wrong while fetching tests");
-    return [];
-  }
-};
+  };
 
+  // ✅ Create Test API
+  const createTest = async (values) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        "https://baitussalam.datainovate.com/backend/api/admin/tests/store",
+        {
+          name: values.name,
+          category_id: values.category_id,
+          price: values.price,
+          description: values.description,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
+      if (response.data.success) {
+        message.success(response.data.message || "Test created successfully", 2);
+        return response.data.data; // return newly created test
+      } else {
+        message.error(response.data.message || "Failed to create test");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error creating test:", error);
+      message.error("Something went wrong while creating test");
+      return null;
+    }
+  };
 
+  // ✅ Get Doctors API
+  const getDoctors = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        "https://baitussalam.datainovate.com/backend/api/doctors",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
+      if (response.data.success) {
+        const doctors = response.data.data || [];
+        return doctors;
+      } else {
+        message.error(response.data.message || "Failed to fetch doctors");
+        return [];
+      }
+    } catch (error) {
+      console.error("Error fetching doctors:", error);
+      message.error("Something went wrong while fetching doctors");
+      return [];
+    }
+  };
 
-
- 
+  // ✅ Logout
+  const logout = () => {
+    localStorage.removeItem("token"); 
+    setRoles([]); 
+    message.success("Logged out successfully", 2);
+    window.location.href = "/login";
+  };
 
   const value = {
     roles,
     loading,
     register,
     login,
-    getTests
+    getTests,
+    getDoctors,
+    createTest,  // ✅ yahan add kiya
+    logout,
   };
 
   return <RoleContext.Provider value={value}>{children}</RoleContext.Provider>;

@@ -14,6 +14,7 @@ import { RoleProvider } from './Context/RolesContext';
 import Register from './pages/Register';
 import PrivateRoute from './PrivateRoute'; // ✅ import
 import Login from './pages/Login';
+import TestsCategory from './pages/TestsCategory';
 
 const App = () => {
   return (
@@ -49,6 +50,10 @@ const App = () => {
               <Route path="permissions" element={<Permissions />} />
               <Route path="assignRole" element={<AssignRole />} />
               <Route path="viewList" element={<ViewList />} />
+              <Route path="testsCategory" element={<TestsCategory/>} />
+              <Route path="testsList" element={<TestsCategory/>} />
+
+              
             </Route>
           </Routes>
         </Router>

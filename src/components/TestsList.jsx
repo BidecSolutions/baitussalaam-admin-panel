@@ -1,15 +1,30 @@
-import React from 'react';
-import { Table, Button, Space, Popconfirm, message, Tag } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Table, Button, Space, Popconfirm, message, Tag, Drawer , Descriptions} from 'antd';
+import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 
-const TestsList = ({ 
-  tests = [], 
-  loading = false, 
-  onEdit, 
+const TestsList = ({
+  tests = [],
+  loading = false,
+  onEdit,
   onDelete,
   pagination,
-  onTableChange 
+  onTableChange
 }) => {
+  // Drawer state
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [selectedTest, setSelectedTest] = useState(null);
+
+  const showDrawer = (test) => {
+    setSelectedTest(test);
+    setDrawerVisible(true);
+  };
+
+  const closeDrawer = () => {
+    setDrawerVisible(false);
+    setSelectedTest(null);
+  };
+
+  // Delete handler
   const handleDelete = async (id) => {
     try {
       await onDelete(id);
@@ -28,46 +43,40 @@ const TestsList = ({
       sorter: true,
       render: (text) => <strong>{text}</strong>,
     },
-     {
-      title: 'Test Name',
-      dataIndex: `category.name`,
-      key: 'category.name',
+    {
+      title: 'Category',
+      key: 'category',
       sorter: true,
-      render: (text) => <strong>{text}</strong>,
+      render: (_, record) => <strong>{record.category?.name || '-'}</strong>,
     },
-    
     {
       title: 'Price',
       dataIndex: 'price',
       key: 'price',
       sorter: true,
-     render: (price) => (
-  <Tag color="green" style={{ fontSize: '14px' }}>
-    PKR {Number(price)?.toFixed(2)}
-  </Tag>
-),
+      render: (price) => (
+        <Tag color="green" style={{ fontSize: '14px' }}>
+          PKR {(Number(price) || 0).toFixed(2)}
+        </Tag>
+      ),
     },
-     {
-      title: 'discounted_price',
+    {
+      title: 'Discounted Price',
       dataIndex: 'discounted_price',
       key: 'discounted_price',
       sorter: true,
-     render: (price) => (
-  <Tag color="green" style={{ fontSize: '14px' }}>
-    PKR {Number(price)?.toFixed(2)}
-  </Tag>
-),
+      render: (price) => (
+        <Tag color="green" style={{ fontSize: '14px' }}>
+          PKR {(Number(price) || 0).toFixed(2)}
+        </Tag>
+      ),
     },
     {
       title: 'Duration',
       dataIndex: 'duration',
       key: 'duration',
       sorter: true,
-      render: (duration) => (
-        <Tag color="blue">
-          {duration} min
-        </Tag>
-      ),
+      render: (duration) => <Tag color="blue">{duration} min</Tag>,
     },
     {
       title: 'Description',
@@ -77,10 +86,9 @@ const TestsList = ({
         if (!description) return '-';
         return (
           <div style={{ maxWidth: 300 }}>
-            {description.length > 100 
-              ? `${description.substring(0, 100)}...` 
-              : description
-            }
+            {description.length > 100
+              ? `${description.substring(0, 100)}...`
+              : description}
           </div>
         );
       },
@@ -92,6 +100,14 @@ const TestsList = ({
         <Space size="middle">
           <Button
             type="primary"
+            icon={<EyeOutlined />}
+            size="small"
+            onClick={() => showDrawer(record)}
+          >
+            View
+          </Button>
+          <Button
+            type="default"
             icon={<EditOutlined />}
             size="small"
             onClick={() => onEdit(record)}
@@ -121,22 +137,72 @@ const TestsList = ({
   ];
 
   return (
-    <Table
-      columns={columns}
-      dataSource={tests}
-      rowKey="id"
-      loading={loading}
-      pagination={{
-        ...pagination,
-        showSizeChanger: true,
-        showQuickJumper: true,
-        showTotal: (total, range) => 
-          `${range[0]}-${range[1]} of ${total} tests`,
-      }}
-      onChange={onTableChange}
-      scroll={{ x: 800 }}
-    />
+    <>
+      <Table
+        columns={columns}
+        dataSource={tests}
+        rowKey="id"
+        loading={loading}
+        pagination={{
+          ...pagination,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} tests`,
+        }}
+        onChange={onTableChange}
+        scroll={{ x: 900 }}
+      />
+
+      {/* Drawer for viewing test details */}
+      <Drawer
+  title={selectedTest?.name}
+  placement="right"
+  width={450}
+  onClose={closeDrawer}
+  visible={drawerVisible} // v4 uses `visible`
+>
+  {selectedTest && (
+    <Descriptions
+      column={1} // one field per row
+      bordered
+      size="small"
+    >
+      <Descriptions.Item label="Category">
+        {selectedTest.category?.name || '-'}
+      </Descriptions.Item>
+
+      <Descriptions.Item label="Price">
+        <Tag color="green">PKR {(Number(selectedTest.price) || 0).toFixed(2)}</Tag>
+      </Descriptions.Item>
+
+      <Descriptions.Item label="Discounted Price">
+        <Tag color="blue">PKR {(Number(selectedTest.discounted_price) || 0).toFixed(2)}</Tag>
+      </Descriptions.Item>
+
+      <Descriptions.Item label="Duration">
+        <Tag color="purple">{selectedTest.duration} min</Tag>
+      </Descriptions.Item>
+
+      <Descriptions.Item label="Description">
+        {selectedTest.description || '-'}
+      </Descriptions.Item>
+
+      <Descriptions.Item label="Preparation Instructions">
+        {selectedTest.preparation_instructions || '-'}
+      </Descriptions.Item>
+
+      <Descriptions.Item label="Note">
+        {selectedTest.note || '-'}
+      </Descriptions.Item>
+
+      <Descriptions.Item label="Slug">
+        {selectedTest.slug || '-'}
+      </Descriptions.Item>
+    </Descriptions>
+  )}
+</Drawer>
+    </>
   );
 };
 
-export default TestsList; 
+export default TestsList;

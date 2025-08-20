@@ -1,114 +1,86 @@
-import React, { useEffect } from 'react';
-import { Form, Input, InputNumber, Button, message } from 'antd';
-import { testsAPI } from '../services/api';
+// src/pages/TestForm.jsx
+import React, { useContext } from "react";
+import { Form, Input, InputNumber, Button, Card } from "antd";
+import { RoleContext } from "../Context/RolesContext";
 
 const { TextArea } = Input;
 
-const TestsForm = ({ 
-  visible, 
-  onCancel, 
-  onSubmit, 
-  initialValues = null, 
-  loading = false 
-}) => {
-  const [form] = Form.useForm();
+const TestForm = () => {
+  const { createTest } = useContext(RoleContext);
 
-  useEffect(() => {
-    if (visible && initialValues) {
-      form.setFieldsValue(initialValues);
-    } else if (visible) {
-      form.resetFields();
-    }
-  }, [visible, initialValues, form]);
-
-  const handleSubmit = async (values) => {
-    try {
-      await onSubmit(values);
-      form.resetFields();
-      message.success(initialValues ? 'Test updated successfully!' : 'Test added successfully!');
-    } catch (error) {
-      message.error('Failed to save test data. Please try again.');
-      console.error('Error submitting test form:', error);
-    }
+  const onFinish = async (values) => {
+    const res = await createTest(values);
+    console.log("Created Test:", res);
   };
 
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      onFinish={handleSubmit}
-    >
-      <Form.Item
-        name="name"
-        label="Test Name"
-        rules={[
-          { required: true, message: 'Please enter test name' },
-          { min: 2, message: 'Test name must be at least 2 characters' }
-        ]}
-      >
-        <Input placeholder="Enter laboratory test name" />
-      </Form.Item>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <Card title="Create New Test" className="w-[500px] shadow-lg">
+        <Form layout="vertical" onFinish={onFinish}>
+          {/* Test Name */}
+          <Form.Item
+            name="name"
+            label="Test Name"
+            rules={[{ required: true, message: "Please enter test name" }]}
+          >
+            <Input placeholder="Enter test name" />
+          </Form.Item>
 
-      <Form.Item
-        name="price"
-        label="Price"
-        rules={[
-          { required: true, message: 'Please enter test price' },
-          { type: 'number', min: 0, message: 'Price must be a positive number' }
-        ]}
-      >
-        <InputNumber
-          placeholder="Enter price"
-          min={0}
-          step={0.01}
-          precision={2}
-          style={{ width: '100%' }}
-          addonAfter="PKR"
-        />
-      </Form.Item>
+          {/* Category */}
+          <Form.Item
+            name="category_id"
+            label="Category"
+            rules={[{ required: true, message: "Please enter category ID" }]}
+          >
+            <Input placeholder="Enter category ID" />
+          </Form.Item>
 
-      <Form.Item
-        name="duration"
-        label="Duration (minutes)"
-        rules={[
-          { required: true, message: 'Please enter test duration' },
-          { type: 'number', min: 1, message: 'Duration must be at least 1 minute' }
-        ]}
-      >
-        <InputNumber
-          placeholder="Enter duration in minutes"
-          min={1}
-          step={1}
-          style={{ width: '100%' }}
-          addonAfter="min"
-        />
-      </Form.Item>
+          {/* Price */}
+          <Form.Item
+            name="price"
+            label="Price"
+            rules={[{ required: true, message: "Please enter price" }]}
+          >
+            <InputNumber
+              className="w-full"
+              min={0}
+              placeholder="Enter price"
+            />
+          </Form.Item>
 
-      <Form.Item
-        name="description"
-        label="Description"
-        rules={[
-          { max: 500, message: 'Description cannot exceed 500 characters' }
-        ]}
-      >
-        <TextArea
-          placeholder="Enter test description (optional)"
-          rows={4}
-          maxLength={500}
-          showCount
-        />
-      </Form.Item>
+          {/* Discounted Price */}
+          <Form.Item name="discounted_price" label="Discounted Price">
+            <InputNumber
+              className="w-full"
+              min={0}
+              placeholder="Enter discounted price"
+            />
+          </Form.Item>
 
-      <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
-        <Button onClick={onCancel} style={{ marginRight: 8 }}>
-          Cancel
-        </Button>
-        <Button type="primary" htmlType="submit" loading={loading}>
-          {initialValues ? 'Update Test' : 'Add Test'}
-        </Button>
-      </Form.Item>
-    </Form>
+          {/* Duration */}
+          <Form.Item
+            name="duration"
+            label="Duration"
+            rules={[{ required: true, message: "Please enter duration" }]}
+          >
+            <Input placeholder="e.g. 2 hours, 30 min" />
+          </Form.Item>
+
+          {/* Description */}
+          <Form.Item name="description" label="Description">
+            <TextArea rows={3} placeholder="Enter description" />
+          </Form.Item>
+
+          {/* Submit Button */}
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              Create Test
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+    </div>
   );
 };
 
-export default TestsForm; 
+export default TestForm;

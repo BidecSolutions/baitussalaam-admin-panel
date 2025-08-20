@@ -1,128 +1,180 @@
-import React from 'react';
-import { Table, Button, Space, Tag, Popconfirm, message } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { WEEKDAYS } from '../utils/constants';
+import React, { useState, useEffect, useContext } from "react";
+import {
+  Table,
+  Button,
+  Space,
+  Tag,
+  Drawer,
+  Descriptions,
+  Modal,
+  Spin,
+} from "antd";
+import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import DoctorsForm from "./DoctorsForm";
+import { RoleContext } from "../Context/RolesContext"; // ✅ context import
 
-const DoctorsList = ({ 
-  doctors = [], 
-  loading = false, 
-  onEdit, 
-  onDelete,
-  pagination,
-  onTableChange 
-}) => {
-  const handleDelete = async (id) => {
-    try {
-      await onDelete(id);
-      message.success('Doctor deleted successfully!');
-    } catch (error) {
-      message.error('Failed to delete doctor. Please try again.');
-      console.error('Error deleting doctor:', error);
-    }
+const DoctorsList = ({ doctors }) => {
+  // const { getDoctors } = useContext(RoleContext); // ✅ context function
+  // const [doctors, setDoctors] = useState([]); // API data state
+  // const [loading, setLoading] = useState(false); // Loader state
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [formVisible, setFormVisible] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+
+  // ✅ Fetch Doctors on Mount
+  // useEffect(() => {
+  //   const fetchDoctors = async () => {
+  //     setLoading(true);
+  //     const result = await getDoctors();
+  //     console.log('result', result);
+  //     setDoctors(result); // API se data set
+  //     setLoading(false);
+  //   };
+  //   fetchDoctors();
+  // }, []);
+
+  const showDrawer = (doctor) => {
+    setSelectedDoctor(doctor);
+    setDrawerVisible(true);
+  };
+
+  const closeDrawer = () => {
+    setDrawerVisible(false);
+    setSelectedDoctor(null);
+  };
+
+  const showEditForm = (doctor) => {
+    setSelectedDoctor(doctor);
+    setFormVisible(true);
+  };
+
+  const handleFormCancel = () => {
+    setFormVisible(false);
+    setSelectedDoctor(null);
+  };
+
+  const handleFormSubmit = async (values) => {
+    console.log("Form Submitted:", values);
+    // 👉 Yahan API call kar ke update karo
+    setFormVisible(false);
+    setSelectedDoctor(null);
   };
 
   const columns = [
+    { title: "ID", dataIndex: "id", key: "id" },
+    { title: "Name", dataIndex: "name", key: "name" },
+    { title: "Email", dataIndex: "email", key: "email" },
+    { title: "Phone", dataIndex: "phone", key: "phone" },
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-      sorter: true,
-      render: (text) => <strong>{text}</strong>,
+      title: "Status",
+      dataIndex: "is_active",
+      key: "is_active",
+      render: (text) => (
+        <Tag color={text === 1 ? "green" : "red"}>
+          {text === 1 ? "Active" : "Inactive"}
+        </Tag>
+      ),
     },
     {
-      title: 'Specialty',
-      dataIndex: 'specialty',
-      key: 'specialty',
-      render: (specialties) => {
-        if (Array.isArray(specialties)) {
-          return specialties.map((specialty, index) => (
-            <Tag key={index} color="blue" style={{ marginBottom: 4 }}>
-              {specialty}
-            </Tag>
-          ));
-        }
-        return <Tag color="blue">{specialties}</Tag>;
-      },
-    },
-    {
-      title: 'Available Days',
-      dataIndex: 'availableDays',
-      key: 'availableDays',
-      render: (days) => {
-        if (!Array.isArray(days)) return '-';
-        
-        const dayLabels = WEEKDAYS.filter(day => 
-          days.includes(day.value)
-        ).map(day => day.label);
-        
-        return dayLabels.map((day, index) => (
-          <Tag key={index} color="green" style={{ marginBottom: 4 }}>
-            {day}
-          </Tag>
-        ));
-      },
-    },
-    {
-      title: 'Time Slots',
-      dataIndex: 'timeSlots',
-      key: 'timeSlots',
-      render: (timeSlots) => {
-        if (!Array.isArray(timeSlots) || timeSlots.length !== 2) return '-';
-        return `${timeSlots[0]} - ${timeSlots[1]}`;
-      },
-    },
-    {
-      title: 'Actions',
-      key: 'actions',
+      title: "Actions",
+      key: "actions",
       render: (_, record) => (
         <Space size="middle">
           <Button
             type="primary"
+            icon={<EyeOutlined />}
+            size="small"
+            onClick={() => showDrawer(record)}
+          >
+            View
+          </Button>
+          <Button
+            type="default"
             icon={<EditOutlined />}
             size="small"
-            onClick={() => onEdit(record)}
+            onClick={() => showEditForm(record)}
           >
             Edit
           </Button>
-          <Popconfirm
-            title="Are you sure you want to delete this doctor?"
-            description="This action cannot be undone."
-            onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
-            placement="topRight"
+          <Button
+            type="primary"
+            danger
+            icon={<DeleteOutlined />}
+            size="small"
+            onClick={() => console.log("Delete", record)}
           >
-            <Button
-              type="primary"
-              danger
-              icon={<DeleteOutlined />}
-              size="small"
-            >
-              Delete
-            </Button>
-          </Popconfirm>
+            Delete
+          </Button>
         </Space>
       ),
     },
   ];
 
   return (
-    <Table
-      columns={columns}
-      dataSource={doctors}
-      rowKey="id"
-      loading={loading}
-      pagination={{
-        ...pagination,
-        showSizeChanger: true,
-        showQuickJumper: true,
-        showTotal: (total, range) => 
-          `${range[0]}-${range[1]} of ${total} doctors`,
-      }}
-      onChange={onTableChange}
-      scroll={{ x: 800 }}
-    />
+    <>
+      {/* Loader + Table */}
+      {/* {loading ? (
+        <Spin size="large" />
+      ) : (
+        <Table columns={columns} dataSource={doctors} rowKey="id" />
+      )} */}
+      <Table columns={columns} dataSource={doctors} rowKey="id" />
+
+      {/* View Drawer */}
+      <Drawer
+        title={selectedDoctor?.name}
+        placement="right"
+        width={500}
+        onClose={closeDrawer}
+        open={drawerVisible}
+      >
+        {selectedDoctor && (
+          <Descriptions column={1} bordered size="small">
+            <Descriptions.Item label="ID">
+              {selectedDoctor.id}
+            </Descriptions.Item>
+            <Descriptions.Item label="Name">
+              {selectedDoctor.name}
+            </Descriptions.Item>
+            <Descriptions.Item label="Description">
+              {selectedDoctor.description}
+            </Descriptions.Item>
+            <Descriptions.Item label="Slug">
+              {selectedDoctor.slug}
+            </Descriptions.Item>
+            <Descriptions.Item label="Email">
+              {selectedDoctor.email}
+            </Descriptions.Item>
+            <Descriptions.Item label="Phone">
+              {selectedDoctor.phone}
+            </Descriptions.Item>
+            <Descriptions.Item label="Bio">
+              {selectedDoctor.bio}
+            </Descriptions.Item>
+            <Descriptions.Item label="Experience">
+              {selectedDoctor.experience_years} years
+            </Descriptions.Item>
+          </Descriptions>
+        )}
+      </Drawer>
+
+      {/* Edit Modal */}
+      <Modal
+        title={selectedDoctor ? "Edit Doctor" : "Add Doctor"}
+        open={formVisible}
+        onCancel={handleFormCancel}
+        footer={null}
+        width={900}
+      >
+        <DoctorsForm
+          visible={formVisible}
+          onCancel={handleFormCancel}
+          onSubmit={handleFormSubmit}
+          initialValues={selectedDoctor}
+        />
+      </Modal>
+    </>
   );
 };
 
-export default DoctorsList; 
+export default DoctorsList;

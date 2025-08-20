@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Layout, Menu, theme, Button } from 'antd';
 import {
   DashboardOutlined,
@@ -12,6 +12,7 @@ import {
   SwapOutlined
 } from '@ant-design/icons';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { RoleContext } from '../../Context/RolesContext';
 
 const { Header, Sider, Content } = Layout;
 
@@ -19,6 +20,8 @@ const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+const {logout} = useContext(RoleContext)
+
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -39,6 +42,11 @@ const AdminLayout = () => {
       key: '/tests',
       icon: <ExperimentOutlined />,
       label: 'Tests',
+    },
+     {
+      key: '/testsCategory',
+      icon: <ExperimentOutlined />,
+      label: 'Tests Category',
     },
     {
       key: 'user-management', // parent menu key
@@ -149,7 +157,7 @@ const AdminLayout = () => {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             {/* <span>Admin User</span> */}
-            <Button type="primary" onClick={handleLogout}>
+            <Button type="primary" onClick={logout}>
               Logout
             </Button>
           </div>

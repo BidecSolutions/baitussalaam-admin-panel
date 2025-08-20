@@ -40,12 +40,13 @@ api.interceptors.response.use(
 
 // For development, use mock data. For production, uncomment the real API calls
 const USE_MOCK_DATA = true; // Set to false when real API is available
+// const createdata = 'https://baitussalam.datainovate.com/backend/api/admin'
 
 // Doctors API
 export const doctorsAPI = {
   getAll: () => USE_MOCK_DATA ? mockAPI.doctors.getAll() : api.get('/doctors'),
   getById: (id) => USE_MOCK_DATA ? mockAPI.doctors.getById(id) : api.get(`/doctors/${id}`),
-  create: (data) => USE_MOCK_DATA ? mockAPI.doctors.create(data) : api.post('/doctors', data),
+  create: (data) =>  api.post('https://baitussalam.datainovate.com/backend/api/admin', data),
   update: (id, data) => USE_MOCK_DATA ? mockAPI.doctors.update(id, data) : api.put(`/doctors/${id}`, data),
   delete: (id) => USE_MOCK_DATA ? mockAPI.doctors.delete(id) : api.delete(`/doctors/${id}`),
 };
