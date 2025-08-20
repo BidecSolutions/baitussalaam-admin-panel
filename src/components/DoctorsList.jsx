@@ -13,7 +13,7 @@ import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import DoctorsForm from "./DoctorsForm";
 import { RoleContext } from "../Context/RolesContext"; // ✅ context import
 
-const DoctorsList = ({ doctors }) => {
+const DoctorsList = ({ doctors, onEdit }) => {
   // const { getDoctors } = useContext(RoleContext); // ✅ context function
   // const [doctors, setDoctors] = useState([]); // API data state
   // const [loading, setLoading] = useState(false); // Loader state
@@ -92,7 +92,10 @@ const DoctorsList = ({ doctors }) => {
             type="default"
             icon={<EditOutlined />}
             size="small"
-            onClick={() => showEditForm(record)}
+            onClick={() => {
+              // onEdit(true)
+              showEditForm(record)
+            }}
           >
             Edit
           </Button>
@@ -101,7 +104,7 @@ const DoctorsList = ({ doctors }) => {
             danger
             icon={<DeleteOutlined />}
             size="small"
-            onClick={() => console.log("Delete", record)}
+            onClick={() => {console.log("Delete", record)}}
           >
             Delete
           </Button>

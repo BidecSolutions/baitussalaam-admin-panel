@@ -45,7 +45,7 @@ const USE_MOCK_DATA = false; // Set to false when real API is available
 export const doctorsAPI = {
   getAll: () => USE_MOCK_DATA ? mockAPI.doctors.getAll() : api.get('/doctors'),
   getById: (id) => USE_MOCK_DATA ? mockAPI.doctors.getById(id) : api.get(`/doctors/${id}`),
-  create: (data) =>  api.post('https://baitussalam.datainovate.com/backend/api/admin', data),
+  create: (data) =>  api.post('/admin/doctors/store', data),
   update: (id, data) => USE_MOCK_DATA ? mockAPI.doctors.update(id, data) : api.put(`/doctors/${id}`, data),
   delete: (id) => USE_MOCK_DATA ? mockAPI.doctors.delete(id) : api.delete(`/doctors/${id}`),
 };

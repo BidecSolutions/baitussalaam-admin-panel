@@ -38,7 +38,6 @@ const DoctorsForm = ({
           values.timeSlots[1].format(TIME_FORMAT)
         ] : undefined
       };
-
       await onSubmit(submitData);
       form.resetFields();
       message.success(initialValues ? 'Doctor updated successfully!' : 'Doctor added successfully!');
