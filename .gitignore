@@ -25,3 +25,6 @@ dist-ssr
 
 # Cursor editor
 .cursor/
+
+# Cursor editor
+.prd/

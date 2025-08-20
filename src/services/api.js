@@ -3,7 +3,7 @@ import { mockAPI } from './mockData';
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: 'https://baitussalam.datainovate.com/backend/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ api.interceptors.response.use(
 );
 
 // For development, use mock data. For production, uncomment the real API calls
-const USE_MOCK_DATA = true; // Set to false when real API is available
+const USE_MOCK_DATA = false; // Set to false when real API is available
 
 // Doctors API
 export const doctorsAPI = {
@@ -57,6 +57,14 @@ export const testsAPI = {
   create: (data) => USE_MOCK_DATA ? mockAPI.tests.create(data) : api.post('/tests', data),
   update: (id, data) => USE_MOCK_DATA ? mockAPI.tests.update(id, data) : api.put(`/tests/${id}`, data),
   delete: (id) => USE_MOCK_DATA ? mockAPI.tests.delete(id) : api.delete(`/tests/${id}`),
+};
+// Tests API
+export const testCategoriesAPI = {
+  getAll: () => api.get('/test-category'),
+  getById: (id) => api.get(`/test-category/${id}`),
+  create: (data) => api.post('/test-category/store', data),
+  update: (id, data) => api.put(`/test-category/${id}/update`, data),
+  delete: (id) => api.delete(`/test-category/${id}`),
 };
 
 // Users API

@@ -9,7 +9,8 @@ import {
   TeamOutlined,
   IdcardOutlined,
   SafetyCertificateOutlined,
-  SwapOutlined
+  SwapOutlined,
+  SettingOutlined
 } from '@ant-design/icons';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 
@@ -39,6 +40,33 @@ const AdminLayout = () => {
       key: '/tests',
       icon: <ExperimentOutlined />,
       label: 'Tests',
+    },
+    {
+      key: 'settings', // parent menu key
+      icon: <SettingOutlined />,
+      label: 'Settings',
+      children: [
+        {
+          key: '/test-categories',
+          // icon: <UserOutlined />,
+          label: 'Test Category',
+        },
+        // {
+        //   key: '/roles',
+        //   icon: <IdcardOutlined />,
+        //   label: 'Roles',
+        // },
+        // {
+        //   key: '/permissions',
+        //   icon: <SafetyCertificateOutlined />,
+        //   label: 'Permissions',
+        // },
+        // {
+        //   key: '/AssignRole',
+        //   icon: <SwapOutlined />,
+        //   label: 'Assign-Role',
+        // },
+      ],
     },
     {
       key: 'user-management', // parent menu key

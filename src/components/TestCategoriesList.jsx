@@ -2,7 +2,7 @@ import React from "react";
 import { Table, Button, Space, Popconfirm, message, Tag } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
-const TestsList = ({
+const TestCategoriesList = ({
   tests = [],
   loading = false,
   onEdit,
@@ -22,7 +22,7 @@ const TestsList = ({
 
   const columns = [ 
     {
-      title: "Test Name",
+      title: "Category Name",
       dataIndex: "name",
       key: "name",
       sorter: true,
@@ -30,61 +30,35 @@ const TestsList = ({
       render: (text) => <strong>{text}</strong>,
     },
     {
-      title: "Category",
-      dataIndex: ['category', 'name'],
-      key: "category",
-      width: 175,
-      sorter: true,
-      // render: (text) => <strong>{text}</strong>,
-    },
-    
-    {
-      title: "Price",
-      dataIndex: "price",
-      key: "price",
-      width: 150,
-      sorter: true,
-      render: (price) => (
-        <Tag color="green" style={{ fontSize: "14px" }}>
-          PKR {Number(price)?.toFixed(2)}
-        </Tag>
-      ),
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+      render: (description) => {
+        if (!description) return "-";
+        return (
+          <div style={{ maxWidth: 300 }}>
+            {description.length > 100
+              ? `${description.substring(0, 100)}...`
+              : description}
+          </div>
+        );
+      },
     },
     {
-      title: "Discounted Price",
-      dataIndex: "discounted_price",
-      key: "discounted_price",
-      width: 150,
-      sorter: true,
-      render: (price) => (
-        <Tag color="green" style={{ fontSize: "14px" }}>
-          PKR {Number(price)?.toFixed(2)}
-        </Tag>
-      ),
+      title: "Active",
+      dataIndex: "is_active",
+      key: "is_active",
+      // render: (description) => {
+      //   if (!description) return "-";
+      //   return (
+      //     <div style={{ maxWidth: 300 }}>
+      //       {description.length > 100
+      //         ? `${description.substring(0, 100)}...`
+      //         : description}
+      //     </div>
+      //   );
+      // },
     },
-    {
-      title: "Duration",
-      dataIndex: "duration",
-      key: "duration",
-      width: 125,
-      sorter: true,
-      render: (duration) => <Tag color="blue">{duration} min</Tag>,
-    },
-    // {
-    //   title: "Description",
-    //   dataIndex: "description",
-    //   key: "description",
-    //   render: (description) => {
-    //     if (!description) return "-";
-    //     return (
-    //       <div style={{ maxWidth: 300 }}>
-    //         {description.length > 100
-    //           ? `${description.substring(0, 100)}...`
-    //           : description}
-    //       </div>
-    //     );
-    //   },
-    // },
     {
       title: "Actions",
       key: "actions",
@@ -140,4 +114,4 @@ const TestsList = ({
   );
 };
 
-export default TestsList;
+export default TestCategoriesList;

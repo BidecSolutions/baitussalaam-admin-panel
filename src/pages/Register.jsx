@@ -1,14 +1,17 @@
 import React, { useContext } from "react";
 import { Form, Input, Button, Checkbox } from "antd";
 import { RoleContext } from "../Context/RolesContext";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [form] = Form.useForm();
   const { register } = useContext(RoleContext);
+  const navigate = useNavigate();
 
   const onFinish = async (values) => {
     const data = await register(values);
     if (data) {
+      navigate("/");
       form.resetFields();
     }
   };

@@ -122,6 +122,33 @@ export const RoleProvider = ({ children }) => {
   }
 };
 
+ const getTestCategories = async () => {
+  try {
+    // const token = localStorage.getItem("token"); // agar auth required hai
+    const response = await axios.get(
+      "https://baitussalam.datainovate.com/backend/api/test-category"
+      // ,{
+      //   headers: {
+      //     Authorization: `Bearer ${token}`, // agar token required hai
+      //   },
+      // }
+    );
+
+    if (response.data.success) {
+      const categories = response.data.data || [];
+      console.log("Fetched Test Categories:", categories);
+      return categories; // return array of categories
+    } else {
+      message.error(response.data.message || "Failed to fetch Test Categories");
+      return [];
+    }
+  } catch (error) {
+    console.error("Error fetching Test Categories:", error);
+    message.error("Something went wrong while fetching Test Categories");
+    return [];
+  }
+};
+
 
 
 
@@ -134,7 +161,8 @@ export const RoleProvider = ({ children }) => {
     loading,
     register,
     login,
-    getTests
+    getTests,
+    getTestCategories,
   };
 
   return <RoleContext.Provider value={value}>{children}</RoleContext.Provider>;

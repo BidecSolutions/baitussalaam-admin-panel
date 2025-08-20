@@ -14,6 +14,7 @@ import { RoleProvider } from './Context/RolesContext';
 import Register from './pages/Register';
 import PrivateRoute from './PrivateRoute'; // ✅ import
 import Login from './pages/Login';
+import TestCategories from './pages/TestCategories';
 
 const App = () => {
   return (
@@ -43,6 +44,7 @@ const App = () => {
             >
               <Route index element={<Dashboard />} />
               <Route path="doctors" element={<Doctors />} />
+              <Route path="test-categories" element={<TestCategories />} />
               <Route path="tests" element={<Tests />} />
               <Route path="users" element={<Users />} />
               <Route path="roles" element={<Roles />} />
