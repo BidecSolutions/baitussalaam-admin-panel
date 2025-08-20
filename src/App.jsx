@@ -15,6 +15,7 @@ import Register from './pages/Register';
 import PrivateRoute from './PrivateRoute'; // ✅ import
 import Login from './pages/Login';
 import TestCategories from './pages/TestCategories';
+import Branches from './pages/Branches';
 
 const App = () => {
   return (
@@ -51,6 +52,7 @@ const App = () => {
               <Route path="permissions" element={<Permissions />} />
               <Route path="assignRole" element={<AssignRole />} />
               <Route path="viewList" element={<ViewList />} />
+              <Route path="/branches" element={<Branches />} />
 
               
             </Route>

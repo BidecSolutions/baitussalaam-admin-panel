@@ -5,7 +5,7 @@ import DoctorsList from "../components/DoctorsList";
 import DoctorsForm from "../components/DoctorsForm";
 import { doctorsAPI } from "../services/api";
 import { DEFAULT_PAGE_SIZE, DEFAULT_CURRENT_PAGE } from "../utils/constants";
-import { RoleContext } from "../Context/RolesContext";
+
 const Doctors = () => {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(false);

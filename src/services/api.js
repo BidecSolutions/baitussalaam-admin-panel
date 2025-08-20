@@ -46,7 +46,7 @@ export const doctorsAPI = {
   getAll: () => USE_MOCK_DATA ? mockAPI.doctors.getAll() : api.get('/doctors'),
   getById: (id) => USE_MOCK_DATA ? mockAPI.doctors.getById(id) : api.get(`/doctors/${id}`),
   create: (data) =>  api.post('/admin/doctors/store', data),
-  update: (id, data) => USE_MOCK_DATA ? mockAPI.doctors.update(id, data) : api.put(`/doctors/${id}`, data),
+  update: (id, data) => api.put(`/doctors/${id}`, data),
   delete: (id) => USE_MOCK_DATA ? mockAPI.doctors.delete(id) : api.delete(`/doctors/${id}`),
 };
 
@@ -58,12 +58,22 @@ export const testsAPI = {
   update: (id, data) => USE_MOCK_DATA ? mockAPI.tests.update(id, data) : api.put(`/tests/${id}`, data),
   delete: (id) => USE_MOCK_DATA ? mockAPI.tests.delete(id) : api.delete(`/tests/${id}`),
 };
+
+// Branches API
+export const BranchesAPI = {
+  getAll: () => api.get('/branches'),
+  getById: (id) => USE_MOCK_DATA ? mockAPI.tests.getById(id) : api.get(`/tests/${id}`),
+  create: (data) => api.post('/admin/branches/store', data),
+  update: (id, data) => api.post(`/admin/branches/${id}/update`, data),
+  delete: (id) => api.delete(`/admin/branches/${id}/delete`),
+  toggleStatus: (id) => api.delete(`admin/branches/${id}/toggle-status`),
+};
 // Tests API
 export const testCategoriesAPI = {
   getAll: () => api.get('/test-category'),
   getById: (id) => api.get(`/test-category/${id}`),
   create: (data) => api.post('admin/test-category/store', data),
-  update: (id, data) => api.put(`/test-category/${id}/update`, data),
+  update: (id, data) => api.post(`/test-category/${id}/update`, data),
   delete: (id) => api.delete(`/test-category/${id}`),
 };
 

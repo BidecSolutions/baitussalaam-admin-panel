@@ -54,6 +54,11 @@ const {logout} = useContext(RoleContext)
           // icon: <UserOutlined />,
           label: 'Test Category',
         },
+         {
+          key: '/branches',
+          // icon: <UserOutlined />,
+          label: 'Branches',
+        },
         // {
         //   key: '/roles',
         //   icon: <IdcardOutlined />,

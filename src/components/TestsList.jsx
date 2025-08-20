@@ -1,6 +1,6 @@
-import React from "react";
-import { Table, Button, Space, Popconfirm, message, Tag } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
+import { Table, Button, Space, Popconfirm, message, Tag , Drawer } from "antd";
+import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 
 const TestsList = ({
   tests = [],
