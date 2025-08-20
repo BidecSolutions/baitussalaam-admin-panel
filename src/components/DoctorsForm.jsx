@@ -29,23 +29,49 @@ const DoctorsForm = ({
     }
   }, [visible, initialValues, form]);
 
-  const handleSubmit = async (values) => {
-    try {
-      const submitData = {
-        ...values,
-        timeSlots: values.timeSlots ? [
-          values.timeSlots[0].format(TIME_FORMAT),
-          values.timeSlots[1].format(TIME_FORMAT)
-        ] : undefined
-      };
-      await onSubmit(submitData);
-      form.resetFields();
-      message.success(initialValues ? 'Doctor updated successfully!' : 'Doctor added successfully!');
-    } catch (error) {
-      message.error('Failed to save doctor data. Please try again.');
-      console.error('Error submitting doctor form:', error);
+ const handleSubmit = async (values) => {
+  try {
+    const formData = new FormData();
+
+    // Simple fields
+    formData.append("name", values.name);
+    formData.append("email", values.email);
+    formData.append("phone", values.phone);
+    formData.append("bio", values.bio);
+    formData.append("experience_years", values.experience_years);
+
+    // Arrays
+    if (values.qualifications) {
+      values.qualifications.forEach((q) => formData.append("qualifications[]", q));
     }
-  };
+    if (values.schedule) {
+      values.schedule.forEach((day) => formData.append("schedule[]", day));
+    }
+    if (values.specializations) {
+      values.specializations.forEach((sp) => formData.append("specializations[]", sp));
+    }
+
+    // Time slots
+    if (values.timeSlots) {
+      formData.append("timeSlots[]", values.timeSlots[0].format(TIME_FORMAT));
+      formData.append("timeSlots[]", values.timeSlots[1].format(TIME_FORMAT));
+    }
+
+    // console.log("FormData payload:", formData.getAll);
+
+    // Send to API
+    await onSubmit(formData); // Make sure your API accepts FormData
+
+    form.resetFields();
+    message.success(
+      initialValues ? "Doctor updated successfully!" : "Doctor added successfully!"
+    );
+  } catch (error) {
+    message.error("Failed to save doctor data. Please try again.");
+    console.error("Error submitting doctor form:", error);
+  }
+};
+
 
   return (
     <Form
