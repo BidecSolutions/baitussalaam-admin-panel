@@ -1,10 +1,17 @@
 import React, { useEffect } from "react";
-import { Form, Input, InputNumber, Button, message, Switch } from "antd";
-import { testsAPI } from "../services/api";
+import {
+  Form,
+  Input,
+  InputNumber,
+  Button,
+  message,
+  Switch,
+  Select,
+} from "antd";
 
 const { TextArea } = Input;
 
-const TestCategoryForm = ({
+const CodeForm = ({
   visible,
   onCancel,
   onSubmit,
@@ -22,25 +29,25 @@ const TestCategoryForm = ({
 
   const handleSubmit = async (values) => {
     try {
-      // INSERT_YOUR_CODE
+      const keyValue =
+        typeof values.value === "string"
+          ? values.value.trim().toLowerCase().replace(/\s+/g, "_")
+          : "";
+      const payload = { ...values, key: keyValue };
       const formData = new FormData();
-      Object.entries(values).forEach(([key, value]) => {
-        // For booleans, convert to string to avoid FormData issues
-        if (typeof key === "is_active") {
-          formData.append(key, value ? "1" : "0");
+      Object.entries(payload).forEach(([key, value]) => {
+        if (typeof value === "boolean") {
+          formData.append(key, value ? "true" : "false");
         } else if (value !== undefined && value !== null) {
           formData.append(key, value);
         }
-        // if (value !== undefined && value !== null) {
-        //   formData.append(key, value);
-        // }
       });
       await onSubmit(formData);
       form.resetFields();
       message.success(
         initialValues
-          ? "Test Category updated successfully!"
-          : "Test Category added successfully!"
+          ? "Code updated successfully!"
+          : "Code added successfully!"
       );
     } catch (error) {
       message.error("Failed to save test data. Please try again.");
@@ -51,40 +58,41 @@ const TestCategoryForm = ({
   return (
     <Form form={form} layout="vertical" onFinish={handleSubmit}>
       <Form.Item
-        name="name"
-        label="Category Name"
+        name="value"
+        label="Name"
         rules={[
-          { required: true, message: "Please enter Category name" },
-          { min: 2, message: "Category name must be at least 2 characters" },
+          { required: true, message: "Please enter name" },
+          { min: 2, message: "Name must be at least 2 characters" },
         ]}
       >
-        <Input placeholder="Enter Test Category Name" />
+        <Input placeholder="Enter Name" />
       </Form.Item>
 
       <Form.Item
-        name="description"
-        label="Description"
-        rules={[
-          { max: 500, message: "Description cannot exceed 500 characters" },
-        ]}
+        name="type"
+        label="Type"
+        rules={[{ required: true, message: "Please select Type" }]}
       >
-        <TextArea
-          placeholder="Enter test description (optional)"
-          rows={4}
-          maxLength={500}
-          showCount
+        <Select
+          placeholder="Select Type"
+          options={[
+            { label: "Doctor's Qualification", value: "doctor_qualification" },
+            {
+              label: "Doctor's Specialization",
+              value: "doctor_specialization",
+            },
+          ]}
         />
       </Form.Item>
 
       <Form.Item
-        name="slug"
-        label="Slug"
+        name="sort_order"
+        label="Sort Order"
         rules={[
-          { required: true, message: "Please enter slug" },
-          { min: 2, message: "Slug must be at least 2 characters" },
+          { required: true, message: "Please enter sort order" }
         ]}
       >
-        <Input placeholder="Enter Slug" />
+        <InputNumber min={0} placeholder="Enter Sort Order" style={{ width: "100%" }} />
       </Form.Item>
 
       <Form.Item
@@ -101,11 +109,11 @@ const TestCategoryForm = ({
           Cancel
         </Button>
         <Button type="primary" htmlType="submit" loading={loading}>
-          {initialValues ? "Update Category" : "Add Category"}
+          {initialValues ? "Update Code" : "Add Code"}
         </Button>
       </Form.Item>
     </Form>
   );
 };
 
-export default TestCategoryForm;
+export default CodeForm;

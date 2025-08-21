@@ -16,6 +16,7 @@ import PrivateRoute from './PrivateRoute'; // ✅ import
 import Login from './pages/Login';
 import TestCategories from './pages/TestCategories';
 import Branches from './pages/Branches';
+import Codes from './pages/Codes';
 
 const App = () => {
   return (
@@ -45,6 +46,7 @@ const App = () => {
             >
               <Route index element={<Dashboard />} />
               <Route path="doctors" element={<Doctors />} />
+              <Route path="codes" element={<Codes />} />
               <Route path="test-categories" element={<TestCategories />} />
               <Route path="tests" element={<Tests />} />
               <Route path="users" element={<Users />} />
