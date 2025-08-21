@@ -37,7 +37,7 @@ const CodeForm = ({
       const formData = new FormData();
       Object.entries(payload).forEach(([key, value]) => {
         if (typeof value === "boolean") {
-          formData.append(key, value ? "true" : "false");
+          formData.append(key, value ? 1 : 0);
         } else if (value !== undefined && value !== null) {
           formData.append(key, value);
         }

@@ -50,7 +50,7 @@ const TestsList = ({
       key: "category",
       width: 175,
       sorter: true,
-      // render: (text) => <strong>{text}</strong>,
+      render: (text) => <strong>{text}</strong>,
     },
     {
       title: "Price",
@@ -97,14 +97,7 @@ const TestsList = ({
         );
       },
     },
-    {
-      title: "Duration",
-      dataIndex: "duration",
-      key: "duration",
-      width: 125,
-      sorter: true,
-      render: (duration) => <Tag color="blue">{duration} min</Tag>,
-    },
+   
     // {
     //   title: "Description",
     //   dataIndex: "description",

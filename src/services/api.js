@@ -52,11 +52,11 @@ export const doctorsAPI = {
 
 // Tests API
 export const testsAPI = {
-  getAll: () => USE_MOCK_DATA ? mockAPI.tests.getAll() : api.get('/tests'),
+  getAll: () =>   api.get('/tests'),
   getById: (id) => USE_MOCK_DATA ? mockAPI.tests.getById(id) : api.get(`/tests/${id}`),
-  create: (data) => USE_MOCK_DATA ? mockAPI.tests.create(data) : api.post('/tests', data),
-  update: (id, data) => USE_MOCK_DATA ? mockAPI.tests.update(id, data) : api.put(`/tests/${id}`, data),
-  delete: (id) => USE_MOCK_DATA ? mockAPI.tests.delete(id) : api.delete(`/tests/${id}`),
+  create: (data) => api.post('/admin/tests/store', data),
+  update: (id, data) => api.post(`/admin/tests/${id}/update`, data),
+  delete: (id) =>  api.delete(`/admin/tests/${id}/delete`),
 };
 
 // Branches API
@@ -68,7 +68,7 @@ export const BranchesAPI = {
   delete: (id) => api.delete(`/admin/branches/${id}/delete`),
   toggleStatus: (id) => api.delete(`admin/branches/${id}/toggle-status`),
 };
-// Tests API
+// category API
 export const testCategoriesAPI = {
   getAll: () => api.get('/test-category'),
   getById: (id) => api.get(`/test-category/${id}`),
@@ -83,7 +83,17 @@ export const codesAPI = {
   getById: (id) => api.get(`/admin/codes/${id}`),
   getCodesByType: (type) => api.get(`/admin/codes/${type}`),
   create: (data) => api.post('/admin/codes/store', data),
-  update: (id, data) => api.put(`/admin/codes/${id}`, data),
+  update: (id, data) => api.post(`/admin/codes/${id}`, data),
+  delete: (id) => api.delete(`/test-category/${id}`),
+};
+
+// Hero Section
+
+export const heroAPI = {
+  getAll: () => api.get('/admin/hero'),
+  getById: (id) => api.get(`/test-category/${id}`),
+  create: (data) => api.post('admin/hero/store', data),
+  update: (id, data) => api.post(`admin/hero/${id}/update`, data),
   delete: (id) => api.delete(`/test-category/${id}`),
 };
 

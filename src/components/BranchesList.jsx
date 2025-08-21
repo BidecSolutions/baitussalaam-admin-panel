@@ -17,6 +17,7 @@ const BranchesList = ({ branches, onEdit, onDelete, status }) => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
   const [selectedBranch, setSelectedBranch] = useState(null);
+  const [loadingIds, setLoadingIds] = useState([]); 
 
   const showDrawer = (branch) => {
     setSelectedBranch(branch);
@@ -44,23 +45,33 @@ const BranchesList = ({ branches, onEdit, onDelete, status }) => {
     setSelectedBranch(null);
   };
 
-  
+  const handleToggle = async (id, checked) => {
+    setLoadingIds((prev) => [...prev, id]); 
+    try {
+      await status(id, checked); 
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingIds((prev) => prev.filter((i) => i !== id)); 
+    }
+  };
 
   const columns = [
     { title: "ID", dataIndex: "id", key: "id" },
     { title: "Name", dataIndex: "name", key: "name" },
     { title: "Email", dataIndex: "email", key: "email" },
     { title: "Phone", dataIndex: "phone", key: "phone" },
-   {
+    {
       title: "Active",
       dataIndex: "is_active",
       key: "Active",
       render: (_, record) => (
         <Switch
           checked={record.is_active}
-          onChange={(checked) => status(record.id, checked)} // ✅ prop use
+          onChange={(checked) => handleToggle(record.id, checked)}
           checkedChildren="Active"
           unCheckedChildren="Inactive"
+          loading={loadingIds.includes(record.id)}
         />
       ),
     },
@@ -108,9 +119,7 @@ const BranchesList = ({ branches, onEdit, onDelete, status }) => {
         dataSource={branches}
         rowKey="id"
         scroll={{ x: 900 }}
-       
         pagination={{ showSizeChanger: true, showQuickJumper: true }}
-       
       />
 
       <Drawer

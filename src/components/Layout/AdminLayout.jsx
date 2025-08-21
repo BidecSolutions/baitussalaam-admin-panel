@@ -68,6 +68,10 @@ const AdminLayout = () => {
           key: "/codes",
           label: "Codes",
         },
+         {
+          key: "/Hero-section",
+          label: "Hero Section",
+        },
         // {
         //   key: '/permissions',
         //   icon: <SafetyCertificateOutlined />,

@@ -3,9 +3,10 @@ import { Button, Modal, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import TestsList from '../components/TestsList';
 import TestsForm from '../components/TestsForm';
+import {testsAPI} from '../services/api'
 
 import { DEFAULT_PAGE_SIZE, DEFAULT_CURRENT_PAGE } from '../utils/constants';
-import { RoleContext } from '../Context/RolesContext';
+// import { RoleContext } from '../Context/RolesContext';
 
 const Tests = () => {
   const [tests, setTests] = useState([]);
@@ -19,18 +20,19 @@ const Tests = () => {
     total: 0,
   });
 
-  const { getTests } = useContext(RoleContext);
+  // const { getTests } = useContext(RoleContext);
 
   // ✅ Fetch tests whenever page or pageSize changes
   useEffect(() => {
     fetchTests();
+    
   }, [pagination.current, pagination.pageSize]);
 
   const fetchTests = async () => {
     try {
       setLoading(true);
-      const testsData = await getTests(); // ✅ Using context API
-      setTests(testsData);
+      const testsData = await testsAPI.getAll(); // ✅ Using context API
+      setTests(testsData.data?.data);
       setPagination(prev => ({
         ...prev,
         total: testsData.length,
@@ -53,6 +55,7 @@ const Tests = () => {
     setEditingTest(test);
     setModalVisible(true);
   };
+  
 
   const handleDeleteTest = async (id) => {
     try {
@@ -115,22 +118,23 @@ const Tests = () => {
         onTableChange={handleTableChange}
       />
 
-      <Modal
-        title={editingTest ? 'Edit Test' : 'Add New Test'}
-        open={modalVisible}
-        onCancel={handleModalCancel}
-        footer={null}
-        width={600}
-        destroyOnHidden // ✅ replace deprecated destroyOnClose
-      >
-        <TestsForm
-          visible={modalVisible}
-          onCancel={handleModalCancel}
-          onSubmit={handleFormSubmit}
-          initialValues={editingTest}
-          loading={formLoading}
-        />
-      </Modal>
+   <Modal
+  // title={editingTest ? "Edit Test" : "Add New Test"}
+  open={modalVisible}
+  onCancel={handleModalCancel}
+  footer={null}
+  width={600}
+  destroyOnClose  
+>
+  <TestsForm
+    visible={modalVisible}
+    onCancel={handleModalCancel}
+    onSubmit={handleFormSubmit}
+    initialValues={editingTest}
+    loading={formLoading}
+  />
+</Modal>
+
     </div>
   );
 };
