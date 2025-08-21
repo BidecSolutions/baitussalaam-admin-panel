@@ -2,8 +2,8 @@ import React from "react";
 import { Table, Button, Space, Popconfirm, message, Tag } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
-const TestCategoriesList = ({
-  tests = [],
+const CodesList = ({
+  codes = [],
   loading = false,
   onEdit,
   onDelete,
@@ -13,35 +13,32 @@ const TestCategoriesList = ({
   const handleDelete = async (id) => {
     try {
       await onDelete(id);
-      message.success("Test deleted successfully!");
+      message.success("Code deleted successfully!");
     } catch (error) {
-      message.error("Failed to delete test. Please try again.");
-      console.error("Error deleting test:", error);
+      message.error("Failed to delete code. Please try again.");
+      console.error("Error deleting code:", error);
     }
   };
 
   const columns = [ 
     {
-      title: "Category Name",
-      dataIndex: "name",
-      key: "name",
+      title: "Name",
+      dataIndex: "value",
+      key: "value",
       sorter: true,
       width: 250,
       render: (text) => <strong>{text}</strong>,
     },
     {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-      render: (description) => {
-        if (!description) return "-";
-        return (
-          <div style={{ maxWidth: 300 }}>
-            {description.length > 100
-              ? `${description.substring(0, 100)}...`
-              : description}
-          </div>
-        );
+      title: "Type",
+      dataIndex: "type",
+      key: "type",
+      render: (type) => {
+        if (!type) return "-";
+        // Replace underscores with spaces and capitalize first letter of each word
+        return type
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (char) => char.toUpperCase());
       },
     },
     {
@@ -67,7 +64,7 @@ const TestCategoriesList = ({
             Edit
           </Button>
           <Popconfirm
-            title="Are you sure you want to delete this test?"
+            title="Are you sure you want to delete this code?"
             description="This action cannot be undone."
             onConfirm={() => handleDelete(record.id)}
             okText="Yes"
@@ -91,7 +88,7 @@ const TestCategoriesList = ({
   return (
     <Table
       columns={columns}
-      dataSource={tests}
+      dataSource={codes}
       rowKey="id"
       loading={loading}
       pagination={{
@@ -99,7 +96,7 @@ const TestCategoriesList = ({
         showSizeChanger: true,
         showQuickJumper: true,
         showTotal: (total, range) =>
-          `${range[0]}-${range[1]} of ${total} tests`,
+          `${range[0]}-${range[1]} of ${total} codes`,
       }}
       onChange={onTableChange}
       scroll={{ x: 800 }}
@@ -107,4 +104,4 @@ const TestCategoriesList = ({
   );
 };
 
-export default TestCategoriesList;
+export default CodesList;

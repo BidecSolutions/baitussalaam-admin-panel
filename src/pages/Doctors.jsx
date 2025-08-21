@@ -68,6 +68,7 @@ const Doctors = () => {
 
   const handleFormSubmit = async (values) => {
     try {
+      console.log('doctors payload', values);
       setFormLoading(true);
       if (editingDoctor) {
         await doctorsAPI.update(editingDoctor.id, values);

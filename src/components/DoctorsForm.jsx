@@ -25,7 +25,7 @@ const DoctorsForm = ({
       };
       form.setFieldsValue(formData);
     } else if (visible) {
-      form.resetFields();
+      // form.resetFields();
     }
   }, [visible, initialValues, form]);
 
@@ -42,13 +42,13 @@ const DoctorsForm = ({
 
     // Arrays
     if (values.qualifications) {
-      values.qualifications.forEach((q) => formData.append("qualifications[]", q));
+      values.qualifications.forEach((q, i) => formData.append(`qualifications[${i}]`, q));
     }
     if (values.schedule) {
-      values.schedule.forEach((day) => formData.append("schedule[]", day));
+      values.schedule.forEach((day, i) => formData.append(`schedule[${i}]`, day));
     }
     if (values.specializations) {
-      values.specializations.forEach((sp) => formData.append("specializations[]", sp));
+      values.specializations.forEach((sp, i) => formData.append(`specializations[${i}]`, sp));
     }
 
     // Time slots
@@ -57,12 +57,12 @@ const DoctorsForm = ({
       formData.append("timeSlots[]", values.timeSlots[1].format(TIME_FORMAT));
     }
 
-    // console.log("FormData payload:", formData.getAll);
+    console.log("FormData payload:", formData);
 
     // Send to API
     await onSubmit(formData); // Make sure your API accepts FormData
 
-    form.resetFields();
+    // form.resetFields();
     message.success(
       initialValues ? "Doctor updated successfully!" : "Doctor added successfully!"
     );

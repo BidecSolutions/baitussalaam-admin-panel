@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react';
-import { Layout, Menu, theme, Button } from 'antd';
+import React, { useContext, useState } from "react";
+import { Layout, Menu, theme, Button } from "antd";
 import {
   DashboardOutlined,
   UserOutlined,
@@ -10,10 +10,10 @@ import {
   IdcardOutlined,
   SafetyCertificateOutlined,
   SwapOutlined,
-  SettingOutlined
-} from '@ant-design/icons';
-import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { RoleContext } from '../../Context/RolesContext';
+  SettingOutlined,
+} from "@ant-design/icons";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import { RoleContext } from "../../Context/RolesContext";
 
 const { Header, Sider, Content } = Layout;
 
@@ -21,7 +21,7 @@ const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-const {logout} = useContext(RoleContext)
+  const { logout } = useContext(RoleContext);
 
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -30,40 +30,44 @@ const {logout} = useContext(RoleContext)
   // Sidebar Menu Items
   const menuItems = [
     {
-      key: '/',
+      key: "/",
       icon: <DashboardOutlined />,
-      label: 'Dashboard',
+      label: "Dashboard",
     },
     {
-      key: '/doctors',
+      key: "/doctors",
       icon: <UserOutlined />,
-      label: 'Doctors',
+      label: "Doctors",
     },
     {
-      key: '/tests',
+      key: "/tests",
       icon: <ExperimentOutlined />,
-      label: 'Tests',
+      label: "Tests",
     },
     {
-      key: 'settings', // parent menu key
+      key: "settings", // parent menu key
       icon: <SettingOutlined />,
-      label: 'Settings',
+      label: "Settings",
       children: [
         {
-          key: '/test-categories',
+          key: "/test-categories",
           // icon: <UserOutlined />,
-          label: 'Test Category',
+          label: "Test Category",
         },
-         {
-          key: '/branches',
+        {
+          key: "/branches",
           // icon: <UserOutlined />,
-          label: 'Branches',
+          label: "Branches",
         },
         // {
         //   key: '/roles',
         //   icon: <IdcardOutlined />,
         //   label: 'Roles',
         // },
+        {
+          key: "/codes",
+          label: "Codes",
+        },
         // {
         //   key: '/permissions',
         //   icon: <SafetyCertificateOutlined />,
@@ -77,36 +81,36 @@ const {logout} = useContext(RoleContext)
       ],
     },
     {
-      key: 'user-management', // parent menu key
+      key: "user-management", // parent menu key
       icon: <TeamOutlined />,
-      label: 'User Management',
+      label: "User Management",
       children: [
         {
-          key: '/users',
+          key: "/users",
           icon: <UserOutlined />,
-          label: 'Users',
+          label: "Users",
         },
         {
-          key: '/roles',
+          key: "/roles",
           icon: <IdcardOutlined />,
-          label: 'Roles',
+          label: "Roles",
         },
         {
-          key: '/permissions',
+          key: "/permissions",
           icon: <SafetyCertificateOutlined />,
-          label: 'Permissions',
+          label: "Permissions",
         },
         {
-          key: '/AssignRole',
+          key: "/AssignRole",
           icon: <SwapOutlined />,
-          label: 'Assign-Role',
+          label: "Assign-Role",
         },
       ],
     },
   ];
 
   const handleMenuClick = ({ key }) => {
-    if (!key.startsWith('/')) return;
+    if (!key.startsWith("/")) return;
     navigate(key);
   };
 
@@ -121,37 +125,39 @@ const {logout} = useContext(RoleContext)
       }
       return null;
     };
-    return findLabel(menuItems) || 'Dashboard';
+    return findLabel(menuItems) || "Dashboard";
   };
 
   // ✅ Logout function
   const handleLogout = () => {
-    localStorage.removeItem('token'); // remove token
+    localStorage.removeItem("token"); // remove token
     message.success("Logged out successfully!");
-    navigate('/login'); // redirect to login page
+    navigate("/login"); // redirect to login page
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: "100vh" }}>
       <Sider
         trigger={null}
         collapsible
         collapsed={collapsed}
         style={{ background: colorBgContainer }}
       >
-        <div style={{
-          height: 32,
-          margin: 16,
-          background: 'rgba(255, 255, 255, 0.2)',
-          borderRadius: borderRadiusLG,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#1890ff',
-          fontWeight: 'bold',
-          fontSize: collapsed ? '12px' : '16px',
-        }}>
-          {collapsed ? 'BS' : 'Baitussalam'}
+        <div
+          style={{
+            height: 32,
+            margin: 16,
+            background: "rgba(255, 255, 255, 0.2)",
+            borderRadius: borderRadiusLG,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#1890ff",
+            fontWeight: "bold",
+            fontSize: collapsed ? "12px" : "16px",
+          }}
+        >
+          {collapsed ? "BS" : "Baitussalam"}
         </div>
 
         <Menu
@@ -166,24 +172,24 @@ const {logout} = useContext(RoleContext)
       <Layout>
         <Header
           style={{
-            padding: '0 16px',
+            padding: "0 16px",
             background: colorBgContainer,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ display: "flex", alignItems: "center" }}>
             <Button
               type="text"
               icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
               onClick={() => setCollapsed(!collapsed)}
-              style={{ fontSize: '16px', width: 64, height: 64 }}
+              style={{ fontSize: "16px", width: 64, height: 64 }}
             />
             <h2 style={{ margin: 0, marginLeft: 16 }}>{getPageTitle()}</h2>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             {/* <span>Admin User</span> */}
             <Button type="primary" onClick={logout}>
               Logout
@@ -193,7 +199,7 @@ const {logout} = useContext(RoleContext)
 
         <Content
           style={{
-            margin: '24px 16px',
+            margin: "24px 16px",
             padding: 24,
             minHeight: 280,
             background: colorBgContainer,
