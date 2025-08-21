@@ -67,6 +67,16 @@ export const testCategoriesAPI = {
   delete: (id) => api.delete(`/test-category/${id}`),
 };
 
+// Codes API
+export const codesAPI = {
+  getAll: () => api.get('/admin/codes'),
+  getById: (id) => api.get(`/admin/codes/${id}`),
+  getCodesByType: (type) => api.get(`/admin/codes/${type}`),
+  create: (data) => api.post('/admin/codes/store', data),
+  update: (id, data) => api.put(`/admin/codes/${id}`, data),
+  delete: (id) => api.delete(`/test-category/${id}`),
+};
+
 // Users API
 export const usersAPI = {
   getAll: () => USE_MOCK_DATA ? mockAPI.users.getAll() : api.get('/users'),
