@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { mockAPI } from './mockData';
+import { meta } from '@eslint/js';
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: 'https://baitussalam.datainovate.com/backend/api',
+  baseURL: import.meta.env.VITE_BASE_API_BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -92,8 +93,14 @@ export const codesAPI = {
 export const heroAPI = {
   getAll: () => api.get('/admin/hero'),
   getById: (id) => api.get(`/test-category/${id}`),
-  create: (data) => api.post('admin/hero/store', data),
-  update: (id, data) => api.post(`admin/hero/${id}/update`, data),
+  create: (data) =>
+    api.post('admin/hero/store', data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
+   update: (id, data) =>
+    api.post(`admin/hero/${id}/update`, data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
   delete: (id) => api.delete(`/test-category/${id}`),
 };
 

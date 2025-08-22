@@ -1,92 +1,100 @@
-import React, { useState } from "react";
-import { Card, Row, Col, Button, Space, Popconfirm, message, Drawer, Descriptions, Tag } from "antd";
-import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import React from "react";
+import { Row, Col, Tag, Descriptions, Button, Image, Card, Spin } from "antd";
+import { EditOutlined } from "@ant-design/icons";
 
-const HeroList = ({ items = [], loading = false, onEdit, onDelete }) => {
-  const [drawerVisible, setDrawerVisible] = useState(false);
-  const [selectedHero, setSelectedHero] = useState(null);
-
-  const showDrawer = (hero) => {
-    setSelectedHero(hero);
-    setDrawerVisible(true);
-  };
-
-  const closeDrawer = () => {
-    setDrawerVisible(false);
-    setSelectedHero(null);
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await onDelete(id);
-      message.success("Hero item deleted successfully!");
-    } catch (error) {
-      message.error("Failed to delete hero item. Please try again.");
-    }
-  };
-
+const HeroList = ({ items = [], onEdit, loading = false }) => {
   return (
-    <>
+    <Spin
+      spinning={loading}
+      tip="Loading Heroes..."
+      size="large"
+      style={{ top: 150 }}
+    >
       <Row gutter={[16, 16]}>
         {items.map((item) => (
-          <Col xs={24} sm={12} md={8} lg={6} key={item.id}>
+          <Col xs={24} sm={24} md={24} lg={24} key={item.id}>
             <Card
-              title={item.heading || "No Heading"}
-              bordered
               hoverable
               actions={[
-                <EyeOutlined key="view" onClick={() => showDrawer(item)} />,
-                <EditOutlined key="edit" onClick={() => onEdit(item)} />,
-                <Popconfirm
-                  title="Are you sure to delete this hero item?"
-                  onConfirm={() => handleDelete(item.id)}
-                  okText="Yes"
-                  cancelText="No"
+                <Button
+                  type="primary"
+                  icon={<EditOutlined />}
+                  onClick={() => onEdit(item)}
+                  size="middle"
+                  style={{ borderRadius: "6px" }}
                 >
-                  <DeleteOutlined key="delete" style={{ color: "red" }} />
-                </Popconfirm>,
+                  Edit
+                </Button>,
               ]}
             >
-              <p>{item.sub_heading || "-"}</p>
-              <Tag color={item.is_active ? "green" : "red"}>
-                {item.is_active ? "Active" : "Inactive"}
-              </Tag>
+              <Row gutter={16}>
+                {/* Image Left */}
+                <Col xs={24} sm={8} md={6}>
+                  <Image
+                    width="100%"
+                    src={
+                      item.image_path
+                        ? `${import.meta.env.VITE_BASE_IMAGE_URL_LIVE}${
+                            item.image_path
+                          }`
+                        : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSExbOmh2VFMws-98GmjgBD0RTlPf39LwFf-Q&s"
+                    }
+                    alt={item.image_alt || "hero image"}
+                    style={{ objectFit: "cover" }}
+                  />
+                </Col>
+
+                {/* Fields Right */}
+                <Col xs={24} sm={16} md={18}>
+                  <Descriptions
+                    column={2}
+                    size="small"
+                    bordered
+                    layout="horizontal"
+                  >
+                    <Descriptions.Item label="Heading">
+                      {item.heading}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Sub Heading">
+                      {item.sub_heading}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Description">
+                      {item.description}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Image Alt">
+                      {item.image_alt || "-"}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Button 1">
+                      <a
+                        href={item.button1_link}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {item.button1_text}
+                      </a>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Button 2">
+                      <a
+                        href={item.button2_link}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {item.button2_text}
+                      </a>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Status" span={2}>
+                      <Tag color={item.is_active ? "green" : "red"}>
+                        {item.is_active ? "Active" : "Inactive"}
+                      </Tag>
+                    </Descriptions.Item>
+                  </Descriptions>
+                </Col>
+              </Row>
             </Card>
           </Col>
         ))}
       </Row>
-
-      {/* Drawer Detail View */}
-      <Drawer
-        title={selectedHero?.heading}
-        placement="right"
-        width={500}
-        onClose={closeDrawer}
-        open={drawerVisible} // v5 -> `open`, v4 -> `visible`
-      >
-        {selectedHero && (
-          <Descriptions column={1} bordered size="small">
-            <Descriptions.Item label="Heading">{selectedHero.heading}</Descriptions.Item>
-            <Descriptions.Item label="Sub Heading">{selectedHero.sub_heading}</Descriptions.Item>
-            <Descriptions.Item label="Description">{selectedHero.description}</Descriptions.Item>
-            <Descriptions.Item label="Image Alt">{selectedHero.image_alt || "-"}</Descriptions.Item>
-            <Descriptions.Item label="Button 1">
-              {selectedHero.button1_text} ({selectedHero.button1_link})
-            </Descriptions.Item>
-            <Descriptions.Item label="Button 2">
-              {selectedHero.button2_text} ({selectedHero.button2_link})
-            </Descriptions.Item>
-            <Descriptions.Item label="Status">
-              <Tag color={selectedHero.is_active ? "green" : "red"}>
-                {selectedHero.is_active ? "Active" : "Inactive"}
-              </Tag>
-            </Descriptions.Item>
-            <Descriptions.Item label="Created At">{selectedHero.created_at}</Descriptions.Item>
-            <Descriptions.Item label="Updated At">{selectedHero.updated_at}</Descriptions.Item>
-          </Descriptions>
-        )}
-      </Drawer>
-    </>
+    </Spin>
   );
 };
 

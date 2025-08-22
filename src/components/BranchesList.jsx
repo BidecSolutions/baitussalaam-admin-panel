@@ -9,15 +9,22 @@ import {
   Modal,
   Popconfirm,
   Switch,
+  Spin,
 } from "antd";
 import { EyeOutlined, EditOutlined } from "@ant-design/icons";
 import BranchesForm from "./BranchesForm";
 
-const BranchesList = ({ branches, onEdit, onDelete, status }) => {
+const BranchesList = ({
+  branches,
+  loading = false,
+  onEdit,
+  onDelete,
+  status,
+}) => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
   const [selectedBranch, setSelectedBranch] = useState(null);
-  const [loadingIds, setLoadingIds] = useState([]); 
+  const [loadingIds, setLoadingIds] = useState([]); // switch loader
 
   const showDrawer = (branch) => {
     setSelectedBranch(branch);
@@ -46,13 +53,13 @@ const BranchesList = ({ branches, onEdit, onDelete, status }) => {
   };
 
   const handleToggle = async (id, checked) => {
-    setLoadingIds((prev) => [...prev, id]); 
+    setLoadingIds((prev) => [...prev, id]);
     try {
-      await status(id, checked); 
+      await status(id, checked);
     } catch (err) {
       console.error(err);
     } finally {
-      setLoadingIds((prev) => prev.filter((i) => i !== id)); 
+      setLoadingIds((prev) => prev.filter((i) => i !== id));
     }
   };
 
@@ -114,13 +121,15 @@ const BranchesList = ({ branches, onEdit, onDelete, status }) => {
 
   return (
     <>
-      <Table
-        columns={columns}
-        dataSource={branches}
-        rowKey="id"
-        scroll={{ x: 900 }}
-        pagination={{ showSizeChanger: true, showQuickJumper: true }}
-      />
+      <Spin spinning={loading} tip="Loading branches..." size="large">
+        <Table
+          columns={columns}
+          dataSource={branches}
+          rowKey="id"
+          scroll={{ x: 900 }}
+          pagination={{ showSizeChanger: true, showQuickJumper: true }}
+        />
+      </Spin>
 
       <Drawer
         title={selectedBranch?.name}
@@ -131,23 +140,47 @@ const BranchesList = ({ branches, onEdit, onDelete, status }) => {
       >
         {selectedBranch && (
           <Descriptions column={1} bordered size="small">
-            <Descriptions.Item label="ID">{selectedBranch.id}</Descriptions.Item>
-            <Descriptions.Item label="Name">{selectedBranch.name}</Descriptions.Item>
-            <Descriptions.Item label="Code">{selectedBranch.code}</Descriptions.Item>
-            <Descriptions.Item label="Address">{selectedBranch.address}</Descriptions.Item>
-            <Descriptions.Item label="Phone">{selectedBranch.phone}</Descriptions.Item>
-            <Descriptions.Item label="Email">{selectedBranch.email}</Descriptions.Item>
-            <Descriptions.Item label="Opening Time">{selectedBranch.opening_time}</Descriptions.Item>
-            <Descriptions.Item label="Closing Time">{selectedBranch.closing_time}</Descriptions.Item>
+            <Descriptions.Item label="ID">
+              {selectedBranch.id}
+            </Descriptions.Item>
+            <Descriptions.Item label="Name">
+              {selectedBranch.name}
+            </Descriptions.Item>
+            <Descriptions.Item label="Code">
+              {selectedBranch.code}
+            </Descriptions.Item>
+            <Descriptions.Item label="Address">
+              {selectedBranch.address}
+            </Descriptions.Item>
+            <Descriptions.Item label="Phone">
+              {selectedBranch.phone}
+            </Descriptions.Item>
+            <Descriptions.Item label="Email">
+              {selectedBranch.email}
+            </Descriptions.Item>
+            <Descriptions.Item label="Opening Time">
+              {selectedBranch.opening_time}
+            </Descriptions.Item>
+            <Descriptions.Item label="Closing Time">
+              {selectedBranch.closing_time}
+            </Descriptions.Item>
             <Descriptions.Item label="Active">
               <Tag color={selectedBranch.is_active ? "green" : "red"}>
                 {selectedBranch.is_active ? "Active" : "Inactive"}
               </Tag>
             </Descriptions.Item>
-            <Descriptions.Item label="Latitude">{selectedBranch.latitude}</Descriptions.Item>
-            <Descriptions.Item label="Longitude">{selectedBranch.longitude}</Descriptions.Item>
-            <Descriptions.Item label="Created At">{selectedBranch.created_at}</Descriptions.Item>
-            <Descriptions.Item label="Updated At">{selectedBranch.updated_at}</Descriptions.Item>
+            <Descriptions.Item label="Latitude">
+              {selectedBranch.latitude}
+            </Descriptions.Item>
+            <Descriptions.Item label="Longitude">
+              {selectedBranch.longitude}
+            </Descriptions.Item>
+            <Descriptions.Item label="Created At">
+              {selectedBranch.created_at}
+            </Descriptions.Item>
+            <Descriptions.Item label="Updated At">
+              {selectedBranch.updated_at}
+            </Descriptions.Item>
           </Descriptions>
         )}
       </Drawer>

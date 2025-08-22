@@ -35,7 +35,7 @@ const TestForm = ({ initialValues, loading, onCancel, visible, onSubmit }) => {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50">
       <Card
-        title={initialValues ? "✏️ Edit Test" : "➕ Create New Test"}
+        title={initialValues ? "Edit Test" : " Create New Test"}
         className="w-full max-w-5xl shadow-xl rounded-2xl"
       >
         <Form

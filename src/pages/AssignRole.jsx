@@ -26,11 +26,11 @@ const AssignRole = () => {
 
         // merge mockData + API
         const combined = [
-          ...assignments, // mock records
+          ...assignments, 
           ...apiUsers.map((u) => ({
             id: u.id,
-            adminName: u.name, // 👈 assume "name" field exists in API
-            roles: u.roles || [], // 👈 if roles come from API
+            adminName: u.name, 
+            roles: u.roles || [], 
           })),
         ];
 
