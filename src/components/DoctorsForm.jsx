@@ -12,7 +12,6 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import { WEEKDAYS, SPECIALTIES, TIME_FORMAT } from "../utils/constants";
-
 const { RangePicker } = TimePicker;
 
 const DoctorsForm = ({
@@ -44,7 +43,6 @@ const DoctorsForm = ({
   const handleSubmit = async (values) => {
     try {
       const formData = new FormData();
-
       // Simple fields
       formData.append("name", values.name);
       formData.append("email", values.email);

@@ -1,18 +1,11 @@
 import React, { useState } from "react";
-import { Table, Button, Space, Popconfirm, message, Tag , Drawer , Descriptions} from "antd";
+import { Table, Button, Space, Popconfirm, message, Tag, Drawer, Descriptions } from "antd";
 import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 
-const TestsList = ({
-  tests = [],
-  loading = false,
-  onEdit,
-  onDelete,
-  pagination,
-  onTableChange,
-}) => {
-  // Drawer state
+const TestsList = ({ tests = [], loading = false, onEdit, onDelete, pagination, onTableChange }) => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedTest, setSelectedTest] = useState(null);
+  const [expandedRows, setExpandedRows] = useState({}); // Track expanded rows for Read More
 
   const showDrawer = (test) => {
     setSelectedTest(test);
@@ -24,7 +17,6 @@ const TestsList = ({
     setSelectedTest(null);
   };
 
-  // Delete handler
   const handleDelete = async (id) => {
     try {
       await onDelete(id);
@@ -33,6 +25,10 @@ const TestsList = ({
       message.error("Failed to delete test. Please try again.");
       console.error("Error deleting test:", error);
     }
+  };
+
+  const toggleReadMore = (id) => {
+    setExpandedRows((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   const columns = [
@@ -86,53 +82,38 @@ const TestsList = ({
       title: "Description",
       dataIndex: "description",
       key: "description",
-      render: (description) => {
+      render: (description, record) => {
         if (!description) return "-";
+
+        const isExpanded = expandedRows[record.id];
+        const displayText = isExpanded ? description : description.substring(0, 30);
+
         return (
           <div style={{ maxWidth: 300 }}>
-            {description.length > 100
-              ? `${description.substring(0, 100)}...`
-              : description}
+            {displayText}
+            {description.length > 100 && (
+              <Button
+                type="link"
+                onClick={() => toggleReadMore(record.id)}
+                style={{ padding: 0, marginLeft: 5 }}
+              >
+                {isExpanded ? "Show Less" : "Read More"}
+              </Button>
+            )}
           </div>
         );
       },
     },
-   
-    // {
-    //   title: "Description",
-    //   dataIndex: "description",
-    //   key: "description",
-    //   render: (description) => {
-    //     if (!description) return "-";
-    //     return (
-    //       <div style={{ maxWidth: 300 }}>
-    //         {description.length > 100
-    //           ? `${description.substring(0, 100)}...`
-    //           : description}
-    //       </div>
-    //     );
-    //   },
-    // },
     {
       title: "Actions",
       key: "actions",
       width: 250,
       render: (_, record) => (
         <Space size="middle">
-          <Button
-            type="primary"
-            icon={<EyeOutlined />}
-            size="small"
-            onClick={() => showDrawer(record)}
-          >
+          <Button type="primary" icon={<EyeOutlined />} size="small" onClick={() => showDrawer(record)}>
             View
           </Button>
-          <Button
-            type="default"
-            icon={<EditOutlined />}
-            size="small"
-            onClick={() => onEdit(record)}
-          >
+          <Button type="default" icon={<EditOutlined />} size="small" onClick={() => onEdit(record)}>
             Edit
           </Button>
           <Popconfirm
@@ -143,12 +124,7 @@ const TestsList = ({
             cancelText="No"
             placement="topRight"
           >
-            <Button
-              type="primary"
-              danger
-              icon={<DeleteOutlined />}
-              size="small"
-            >
+            <Button type="primary" danger icon={<DeleteOutlined />} size="small">
               Delete
             </Button>
           </Popconfirm>
@@ -168,62 +144,30 @@ const TestsList = ({
           ...pagination,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} of ${total} tests`,
+          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} tests`,
         }}
         onChange={onTableChange}
         scroll={{ x: 900 }}
       />
 
-      {/* Drawer for viewing test details */}
-      <Drawer
-        title={selectedTest?.name}
-        placement="right"
-        width={450}
-        onClose={closeDrawer}
-        visible={drawerVisible} // v4 uses `visible`
-      >
+      {/* Drawer */}
+      <Drawer title={selectedTest?.name} placement="right" width={450} onClose={closeDrawer} visible={drawerVisible}>
         {selectedTest && (
-          <Descriptions
-            column={1} // one field per row
-            bordered
-            size="small"
-          >
-            <Descriptions.Item label="Category">
-              {selectedTest.category?.name || "-"}
-            </Descriptions.Item>
-
+          <Descriptions column={1} bordered size="small">
+            <Descriptions.Item label="Category">{selectedTest.category?.name || "-"}</Descriptions.Item>
             <Descriptions.Item label="Price">
-              <Tag color="green">
-                PKR {(Number(selectedTest.price) || 0).toFixed(2)}
-              </Tag>
+              <Tag color="green">PKR {(Number(selectedTest.price) || 0).toFixed(2)}</Tag>
             </Descriptions.Item>
-
             <Descriptions.Item label="Discounted Price">
-              <Tag color="blue">
-                PKR {(Number(selectedTest.discounted_price) || 0).toFixed(2)}
-              </Tag>
+              <Tag color="blue">PKR {(Number(selectedTest.discounted_price) || 0).toFixed(2)}</Tag>
             </Descriptions.Item>
-
             <Descriptions.Item label="Duration">
               <Tag color="purple">{selectedTest.duration} min</Tag>
             </Descriptions.Item>
-
-            <Descriptions.Item label="Description">
-              {selectedTest.description || "-"}
-            </Descriptions.Item>
-
-            <Descriptions.Item label="Preparation Instructions">
-              {selectedTest.preparation_instructions || "-"}
-            </Descriptions.Item>
-
-            <Descriptions.Item label="Note">
-              {selectedTest.note || "-"}
-            </Descriptions.Item>
-
-            <Descriptions.Item label="Slug">
-              {selectedTest.slug || "-"}
-            </Descriptions.Item>
+            <Descriptions.Item label="Description">{selectedTest.description || "-"}</Descriptions.Item>
+            <Descriptions.Item label="Preparation Instructions">{selectedTest.preparation_instructions || "-"}</Descriptions.Item>
+            <Descriptions.Item label="Note">{selectedTest.note || "-"}</Descriptions.Item>
+            <Descriptions.Item label="Slug">{selectedTest.slug || "-"}</Descriptions.Item>
           </Descriptions>
         )}
       </Drawer>

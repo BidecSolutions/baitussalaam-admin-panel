@@ -37,6 +37,7 @@ const TestForm = ({ initialValues, loading, onCancel, visible, onSubmit }) => {
       <Card
         title={initialValues ? "Edit Test" : " Create New Test"}
         className="w-full max-w-5xl shadow-xl rounded-2xl"
+        bordered={false} 
       >
         <Form
           layout="vertical"

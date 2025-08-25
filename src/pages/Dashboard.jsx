@@ -23,9 +23,11 @@ const Dashboard = () => {
 
         setStats({
           totalDoctors: doctorsResponse.data?.length || 0,
-          totalTests: testsResponse.data?.length || 0,
+          totalTests: testsResponse.data?.data?.length || 0,
           todayAppointments: 0, // Placeholder for now
         });
+        // console.log(stats.totalTests);
+        
       } catch (error) {
         console.error('Error fetching dashboard stats:', error);
         // Set default values on error
