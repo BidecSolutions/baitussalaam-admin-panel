@@ -1,27 +1,81 @@
-import React, { useContext } from "react";
-import { Form, Input, Button, message } from "antd";
+import React, { useState } from "react";
+import { Form, Input, Button, message, Modal } from "antd";
 import { useNavigate } from "react-router-dom";
-import { RoleContext } from "../Context/RolesContext";
+import { authAPI } from "../services/api";
 
 const Login = () => {
   const [form] = Form.useForm();
-  const { login } = useContext(RoleContext); // login function
+  const [passwordForm] = Form.useForm();
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // 🔹 Handle Login
   const handleLogin = async (values) => {
     try {
-      await login(values); // context se login call
-      navigate("/");
-      // const response = await login(values); // context se login call
-      // if (response) {
-      //   if (response.role === "admin") {
-      //     navigate("/");
-      //   } else {
-      //     navigate("/user-dashboard");
-      //   }
-      // }
+      let response = await authAPI.loginAdmin(values);
+      if (response.data.success) {
+        const user = response.data.data;
+        const token = response.data.token;
+        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("token", token);
+        message.success("Admin Login successful!");
+        navigate("/"); // Admin dashboard
+        return;
+      } else {
+        message.error("Invalid admin credentials!");
+      }
+    } catch (adminError) {
+      try {
+        let response = await authAPI.loginUser(values);
+        if (response.data.success) {
+          const user = response.data.data;
+          const token = response.data.token;
+          localStorage.setItem("user", JSON.stringify(user));
+          localStorage.setItem("token", token);
+          message.success("User Login successful!");
+          navigate("/user-dashboard");
+          return;
+        } else {
+          Modal.error({
+            title: "User Login Failed",
+            content: "Invalid user credentials!",
+          });
+        }
+      } catch (userError) {
+        Modal.error({
+          title: "Login Failed",
+          content: "Something went wrong. Please try again later.",
+        });
+      }
+    }
+  };
+
+  // 🔹 Change Password
+  const handleChangePassword = async (values) => {
+    try {
+      setLoading(true);
+      const payload = {
+        current_password: values.currentPassword,
+        new_password: values.newPassword,
+        new_password_confirmation: values.confirmPassword,
+      };
+
+      // 🔹 Token is already added via axios interceptor
+      const response = await authAPI.changePassword(payload);
+
+      if (response.data.success) {
+        message.success("Password changed successfully!");
+        setShowChangePassword(false);
+        passwordForm.resetFields();
+      } else {
+        message.error(response.data.message || "Password change failed!");
+      }
     } catch (error) {
-      message.error("Login failed. Please check your credentials.");
+      console.log(error.response);
+      message.error(error.response?.data?.message || "Something went wrong!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -38,6 +92,7 @@ const Login = () => {
     >
       <h2 style={{ textAlign: "center", marginBottom: 24 }}>Login</h2>
 
+      {/* Login Form */}
       <Form
         form={form}
         layout="vertical"
@@ -69,7 +124,69 @@ const Login = () => {
             Login
           </Button>
         </Form.Item>
+
+        <p
+          style={{ color: "blue", cursor: "pointer", textAlign: "center" }}
+          onClick={() => setShowChangePassword(true)}
+        >
+          Change Password
+        </p>
       </Form>
+
+      {/* Change Password Modal */}
+      <Modal
+        title="Change Password"
+        open={showChangePassword}
+        onCancel={() => setShowChangePassword(false)}
+        footer={null}
+      >
+        <Form
+          form={passwordForm}
+          layout="vertical"
+          onFinish={handleChangePassword}
+        >
+          <Form.Item
+            name="current_Password"
+            label="Current Password"
+            rules={[{ required: true, message: "Please enter current password" }]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item
+            name="new_Password"
+            label="New Password"
+            rules={[{ required: true, message: "Please enter new password" }]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item
+            name="confirm_Password"
+            label="Confirm Password"
+            dependencies={["new_Password"]}
+            rules={[
+              { required: true, message: "Please confirm password" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("new_Password") === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error("Passwords do not match!"));
+                },
+              }),
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block loading={loading}>
+              Update Password
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

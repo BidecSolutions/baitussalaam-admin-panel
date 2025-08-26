@@ -18,6 +18,7 @@ import TestCategories from './pages/TestCategories';
 import Branches from './pages/Branches';
 import Codes from './pages/Codes';
 import HeroSection from './pages/HeroSection';
+import Customer from './pages/Customers';
 
 const App = () => {
   return (
@@ -57,8 +58,9 @@ const App = () => {
               <Route path="viewList" element={<ViewList />} />
               <Route path="/branches" element={<Branches />} />
               <Route path="/Hero-section" element={<HeroSection />} />
+              <Route path="/customer" element={<Customer/>} />
 
-              Hero-section
+              
             </Route>
           </Routes>
         </Router>

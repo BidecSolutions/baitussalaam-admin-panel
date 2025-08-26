@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Form, Input, Select, Button, message } from "antd";
+import { Form, Input, Button, message, Switch, Select } from "antd";
 
 const { Option } = Select;
 
@@ -14,7 +14,11 @@ const UsersForm = ({
 
   useEffect(() => {
     if (visible && initialValues) {
-      form.setFieldsValue(initialValues);
+      // edit mode me status ko convert karna zaroori hai
+      form.setFieldsValue({
+        ...initialValues,
+        status: initialValues.status === 1, // 1 => true, 0 => false
+      });
     } else if (visible) {
       form.resetFields();
     }
@@ -22,8 +26,12 @@ const UsersForm = ({
 
   const handleSubmit = async (values) => {
     try {
+      // switch ke value ko backend ke liye int me convert karna
+      values.status = values.status ? 1 : 0;
+
       await onSubmit(values);
       form.resetFields();
+
       message.success(
         initialValues
           ? "User updated successfully!"
@@ -42,6 +50,7 @@ const UsersForm = ({
       onFinish={handleSubmit}
       initialValues={{
         role: "user",
+        status: 1, // default active
       }}
     >
       {/* Full Name */}
@@ -68,20 +77,21 @@ const UsersForm = ({
         <Input placeholder="Enter user's email address" />
       </Form.Item>
 
-      {/* Role */}
+      {/* Phone */}
       <Form.Item
-        name="role"
-        label="Role"
-        rules={[{ required: true, message: "Please select role" }]}
+        name="phone"
+        label="Phone"
+        rules={[
+          { required: true, message: "Please enter phone number" },
+          { min: 10, message: "Phone must be at least 10 digits" },
+        ]}
       >
-        <Select placeholder="Select role" allowClear>
-          <Option value="admin">Admin</Option>
-          <Option value="manager">Manager</Option>
-          <Option value="user">User</Option>
-        </Select>
+        <Input placeholder="Enter user's phone number" />
       </Form.Item>
 
-      {/* Password */}
+      
+
+      {/* Password - only for add new */}
       {!initialValues && (
         <Form.Item
           name="password"
@@ -94,6 +104,15 @@ const UsersForm = ({
           <Input.Password placeholder="Enter password" />
         </Form.Item>
       )}
+
+      {/* Status - Toggle */}
+      <Form.Item
+        name="status"
+        label="Status"
+        valuePropName="checked" // Switch ke liye required
+      >
+        <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
+      </Form.Item>
 
       {/* Action Buttons */}
       <Form.Item style={{ marginBottom: 0, textAlign: "right" }}>

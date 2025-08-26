@@ -34,25 +34,18 @@ const UsersList = ({
       key: 'email',
     },
     {
-      title: 'Role',
-      dataIndex: 'role',
-      key: 'role',
-      render: (role) => (
-        <Tag color={role === 'admin' ? 'red' : 'blue'}>
-          {role?.toUpperCase()}
-        </Tag>
-      ),
+      title: 'phone',
+      dataIndex: 'phone',
+      key: 'phoneole',
+     
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => (
-        <Tag color={status === 'active' ? 'green' : 'volcano'}>
-          {status?.toUpperCase()}
-        </Tag>
-      ),
-    },
+  title: 'Status',
+  dataIndex: 'status',
+  key: 'status',
+  render: (status) =>
+    status === 1 ? <Tag color="green">Active</Tag> : <Tag color="red">Inactive</Tag>,
+},
     {
       title: 'Actions',
       key: 'actions',

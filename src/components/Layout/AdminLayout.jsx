@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Layout, Menu, theme, Button } from "antd";
+import { Layout, Menu, theme, Button, Avatar } from "antd";
 import {
   DashboardOutlined,
   UserOutlined,
@@ -11,14 +11,17 @@ import {
   SafetyCertificateOutlined,
   SwapOutlined,
   SettingOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { RoleContext } from "../../Context/RolesContext";
+import ProfileDrawer from "./ProfileDrawer"; // ✅ apna component import
 
 const { Header, Sider, Content } = Layout;
 
 const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false); // ✅ Profile Drawer state
   const navigate = useNavigate();
   const location = useLocation();
   const { logout } = useContext(RoleContext);
@@ -29,86 +32,30 @@ const AdminLayout = () => {
 
   // Sidebar Menu Items
   const menuItems = [
+    { key: "/", icon: <DashboardOutlined />, label: "Dashboard" },
+    { key: "/doctors", icon: <UserOutlined />, label: "Doctors" },
+    { key: "/tests", icon: <ExperimentOutlined />, label: "Tests" },
     {
-      key: "/",
-      icon: <DashboardOutlined />,
-      label: "Dashboard",
-    },
-    {
-      key: "/doctors",
-      icon: <UserOutlined />,
-      label: "Doctors",
-    },
-    {
-      key: "/tests",
-      icon: <ExperimentOutlined />,
-      label: "Tests",
-    },
-    {
-      key: "settings", // parent menu key
+      key: "settings",
       icon: <SettingOutlined />,
       label: "Settings",
       children: [
-        {
-          key: "/test-categories",
-          // icon: <UserOutlined />,
-          label: "Test Category",
-        },
-        {
-          key: "/branches",
-          // icon: <UserOutlined />,
-          label: "Branches",
-        },
-        // {
-        //   key: '/roles',
-        //   icon: <IdcardOutlined />,
-        //   label: 'Roles',
-        // },
-        {
-          key: "/codes",
-          label: "Codes",
-        },
-        {
-          key: "/Hero-section",
-          label: "Hero Section",
-        },
-        // {
-        //   key: '/permissions',
-        //   icon: <SafetyCertificateOutlined />,
-        //   label: 'Permissions',
-        // },
-        // {
-        //   key: '/AssignRole',
-        //   icon: <SwapOutlined />,
-        //   label: 'Assign-Role',
-        // },
+        { key: "/test-categories", label: "Test Category" },
+        { key: "/branches", label: "Branches" },
+        { key: "/codes", label: "Codes" },
+        { key: "/Hero-section", label: "Hero Section" },
       ],
     },
     {
-      key: "user-management", // parent menu key
+      key: "user-management",
       icon: <TeamOutlined />,
       label: "User Management",
       children: [
-        {
-          key: "/users",
-          icon: <UserOutlined />,
-          label: "Users",
-        },
-        {
-          key: "/roles",
-          icon: <IdcardOutlined />,
-          label: "Roles",
-        },
-        {
-          key: "/permissions",
-          icon: <SafetyCertificateOutlined />,
-          label: "Permissions",
-        },
-        {
-          key: "/AssignRole",
-          icon: <SwapOutlined />,
-          label: "Assign-Role",
-        },
+        { key: "/users", icon: <UserOutlined />, label: "Users" },
+        { key: "/roles", icon: <IdcardOutlined />, label: "Roles" },
+        { key: "/permissions", icon: <SafetyCertificateOutlined />, label: "Permissions" },
+        { key: "/AssignRole", icon: <SwapOutlined />, label: "Assign-Role" },
+        { key: "/customer", icon: <UserOutlined />, label: "Customer" },
       ],
     },
   ];
@@ -134,9 +81,8 @@ const AdminLayout = () => {
 
   // ✅ Logout function
   const handleLogout = () => {
-    localStorage.removeItem("token"); // remove token
-    message.success("Logged out successfully!");
-    navigate("/login"); // redirect to login page
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
   return (
@@ -193,9 +139,34 @@ const AdminLayout = () => {
             <h2 style={{ margin: 0, marginLeft: 16 }}>{getPageTitle()}</h2>
           </div>
 
+          {/* 🔹 Right Side Buttons */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            {/* <span>Admin User</span> */}
-            <Button type="primary" onClick={logout}>
+            {/* Profile Button */}
+            <Button
+              type="default"
+              shape="round"
+              icon={<Avatar size="small" icon={<UserOutlined />} />}
+              onClick={() => setIsProfileOpen(true)} // ✅ Drawer open
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "0 12px",
+                fontWeight: "500",
+                background: "#f0f2f5",
+                border: "1px solid #d9d9d9",
+              }}
+            >
+              Profile
+            </Button>
+
+            {/* Logout Button */}
+            <Button
+              type="primary"
+              shape="round"
+              icon={<LogoutOutlined />}
+              onClick={handleLogout}
+            >
               Logout
             </Button>
           </div>
@@ -212,6 +183,9 @@ const AdminLayout = () => {
         >
           <Outlet />
         </Content>
+
+        {/* 🔹 Drawer for Profile */}
+        <ProfileDrawer open={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
       </Layout>
     </Layout>
   );

@@ -21,6 +21,8 @@ const PermissionsList = ({
     }
   };
 
+  console.log('permissions list ', permissions);
+
   const columns = [
     {
       title: 'S.NO',
@@ -29,22 +31,22 @@ const PermissionsList = ({
       sorter: true,
     },
     {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+      render: (text) => <strong>{text}</strong>,
+    },
+    {
       title: 'Module Name',
-      dataIndex: 'module',
+      dataIndex: 'module_name',
       key: 'module',
       sorter: true,
     },
     {
       title: 'Permission Name',
-      dataIndex: 'permissionName', // corrected field name
+      dataIndex: 'permission_name', // corrected field name
       key: 'permissionName',
       sorter: true,
-    },
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-      render: (text) => <strong>{text}</strong>,
     },
     {
       title: 'Actions',
@@ -67,14 +69,14 @@ const PermissionsList = ({
             cancelText="No"
             placement="topRight"
           >
-            <Button
+            {/* <Button
               type="primary"
               danger
               icon={<DeleteOutlined />}
               size="small"
             >
               Delete
-            </Button>
+            </Button> */}
           </Popconfirm>
         </Space>
       ),
@@ -84,7 +86,7 @@ const PermissionsList = ({
   return (
     <Table
       columns={columns}
-      dataSource={permissions}
+      dataSource={permissions || []}
       rowKey="id"
       loading={loading}
       pagination={{

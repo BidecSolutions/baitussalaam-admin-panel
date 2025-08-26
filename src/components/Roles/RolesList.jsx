@@ -28,13 +28,14 @@ const RolesList = ({
       dataIndex: 'id',
       key: 'id',
       sorter: true,
-      width: 80,
+      width: 200,
       align: 'center',
     },
     {
       title: 'Role Name',
       dataIndex: 'name',
       key: 'name',
+      width: 300,
       sorter: true,
       render: (text) => <Tag color="blue">{text}</Tag>, // 👈 styled with Tag
     },

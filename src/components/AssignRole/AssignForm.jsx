@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Form, Select, Button, message } from "antd";
 import { rolesAPI, usersAPI } from "../../services/api"; // ✅ Users API bhi import kiya
+import { RoleContext } from "../../Context/RolesContext";
+
+// import { RoleContext } from "../../Context/RolesContext"; // ✅ Context
 
 const { Option } = Select;
 
@@ -9,13 +12,15 @@ const AssignForm = ({
   onCancel,
   initialValues = null,
   loading = false,
+  set
 }) => {
+ 
   const [form] = Form.useForm();
   const [roles, setRoles] = useState([]);
   const [users, setUsers] = useState([]);
   const [fetchingRoles, setFetchingRoles] = useState(false);
   const [fetchingUsers, setFetchingUsers] = useState(false);
-
+  const { AssignsRole, updateRole} = useContext(RoleContext);
   useEffect(() => {
     fetchRoles();
     fetchUsers();
@@ -26,8 +31,14 @@ const AssignForm = ({
     try {
       setFetchingRoles(true);
       const response = await rolesAPI.getAll(); // GET /roles
-      const rolesData = response.data || [];
-      setRoles(rolesData);
+      const data = Array.isArray(response.data)
+        ? response.data
+        : response.data?.data || [];
+      const filteredUsers = data.filter((data) => {
+        return data.guard_name === "admin-api"
+      });
+      console.log(filteredUsers)
+      setRoles(filteredUsers);
     } catch (error) {
       console.error("Error fetching roles:", error);
       message.error("Failed to fetch roles. Please try again.");
@@ -42,8 +53,10 @@ const AssignForm = ({
     try {
       setFetchingUsers(true);
       const response = await usersAPI.getAll(); // GET /users
-      const usersData = response.data || [];
-      setUsers(usersData);
+      const data = Array.isArray(response.data)
+        ? response.data
+        : response.data?.data || [];
+      setUsers(data);
     } catch (error) {
       console.error("Error fetching users:", error);
       message.error("Failed to fetch users. Please try again.");
@@ -61,8 +74,22 @@ const AssignForm = ({
     }
   }, [initialValues, form]);
 
-  const handleFinish = (values) => {
-    onSubmit(values);
+  const handleFinish = async (values) => {
+   try {
+         const payLoad = {
+           adminId: values.admin_id,
+           role: values.role,
+         };
+            const res = await AssignsRole(payLoad);
+        
+         console.log(values);
+         form.resetFields();
+        //  toast.success("Role Asssigned");
+         set(false)
+       } catch (e) {
+        //  toast.success("Role Failed To Assigned");
+         console.log(e);
+       }
   };
 
   return (
@@ -74,12 +101,12 @@ const AssignForm = ({
     >
       {/* ✅ Select User */}
       <Form.Item
-        name="userId"
-        label="Select User"
-        rules={[{ required: true, message: "Please select a user" }]}
+        name="admin_id"
+        label="Select Admin"
+        rules={[{ required: true, message: "Please select a admin" }]}
       >
         <Select placeholder="Choose a user" loading={fetchingUsers}>
-          {users.map((user) => (
+          {users?.map((user) => (
             <Option key={user.id} value={user.id}>
               {user.name}
             </Option>
@@ -89,18 +116,17 @@ const AssignForm = ({
 
       {/* ✅ Select Roles */}
       <Form.Item
-        name="roles"
+        name="role"
         label="Select Roles"
         rules={[{ required: true, message: "Please select at least one role" }]}
       >
         <Select
-          mode="multiple"
           placeholder="Choose roles"
           allowClear
           loading={fetchingRoles}
         >
           {roles.map((role) => (
-            <Option key={role.id} value={role.id}>
+            <Option key={role.id} value={role.name}>
               {role.name}
             </Option>
           ))}

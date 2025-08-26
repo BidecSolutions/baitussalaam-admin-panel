@@ -4,10 +4,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import PermissionsList from "../components/Permission/PermissionList"; // Table component
 import PermissionsForm from "../components/Permission/PermissionsForm"; // Form component
 import { permissionsAPI } from "../services/api"; // API service
-import {
-  DEFAULT_PAGE_SIZE,
-  DEFAULT_CURRENT_PAGE,
-} from "../utils/constants";
+import { DEFAULT_PAGE_SIZE, DEFAULT_CURRENT_PAGE } from "../utils/constants";
 
 const Permissions = () => {
   const [permissions, setPermissions] = useState([]);
@@ -23,26 +20,44 @@ const Permissions = () => {
 
   useEffect(() => {
     fetchPermissions();
+    console.log("fetchPermissions" , fetchPermissions());
+    
   }, [pagination.current, pagination.pageSize]);
 
-  const fetchPermissions = async () => {
-    try {
-      setLoading(true);
-      const response = await permissionsAPI.getAll(); // GET /permissions
-      const permissionsData = response.data || [];
-      setPermissions(permissionsData);
-      setPagination((prev) => ({
-        ...prev,
-        total: permissionsData.length,
-      }));
-    } catch (error) {
-      console.error("Error fetching permissions:", error);
-      message.error("Failed to fetch permissions. Please try again.");
-      setPermissions([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+ const fetchPermissions = async () => {
+  try {
+    setLoading(true);
+    const response = await permissionsAPI.getAll();
+
+    const inventoryPermissions = response.data?.data || {};
+    console.log("inventoryPermissions", inventoryPermissions);
+
+    // Convert object -> array
+    const permissionsData = Object.entries(inventoryPermissions).flatMap(
+      ([moduleName, actions]) =>
+        Object.keys(actions).map((action) => ({
+          module: moduleName,
+          action: action
+        }))
+    );
+
+    console.log("permissionsData", permissionsData);
+
+    setPermissions(permissionsData);
+
+    setPagination((prev) => ({
+      ...prev,
+      total: permissionsData.length,
+    }));
+  } catch (error) {
+    console.error("Error fetching permissions:", error);
+    message.error("Failed to fetch permissions. Please try again.");
+    setPermissions([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleAddPermission = () => {
     setEditingPermission(null);
@@ -134,7 +149,7 @@ const Permissions = () => {
         onCancel={handleModalCancel}
         footer={null}
         width={600}
-        destroyOnClose
+        destroyOnHidden
       >
         <PermissionsForm
           visible={modalVisible}

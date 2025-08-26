@@ -26,23 +26,30 @@ const Users = () => {
   }, [pagination.current, pagination.pageSize]);
 
   const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const response = await usersAPI.getAll(); // GET /users
-      const usersData = response.data || [];
-      setUsers(usersData);
-      setPagination((prev) => ({
-        ...prev,
-        total: usersData.length,
-      }));
-    } catch (error) {
-      console.error("Error fetching users:", error);
-      message.error("Failed to fetch users. Please try again.");
-      setUsers([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+    const response = await usersAPI.getAll(); // GET /admin/list
+
+    // Response se data nikalo
+    const usersData = response.data?.data || [];
+
+    setUsers(usersData); // sidha array set karna hai
+
+    setPagination((prev) => ({
+      ...prev,
+      total: usersData.length, // total users count
+    }));
+
+    console.log("Fetched Users:", usersData);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    message.error("Failed to fetch users. Please try again.");
+    setUsers([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleAddUser = () => {
     setEditingUser(null);
@@ -66,22 +73,34 @@ const Users = () => {
   };
 
   const handleFormSubmit = async (values) => {
-    try {
-      setFormLoading(true);
-      if (editingUser) {
-        await usersAPI.update(editingUser.id, values); // PUT /users/:id
-      } else {
-        await usersAPI.create(values); // POST /users
-      }
-      setModalVisible(false);
-      await fetchUsers();
-    } catch (error) {
-      console.error("Error saving user:", error);
-      throw error;
-    } finally {
-      setFormLoading(false);
+  try {
+    setFormLoading(true);
+
+    const payload = {
+      name: values.name,
+      email: values.email,
+      phone: values.phone,
+      status: values.status ? 1 : 0,
+      // sirf add ke time password bhejna hai
+      ...(editingUser ? {} : { password: values.password }),
+    };
+
+    if (editingUser) {
+      await usersAPI.update(editingUser.id, payload);
+    } else {
+      await usersAPI.create(payload);
     }
-  };
+
+    setModalVisible(false);
+    await fetchUsers();
+  } catch (error) {
+    console.error("Error saving user:", error.response?.data || error);
+    throw error;
+  } finally {
+    setFormLoading(false);
+  }
+};
+
 
   const handleModalCancel = () => {
     setModalVisible(false);

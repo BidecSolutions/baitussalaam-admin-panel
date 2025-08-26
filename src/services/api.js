@@ -42,6 +42,16 @@ api.interceptors.response.use(
 // For development, use mock data. For production, uncomment the real API calls
 const USE_MOCK_DATA = false; // Set to false when real API is available
 
+export const authAPI = {
+  loginAdmin: (data) => api.post("/admin/login", data),
+  loginUser: (data) => api.post("/user/login", data),
+  updateProfile : (data) => api.post(`admin/${id}/update` ,data),
+  changePassword: (data, token) =>
+    api.post("/admin/change-password", data, {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+};
+
 // Doctors API
 export const doctorsAPI = {
   getAll: () => USE_MOCK_DATA ? mockAPI.doctors.getAll() : api.get('/doctors'),
@@ -106,27 +116,41 @@ export const heroAPI = {
 
 // Users API
 export const usersAPI = {
-  getAll: () => USE_MOCK_DATA ? mockAPI.users.getAll() : api.get('/users'),
+  getAll: () =>  api.get('/admin/list'),
   getById: (id) => USE_MOCK_DATA ? mockAPI.users.getById(id) : api.get(`/users/${id}`),
-  create: (data) => USE_MOCK_DATA ? mockAPI.users.create(data) : api.post('/users', data),
-  update: (id, data) => USE_MOCK_DATA ? mockAPI.users.update(id, data) : api.put(`/users/${id}`, data),
+  create: (data) =>  api.post('/admin/store', data),
+  update: (id, data) =>  api.post(`/admin/${id}/update`, data),
   delete: (id) => USE_MOCK_DATA ? mockAPI.users.delete(id) : api.delete(`/users/${id}`),
 };
 
 
 export const rolesAPI = {
-  getAll: () => USE_MOCK_DATA ? mockAPI.roles.getAll() : api.get('/roles'),
+  getAll: () =>  api.get('/admin/roles'),
+  create: (data) =>  api.post('/admin/assign-role-admin', data),
+  update: (id, data) => USE_MOCK_DATA ? mockAPI.roles.update(id, data) : api.put(`/roles/${id}`, data),
+  delete: (id) => USE_MOCK_DATA ? mockAPI.roles.delete(id) : api.delete(`/roles/${id}`),
+};
+
+export const AssignRole = {
+  getAll: () =>  api.get('/admin/list-admin-roles'),
   create: (data) => USE_MOCK_DATA ? mockAPI.roles.create(data) : api.post('/roles', data),
   update: (id, data) => USE_MOCK_DATA ? mockAPI.roles.update(id, data) : api.put(`/roles/${id}`, data),
   delete: (id) => USE_MOCK_DATA ? mockAPI.roles.delete(id) : api.delete(`/roles/${id}`),
 };
 
 export const permissionsAPI = {
-  getAll: () => USE_MOCK_DATA ? mockAPI.permissions.getAll() : api.get('/permissions'),
+  getAll: () => api.get('/admin/permissions'),
   getById: (id) => USE_MOCK_DATA ? mockAPI.permissions.getById(id) : api.get(`/permissions/${id}`),
-  create: (data) => USE_MOCK_DATA ? mockAPI.permissions.create(data) : api.post('/permissions', data),
-  update: (id, data) => USE_MOCK_DATA ? mockAPI.permissions.update(id, data) : api.put(`/permissions/${id}`, data),
-  delete: (id) => USE_MOCK_DATA ? mockAPI.permissions.delete(id) : api.delete(`/permissions/${id}`),
+  create: (data) =>  api.post('/admin/create-permission', data),
+  update: (id, data) =>  api.put(`/admin/update-permission/${id}`, data),
+  // delete: (id) => USE_MOCK_DATA ? mockAPI.permissions.delete(id) : api.delete(`/permissions/${id}`),
+};
+export const customersAPI = {
+  getAll: () => USE_MOCK_DATA ? mockAPI.users.getAll() : api.get('admin/user'),
+  getById: (id) => USE_MOCK_DATA ? mockAPI.users.getById(id) : api.get(`admin/user/${id}/edit`),
+  create: (data) => USE_MOCK_DATA ? mockAPI.users.create(data) : api.post('admin/user/store', data),
+  update: (id, data) => USE_MOCK_DATA ? mockAPI.users.update(id, data) : api.post(`admin/user/${id}/update`, data),
+  delete: (id) => USE_MOCK_DATA ? mockAPI.users.delete(id) : api.delete(`admin/user/${id}/changeactiveInactive`),
 };
 
 

@@ -29,23 +29,29 @@ const Roles = () => {
   }, [pagination.current, pagination.pageSize]);
 
   const fetchRoles = async () => {
-    try {
-      setLoading(true);
-      const response = await rolesAPI.getAll(); // GET /roles
-      const rolesData = response.data || [];
-      setRoles(rolesData);
-      setPagination((prev) => ({
-        ...prev,
-        total: rolesData.length,
-      }));
-    } catch (error) {
-      console.error("Error fetching roles:", error);
-      message.error("Failed to fetch roles. Please try again.");
-      setRoles([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+    const response = await rolesAPI.getAll(); // GET /roles
+    const rolesData = response.data?.data;
+
+    // agar ek object aa raha hai to array banado
+    const rolesArray = Array.isArray(rolesData) ? rolesData : [rolesData];
+
+    setRoles(rolesArray);
+
+    setPagination((prev) => ({
+      ...prev,
+      total: rolesArray.length,
+    }));
+  } catch (error) {
+    console.error("Error fetching roles:", error);
+    message.error("Failed to fetch roles. Please try again.");
+    setRoles([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleAddRole = () => {
     setEditingRole(null);
@@ -73,23 +79,26 @@ const Roles = () => {
     }
   };
 
-  const handleFormSubmit = async (values) => {
-    try {
-      setFormLoading(true);
-      if (editingRole) {
-        await rolesAPI.update(editingRole.id, values); // PUT /roles/:id
-      } else {
-        await rolesAPI.create(values); // POST /roles
-      }
-      setModalVisible(false);
-      await fetchRoles();
-    } catch (error) {
-      console.error("Error saving role:", error);
-      throw error;
-    } finally {
-      setFormLoading(false);
+ const handleFormSubmit = async (values) => {
+  try {
+    setFormLoading(true);
+    if (editingRole) {
+      await rolesAPI.update(editingRole.id, values); // PUT
+    } else {
+      await rolesAPI.create(values); // POST
     }
-  };
+    setModalVisible(false);
+    await fetchRoles();
+    message.success(editingRole ? "Role updated!" : "Role created!");
+  } catch (error) {
+    console.error("Error saving role:", error);
+    message.error("Failed to save role!");
+    throw error;
+  } finally {
+    setFormLoading(false);
+  }
+};
+
 
   const handleModalCancel = () => {
     setModalVisible(false);
@@ -142,7 +151,13 @@ const Roles = () => {
         open={modalVisible}
         onCancel={handleModalCancel}
         footer={null}
-        width={600}
+        width="90%"        
+       style={{ top: 40 }}    
+       bodyStyle={{
+       maxHeight: "70vh",  
+       overflowY: "auto",   
+       padding: "20px",
+  }}
         destroyOnClose
       >
         <RolesForm

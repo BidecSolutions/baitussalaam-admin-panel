@@ -2,20 +2,11 @@ import React from "react";
 import { Table, Button, Space, Tag } from "antd";
 
 // Dummy data (isko baad me API se laa sakte ho)
-const dataSource = [
-  {
-    id: 1,
-    adminName: "Hassan",
-    roles: ["Admin", "Editor"],
-  },
-  {
-    id: 2,
-    adminName: "Ali",
-    roles: ["Viewer"],
-  },
-];
 
-const AssignList = ({ onEdit, onDelete }) => {
+
+const AssignList = ({ onEdit, onDelete, data, loading = false, }) => {
+  const dataSource = data;
+  console.log(dataSource)
   const columns = [
     {
       title: "ID",
@@ -24,22 +15,14 @@ const AssignList = ({ onEdit, onDelete }) => {
     },
     {
       title: "Admin Name",
-      dataIndex: "adminName",
-      key: "adminName",
+      dataIndex: "admin_name",
+      key: "admin_name",
     },
     {
       title: "Roles",
       dataIndex: "roles",
       key: "roles",
-      render: (roles) => (
-        <>
-          {roles.map((role) => (
-            <Tag color="blue" key={role}>
-              {role}
-            </Tag>
-          ))}
-        </>
-      ),
+      render: (text) => (text?.map((d) => (<Tag color="blue">{d}</Tag>)))
     },
     {
       title: "Action",
@@ -61,7 +44,8 @@ const AssignList = ({ onEdit, onDelete }) => {
     <Table
       rowKey="id"
       columns={columns}
-      dataSource={dataSource}
+      loading={loading}
+      dataSource={Array.isArray(dataSource) ? dataSource : []}
       pagination={{ pageSize: 5 }}
     />
   );
