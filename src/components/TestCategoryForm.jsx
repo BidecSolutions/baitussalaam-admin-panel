@@ -26,7 +26,8 @@ const TestCategoryForm = ({
       const formData = new FormData();
       Object.entries(values).forEach(([key, value]) => {
         // For booleans, convert to string to avoid FormData issues
-        if (typeof key === "is_active") {
+        // if (typeof key === "is_active") {
+        if (key === "is_active") {
           formData.append(key, value ? "1" : "0");
         } else if (value !== undefined && value !== null) {
           formData.append(key, value);

@@ -1,13 +1,19 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Button, Modal, message, Spin } from "antd";
+import React, { useState, useEffect } from "react";
+import { Button, Modal, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import DoctorsList from "../components/DoctorsList";
 import DoctorsForm from "../components/DoctorsForm";
-import { doctorsAPI } from "../services/api";
+import { doctorsAPI, codesAPI } from "../services/api";
 import { DEFAULT_PAGE_SIZE, DEFAULT_CURRENT_PAGE } from "../utils/constants";
 
 const Doctors = () => {
   const [doctors, setDoctors] = useState([]);
+  const [codes, setCodes] = useState({
+    doctor_specialization: [],
+    doctor_qualification: [],
+    working_day: [],
+    timing_slot: [],
+  });
   const [loading, setLoading] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -18,29 +24,52 @@ const Doctors = () => {
     total: 0,
   });
 
-  // const { getDoctors } = useContext(RoleContext);
-
   useEffect(() => {
     fetchDoctors();
+    fetchCodes();
   }, [pagination.current, pagination.pageSize]);
 
+  // 🔹 Doctors fetch
   const fetchDoctors = async () => {
     try {
       setLoading(true);
-      // const doctorsData = await getDoctors(); // context se data
-      const doctorsData = await doctorsAPI.getAll(); // context se data
-      console.log("doctorsData", doctorsData);
-      setDoctors(doctorsData?.data?.data);
+      const doctorsData = await doctorsAPI.getAll({
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+      });
+
+      setDoctors(doctorsData?.data?.data || []);
       setPagination((prev) => ({
         ...prev,
-        total: doctorsData.length,
+        total: doctorsData?.data?.total || 0,
       }));
     } catch (error) {
       console.error("Error fetching doctors:", error);
-      message.error("Failed to fetch doctors. Please try again.");
+      message.error("Failed to fetch doctors.");
       setDoctors([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // 🔹 Codes fetch (specialization, qualification, etc.)
+  const fetchCodes = async () => {
+    try {
+      const res = await codesAPI.getAll();
+      const allCodes = res?.data?.data || [];
+
+      console.log('allCodes', allCodes);
+      
+
+      setCodes({
+        doctor_specialization: allCodes.filter((c) => c.type === "doctor_specialization"),
+        doctor_qualification: allCodes.filter((c) => c.type === "doctor_qualification"),
+        working_day: allCodes.filter((c) => c.type === "working_day"),
+        timing_slot: allCodes.filter((c) => c.type === "timing_slot"),
+      });
+    } catch (err) {
+      console.error("Error fetching codes:", err);
+      message.error("Failed to fetch codes.");
     }
   };
 
@@ -50,7 +79,6 @@ const Doctors = () => {
   };
 
   const handleEditDoctor = (doctor) => {
-    console.log('doctor', doctor);
     setEditingDoctor(doctor);
     setModalVisible(true);
   };
@@ -58,62 +86,82 @@ const Doctors = () => {
   const handleDeleteDoctor = async (id) => {
     try {
       await doctorsAPI.delete(id);
-      await fetchDoctors(); // Refresh the list
-      return Promise.resolve();
+      await fetchDoctors();
+      message.success("Doctor deleted successfully");
     } catch (error) {
       console.error("Error deleting doctor:", error);
-      return Promise.reject(error);
+      message.error("Delete failed!");
     }
   };
 
   const handleFormSubmit = async (values) => {
     try {
-      console.log('doctors payload', values);
       setFormLoading(true);
-      if (editingDoctor) {
-        await doctorsAPI.update(editingDoctor.id, values);
-      } else {
-        await doctorsAPI.create(values);
+
+      const formData = new FormData();
+
+      // Basic fields
+      formData.append("name", values.name);
+      formData.append("email", values.email);
+      formData.append("phone", values.phone);
+      formData.append("bio", values.bio);
+      formData.append("experience_years", values.experience_years);
+      formData.append(`start_time`, values.start_time);
+      formData.append(`end_time`, values.end_time);
+
+      // 🔹 Qualifications
+      if (values.qualifications && values.qualifications.length > 0) {
+        values.qualifications.forEach((q, i) => {
+          formData.append(`qualifications[${i}]`, q);
+        });
       }
+
+      // 🔹 Specializations (sirf code_id bhejna hoga)
+      if (values.specializations && values.specializations.length > 0) {
+        values.specializations.forEach((s, i) => {
+          formData.append(`specializations[${i}][code_id]`, s.code_id || s);
+        });
+      }
+
+      
+      if (values.working_days && values.working_days.length > 0) {
+        values.working_days.forEach((day, i) => {
+          formData.append(`working_days[${i}]`, day);
+        });
+      }
+
+      // 🔹 Image Upload
+      if (values.image && values.image.file) {
+        formData.append("image", values.image_path);
+      }
+
+      // 🔹 Create or Update
+      if (editingDoctor) {
+        await doctorsAPI.update(editingDoctor.id, formData);
+        message.success("Doctor updated successfully");
+      } else {
+        await doctorsAPI.create(formData);
+        message.success("Doctor added successfully");
+      }
+
       setModalVisible(false);
-      await fetchDoctors(); // Refresh the list
+      await fetchDoctors();
     } catch (error) {
       console.error("Error saving doctor:", error);
-      throw error; // Re-throw to let the form handle the error
+      message.error("Save failed!");
     } finally {
       setFormLoading(false);
     }
   };
 
-  const handleModalCancel = () => {
-    setModalVisible(false);
-    setEditingDoctor(null);
-  };
+  console.log('codes', codes);
 
-  const handleTableChange = (paginationInfo, filters, sorter) => {
-    setPagination((prev) => ({
-      ...prev,
-      current: paginationInfo.current,
-      pageSize: paginationInfo.pageSize,
-    }));
-  };
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-        }}
-      >
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
         <h1>Doctors Management</h1>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={handleAddDoctor}
-        >
+        <Button type="primary" icon={<PlusOutlined />} onClick={handleAddDoctor}>
           Add Doctor
         </Button>
       </div>
@@ -124,22 +172,27 @@ const Doctors = () => {
         onEdit={handleEditDoctor}
         onDelete={handleDeleteDoctor}
         pagination={pagination}
-        onTableChange={handleTableChange}
+        onTableChange={(info) =>
+          setPagination((prev) => ({
+            ...prev,
+            current: info.current,
+            pageSize: info.pageSize,
+          }))
+        }
       />
 
       <Modal
         title={editingDoctor ? "Edit Doctor" : "Add New Doctor"}
         open={modalVisible}
-        onCancel={handleModalCancel}
+        onCancel={() => setModalVisible(false)}
         footer={null}
-        width={600}
+        width={800} // 🔹 thoda wide rakha for horizontal form
         destroyOnClose
       >
         <DoctorsForm
-          visible={modalVisible}
-          onCancel={handleModalCancel}
-          onSubmit={handleFormSubmit}
+          codes={codes}
           initialValues={editingDoctor}
+          onSubmit={handleFormSubmit}
           loading={formLoading}
         />
       </Modal>

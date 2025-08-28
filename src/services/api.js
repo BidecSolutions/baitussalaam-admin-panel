@@ -54,9 +54,10 @@ export const authAPI = {
 
 // Doctors API
 export const doctorsAPI = {
-  getAll: () => USE_MOCK_DATA ? mockAPI.doctors.getAll() : api.get('/doctors'),
+  getAll: () =>  api.get('/doctors'),
   getById: (id) => USE_MOCK_DATA ? mockAPI.doctors.getById(id) : api.get(`/doctors/${id}`),
   create: (data) =>  api.post('/admin/doctors/store', data),
+
   update: (id, data) => api.put(`/doctors/${id}`, data),
   delete: (id) => USE_MOCK_DATA ? mockAPI.doctors.delete(id) : api.delete(`/doctors/${id}`),
 };

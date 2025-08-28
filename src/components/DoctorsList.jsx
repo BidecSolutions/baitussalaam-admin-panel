@@ -1,41 +1,31 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState } from "react";
 import {
   Table,
   Button,
   Space,
-  Tag,
   Drawer,
   Descriptions,
   Modal,
-  Spin,
+  Image,
 } from "antd";
 import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import DoctorsForm from "./DoctorsForm";
-import { RoleContext } from "../Context/RolesContext"; // ✅ context import
 
-const DoctorsList = ({ doctors, onEdit }) => {
-  // const { getDoctors } = useContext(RoleContext); // ✅ context function
-  // const [doctors, setDoctors] = useState([]); // API data state
-  // const [loading, setLoading] = useState(false); // Loader state
+const DoctorsList = ({ doctors, onEdit, onDelete }) => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
 
-  // ✅ Fetch Doctors on Mount
-  // useEffect(() => {
-  //   const fetchDoctors = async () => {
-  //     setLoading(true);
-  //     const result = await getDoctors();
-  //     console.log('result', result);
-  //     setDoctors(result); // API se data set
-  //     setLoading(false);
-  //   };
-  //   fetchDoctors();
-  // }, []);
-
+  // ✅ View Drawer
   const showDrawer = (doctor) => {
     setSelectedDoctor(doctor);
     setDrawerVisible(true);
+  };
+
+  const handleFormSubmit = (values) => {
+    console.log("Form Submitted:", values);
+    setFormVisible(false);
+    setSelectedDoctor(null);
   };
 
   const closeDrawer = () => {
@@ -43,6 +33,7 @@ const DoctorsList = ({ doctors, onEdit }) => {
     setSelectedDoctor(null);
   };
 
+  // ✅ Edit Modal
   const showEditForm = (doctor) => {
     setSelectedDoctor(doctor);
     setFormVisible(true);
@@ -53,58 +44,51 @@ const DoctorsList = ({ doctors, onEdit }) => {
     setSelectedDoctor(null);
   };
 
-  const handleFormSubmit = async (values) => {
-    console.log("Form Submitted:", values);
-    // 👉 Yahan API call kar ke update karo
-    setFormVisible(false);
-    setSelectedDoctor(null);
-  };
-
+  // ✅ Table Columns (sirf basic info show karega)
   const columns = [
-    { title: "ID", dataIndex: "id", key: "id" },
     { title: "Name", dataIndex: "name", key: "name" },
     { title: "Email", dataIndex: "email", key: "email" },
     { title: "Phone", dataIndex: "phone", key: "phone" },
     {
-      title: "Status",
-      dataIndex: "is_active",
-      key: "is_active",
-      render: (text) => (
-        <Tag color={text === 1 ? "green" : "red"}>
-          {text === 1 ? "Active" : "Inactive"}
-        </Tag>
+      title: "Image",
+      key: "image",
+      render: (_, doctor) => (
+        <Image
+          width={80}
+          src={
+            doctor.image_path
+              ? `${import.meta.env.VITE_BASE_IMAGE_URL_LIVE}${doctor.image_path}`
+              : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSExbOmh2VFMws-98GmjgBD0RTlPf39LwFf-Q&s"
+          }
+          alt={doctor.image_alt || "Doctor Image"}
+          style={{ objectFit: "cover", borderRadius: "8px" }}
+        />
       ),
     },
     {
       title: "Actions",
       key: "actions",
-      render: (_, record) => (
-        <Space size="middle">
+      render: (_, doctor) => (
+        <Space>
           <Button
-            type="primary"
+            type="link"
             icon={<EyeOutlined />}
-            size="small"
-            onClick={() => showDrawer(record)}
+            onClick={() => showDrawer(doctor)}
           >
             View
           </Button>
           <Button
-            type="default"
+            type="link"
             icon={<EditOutlined />}
-            size="small"
-            onClick={() => {
-              // onEdit(true)
-              showEditForm(record)
-            }}
+            onClick={() => showEditForm(doctor)}
           >
             Edit
           </Button>
           <Button
-            type="primary"
             danger
+            type="link"
             icon={<DeleteOutlined />}
-            size="small"
-            onClick={() => {console.log("Delete", record)}}
+            onClick={() => onDelete(doctor.id)}
           >
             Delete
           </Button>
@@ -115,15 +99,10 @@ const DoctorsList = ({ doctors, onEdit }) => {
 
   return (
     <>
-      {/* Loader + Table */}
-      {/* {loading ? (
-        <Spin size="large" />
-      ) : (
-        <Table columns={columns} dataSource={doctors} rowKey="id" />
-      )} */}
+      {/* Doctor Table */}
       <Table columns={columns} dataSource={doctors} rowKey="id" />
 
-      {/* View Drawer */}
+      {/* Drawer - Full Details */}
       <Drawer
         title={selectedDoctor?.name}
         placement="right"
@@ -133,30 +112,25 @@ const DoctorsList = ({ doctors, onEdit }) => {
       >
         {selectedDoctor && (
           <Descriptions column={1} bordered size="small">
-            <Descriptions.Item label="ID">
-              {selectedDoctor.id}
-            </Descriptions.Item>
-            <Descriptions.Item label="Name">
-              {selectedDoctor.name}
-            </Descriptions.Item>
-            <Descriptions.Item label="Description">
-              {selectedDoctor.description}
-            </Descriptions.Item>
-            <Descriptions.Item label="Slug">
-              {selectedDoctor.slug}
-            </Descriptions.Item>
-            <Descriptions.Item label="Email">
-              {selectedDoctor.email}
-            </Descriptions.Item>
-            <Descriptions.Item label="Phone">
-              {selectedDoctor.phone}
-            </Descriptions.Item>
-            <Descriptions.Item label="Bio">
-              {selectedDoctor.bio}
-            </Descriptions.Item>
+            <Descriptions.Item label="ID">{selectedDoctor.id}</Descriptions.Item>
+            <Descriptions.Item label="Email">{selectedDoctor.email}</Descriptions.Item>
+            <Descriptions.Item label="Phone">{selectedDoctor.phone}</Descriptions.Item>
+            <Descriptions.Item label="Bio">{selectedDoctor.bio}</Descriptions.Item>
             <Descriptions.Item label="Experience">
               {selectedDoctor.experience_years} years
             </Descriptions.Item>
+            <Descriptions.Item label="Qualifications">
+              {selectedDoctor.qualifications?.map((q) => q.value).join(", ") || "-"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Specializations">
+              {selectedDoctor.specializations?.map((s) => s.value).join(", ") || "-"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Schedule">
+  {selectedDoctor.doctor_schedules
+    ?.map((s) => `${s.day_of_week} (${s.start_time} - ${s.end_time})`)
+    .join(", ") || "-"}
+</Descriptions.Item>
+
           </Descriptions>
         )}
       </Drawer>

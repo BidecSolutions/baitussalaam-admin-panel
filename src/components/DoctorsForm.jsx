@@ -1,136 +1,90 @@
-import React, { useEffect } from "react";
-import {
-  Form,
-  Input,
-  Select,
-  TimePicker,
-  Button,
-  message,
-  Row,
-  Col,
-  InputNumber,
-} from "antd";
+import { Form, Input, Button, Row, Col, Select, Upload, TimePicker, InputNumber } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
+import { useEffect } from "react";
 import dayjs from "dayjs";
-import { WEEKDAYS, SPECIALTIES, TIME_FORMAT } from "../utils/constants";
-const { RangePicker } = TimePicker;
 
-const DoctorsForm = ({
-  visible,
-  onCancel,
-  onSubmit,
-  initialValues = null,
-  loading = false,
-}) => {
+const DoctorsForm = ({ initialValues, onSubmit, loading, codes }) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (visible && initialValues) {
-      const formData = {
+    if (initialValues) {
+      form.setFieldsValue({
         ...initialValues,
-        timeSlots: initialValues.timeSlots
-          ? [
-              dayjs(initialValues.timeSlots[0], TIME_FORMAT),
-              dayjs(initialValues.timeSlots[1], TIME_FORMAT),
-            ]
-          : undefined,
-      };
-      form.setFieldsValue(formData);
-    } else if (visible) {
-      // form.resetFields();
+        start_time: initialValues.start_time
+          ? dayjs(initialValues.start_time, "HH:mm")
+          : null,
+        end_time: initialValues.end_time
+          ? dayjs(initialValues.end_time, "HH:mm")
+          : null,
+      });
+    } else {
+      form.resetFields();
     }
-  }, [visible, initialValues, form]);
+  }, [initialValues, form]);
 
-  const handleSubmit = async (values) => {
-    try {
-      const formData = new FormData();
-      // Simple fields
-      formData.append("name", values.name);
-      formData.append("email", values.email);
-      formData.append("phone", values.phone);
-      formData.append("bio", values.bio);
-      formData.append("experience_years", values.experience_years);
+  const handleFinish = (values) => {
+    const formData = {};
 
-      // Arrays
-      if (values.qualifications) {
-        values.qualifications.forEach((q, i) =>
-          formData.append(`qualifications[${i}]`, q)
-        );
-      }
-      if (values.schedule) {
-        values.schedule.forEach((day, i) =>
-          formData.append(`schedule[${i}]`, day)
-        );
-      }
-      if (values.specializations) {
-        values.specializations.forEach((sp, i) =>
-          formData.append(`specializations[${i}]`, sp)
-        );
-      }
+    // Basic fields
+    formData.name = values.name;
+    formData.email = values.email;
+    formData.phone = values.phone;
+    formData.bio = values.bio;
+    formData.experience_years = values.experience_years;
 
-      // Time slots
-      if (values.timeSlots) {
-        formData.append("timeSlots[]", values.timeSlots[0].format(TIME_FORMAT));
-        formData.append("timeSlots[]", values.timeSlots[1].format(TIME_FORMAT));
-      }
+    // Time values
+    formData.start_time = values.start_time
+      ? values.start_time.format("HH:mm")
+      : null;
+    formData.end_time = values.end_time
+      ? values.end_time.format("HH:mm")
+      : null;
 
-      console.log("FormData payload:", formData);
+    // Qualifications → array of ids
+    formData.qualifications = values.qualifications?.map((id) => Number(id));
 
-      // Send to API
-      await onSubmit(formData); // Make sure your API accepts FormData
+    // Specializations → array of ids
+    formData.specializations = values.specializations?.map((id) => Number(id));
 
-      // form.resetFields();
-      message.success(
-        initialValues
-          ? "Doctor updated successfully!"
-          : "Doctor added successfully!"
-      );
-    } catch (error) {
-      message.error("Failed to save doctor data. Please try again.");
-      console.error("Error submitting doctor form:", error);
+    // Working days → array of values
+    formData.working_days = values.working_days;
+
+    // Image
+    if (values.image?.[0]?.originFileObj) {
+      formData.image = values.image[0].originFileObj;
     }
+
+    console.log("🚀 Final Payload:", formData);
+    onSubmit(formData);
   };
 
   return (
     <Form
       form={form}
       layout="vertical"
-      onFinish={handleSubmit}
-      initialValues={{
-        availableDays: [],
-        qualifications: [],
-        specializations: [],
-        schedule: [],
-        experience_years: undefined,
-        timeSlots: undefined,
-      }}
-      style={{ width: "100%" }}
+      onFinish={handleFinish}
+      initialValues={initialValues}
     >
-      <Row gutter={24}>
-        {/* Doctor Name */}
+      <Row gutter={16}>
+        {/* Name */}
         <Col span={8}>
           <Form.Item
             name="name"
-            label="Doctor Name"
-            rules={[
-              { required: true, message: "Please enter doctor name" },
-              { min: 2, message: "Name must be at least 2 characters" },
-            ]}
+            label="Full Name"
+            rules={[{ required: true, message: "Please enter doctor's name" }]}
           >
-            <Input placeholder="Enter doctor's full name" />
+            <Input placeholder="Enter doctor's name" />
           </Form.Item>
         </Col>
 
-        {/* Doctor Email */}
+        {/* Email */}
         <Col span={8}>
           <Form.Item
             name="email"
-            label="Doctor Email"
-            rules={[
-              { required: true, message: "Please enter doctor email" },
-              { type: "email", message: "Enter valid email address" },
-            ]}
+            label="Email"
+            rules={[{ required: true, type: "email", message: "Enter valid email" }]}
           >
-            <Input placeholder="Enter doctor's email" />
+            <Input placeholder="Enter email" />
           </Form.Item>
         </Col>
 
@@ -138,123 +92,133 @@ const DoctorsForm = ({
         <Col span={8}>
           <Form.Item
             name="phone"
-            label="Phone Number"
+            label="Phone"
             rules={[{ required: true, message: "Please enter phone number" }]}
           >
-            <Input placeholder="03001234567" />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Row gutter={24}>
-        {/* Bio */}
-        <Col span={8}>
-          <Form.Item name="bio" label="Bio">
-            <Input.TextArea placeholder="Doctor's bio" rows={1} />
+            <Input placeholder="Enter phone number" />
           </Form.Item>
         </Col>
 
-        {/* Experience Years */}
+        {/* Experience */}
         <Col span={8}>
           <Form.Item
             name="experience_years"
             label="Experience (Years)"
-            rules={[
-              { required: true, message: "Please enter experience years" },
-            ]}
+            rules={[{ required: true, message: "Enter years of experience" }]}
           >
-            <InputNumber
-              min={0}
-              style={{ width: "100%" }}
-              placeholder="Enter experience years"
-            />
+            <InputNumber style={{ width: "100%" }} min={0} placeholder="Years" />
           </Form.Item>
         </Col>
 
-        {/* Qualifications */}
+        {/* Bio */}
+        <Col span={16}>
+          <Form.Item
+            name="bio"
+            label="Bio"
+            rules={[{ required: true, message: "Please enter bio" }]}
+          >
+            <Input.TextArea rows={1} placeholder="Short bio" />
+          </Form.Item>
+        </Col>
+
+        {/* Qualifications Multi Select */}
         <Col span={8}>
           <Form.Item
             name="qualifications"
             label="Qualifications"
-            rules={[
-              { required: true, message: "Please select qualifications" },
-            ]}
+            rules={[{ required: true, message: "Select qualification(s)" }]}
           >
-            <Select
-              mode="multiple"
-              placeholder="Select qualifications"
-              options={[
-                { label: "MBBS", value: "MBBS" },
-                { label: "FCPS", value: "FCPS" },
-              ]}
-            />
+            <Select mode="multiple" placeholder="Select qualifications">
+              {codes.doctor_qualification.map((q) => (
+                <Select.Option key={q.id} value={q.id}>
+                  {q.value}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
         </Col>
-      </Row>
 
-      <Row gutter={24}>
-        {/* Specializations */}
+        {/* Specializations Multi Select */}
         <Col span={8}>
           <Form.Item
             name="specializations"
             label="Specializations"
-            rules={[
-              { required: true, message: "Please select specializations" },
-            ]}
+            rules={[{ required: true, message: "Select specialization(s)" }]}
           >
-            <Select
-              mode="multiple"
-              placeholder="Select specialization"
-              options={[
-                { label: "SP001 - Primary", value: "SP001" },
-                { label: "SP002 - Secondary", value: "SP002" },
-              ]}
-            />
+            <Select mode="multiple" placeholder="Select specializations">
+              {codes.doctor_specialization.map((s) => (
+                <Select.Option key={s.id} value={s.id}>
+                  {s.value}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
         </Col>
 
-        {/* Schedule (Days) */}
+        {/* Working Days Multi Select */}
         <Col span={8}>
           <Form.Item
-            name="schedule"
-            label="Available Days"
-            rules={[{ required: true, message: "Please select days" }]}
+            name="working_days"
+            label="Working Days"
+            rules={[{ required: true, message: "Select working day(s)" }]}
           >
-            <Select
-              mode="multiple"
-              placeholder="Select available days"
-              options={WEEKDAYS}
-            />
+            <Select mode="multiple" placeholder="Select working days">
+              {codes.working_day.map((d) => (
+                <Select.Option key={d.key} value={d.value}>
+                  {d.value}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
         </Col>
 
-        {/* Time Slots */}
+        {/* Start Time */}
         <Col span={8}>
           <Form.Item
-            name="timeSlots"
-            label="Time Slots"
-            rules={[{ required: true, message: "Please select time slots" }]}
+            name="start_time"
+            label="Start Time"
+            rules={[{ required: true, message: "Select start time" }]}
           >
-            <RangePicker
-              format={TIME_FORMAT}
-              placeholder={["Start Time", "End Time"]}
-              style={{ width: "100%" }}
-            />
+            <TimePicker style={{ width: "100%" }} format="HH:mm" />
+          </Form.Item>
+        </Col>
+
+        {/* End Time */}
+        <Col span={8}>
+          <Form.Item
+            name="end_time"
+            label="End Time"
+            rules={[{ required: true, message: "Select end time" }]}
+          >
+            <TimePicker style={{ width: "100%" }} format="HH:mm" />
+          </Form.Item>
+        </Col>
+
+        {/* Image */}
+        <Col span={8}>
+          <Form.Item
+            name="image"
+            label="Profile Image"
+            valuePropName="fileList"
+            getValueFromEvent={(e) => (Array.isArray(e) ? e : e && e.fileList)}
+            rules={[{ required: true, message: "Please upload image" }]}
+          >
+            <Upload beforeUpload={() => false} maxCount={1}>
+              <Button icon={<UploadOutlined />}>Upload Image</Button>
+            </Upload>
           </Form.Item>
         </Col>
       </Row>
 
-      {/* Action Buttons */}
+      {/* Buttons */}
       <Row justify="end">
         <Col>
-          <Form.Item style={{ marginBottom: 0 }}>
-            <Button onClick={onCancel} style={{ marginRight: 8 }}>
-              Cancel
-            </Button>
-            <Button type="primary" htmlType="submit" loading={loading}>
-              {initialValues ? "Update Doctor" : "Add Doctor"}
-            </Button>
-          </Form.Item>
+          <Button onClick={() => form.resetFields()} style={{ marginRight: 8 }}>
+            Reset
+          </Button>
+          <Button type="primary" htmlType="submit" loading={loading}>
+            {initialValues ? "Update Doctor" : "Add Doctor"}
+          </Button>
         </Col>
       </Row>
     </Form>
