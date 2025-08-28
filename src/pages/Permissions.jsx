@@ -33,21 +33,21 @@ const Permissions = () => {
     console.log("inventoryPermissions", inventoryPermissions);
 
     // Convert object -> array
-    const permissionsData = Object.entries(inventoryPermissions).flatMap(
-      ([moduleName, actions]) =>
-        Object.keys(actions).map((action) => ({
-          module: moduleName,
-          action: action
-        }))
-    );
+    // const permissionsData = Object.entries(inventoryPermissions).flatMap(
+    //   ([moduleName, actions]) =>
+    //     Object.keys(actions).map((action) => ({
+    //       module: moduleName,
+    //       action: action
+    //     }))
+    // );
 
-    console.log("permissionsData", permissionsData);
+    // console.log("permissionsData", permissionsData);
 
-    setPermissions(permissionsData);
+    setPermissions(inventoryPermissions);
 
     setPagination((prev) => ({
       ...prev,
-      total: permissionsData.length,
+      total: inventoryPermissions.length,
     }));
   } catch (error) {
     console.error("Error fetching permissions:", error);
@@ -84,9 +84,9 @@ const Permissions = () => {
     try {
       setFormLoading(true);
       if (editingPermission) {
-        await permissionsAPI.update(editingPermission.id, values); // PUT /permissions/:id
+        await permissionsAPI.update(editingPermission.id, {...values, guard: "admin-api"}); // PUT /permissions/:id
       } else {
-        await permissionsAPI.create(values); // POST /permissions
+        await permissionsAPI.create({...values, guard: "admin-api"}); // POST /permissions
       }
       setModalVisible(false);
       await fetchPermissions();

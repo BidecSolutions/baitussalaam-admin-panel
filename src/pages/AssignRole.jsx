@@ -3,38 +3,31 @@ import { Button, Modal, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import AssignList from "../components/AssignRole/AssignList";
 import RolesForm from "../components/AssignRole/AssignForm";
-import { usersAPI , rolesAPI } from "../services/api"; // ✅ users API import
+import { AssignRoleAdmins, rolesAPI } from "../services/api";
 
 const AssignRole = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [users, setUsers] = useState([]); // ✅ users from API
+  const [users, setUsers] = useState([]); 
+  const [assignments, setAssignments] = useState([]); // ✅ FIX: added state
 
-  // ✅ Dummy assignments (mock)
-  const [assignments, setAssignments] = useState([
-    { id: 1, adminName: "Hassan", roles: ["Admin", "Editor"] },
-    { id: 2, adminName: "Ali", roles: ["Viewer"] },
-  ]);
-
-  // ✅ Fetch users from API
+  
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await usersAPI.getAll(); // GET /users
-        const apiUsers = response.data || [];
+        const response = await AssignRoleAdmins.getAll(); 
+        const apiUsers = response.data?.data || [];
+        console.log("apiUsers", apiUsers);
 
-        // merge mockData + API
-        const combined = [
-          ...assignments, 
-          ...apiUsers.map((u) => ({
-            id: u.id,
-            adminName: u.name, 
-            roles: u.roles || [], 
-          })),
-        ];
+        
+        const formatted = apiUsers.map((u) => ({
+          id: u.admin_id,
+          admin_name: u.admin_name,
+          roles: u.roles || [], 
+        }));
 
-        setAssignments(combined);
+        setAssignments(formatted);
         setUsers(apiUsers);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -43,50 +36,49 @@ const AssignRole = () => {
     };
 
     fetchUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ✅ Add / Edit Role Assignment
- const handleSubmit = async (values) => {
-  try {
-    setLoading(true);
 
-    // ✅ userId se user ka name nikalna
-    const selectedUser = users.find((u) => u.id === values.userId);
-    const adminName = selectedUser ? selectedUser.name : "Unknown";
+  const handleSubmit = async (values) => {
+    try {
+      setLoading(true);
 
-    // ✅ roleIds se role names nikalna
-    const allRoles = await rolesAPI.getAll();
-    const roleNames = allRoles.data
-      .filter((r) => values.roles.includes(r.id))
-      .map((r) => r.name);
+      const selectedUser = users.find((u) => u.id === values.userId);
+      const adminName = selectedUser ? selectedUser.name : "Unknown";
 
-    const newRecord = {
-      id: editingRecord ? editingRecord.id : assignments.length + 1,
-      adminName,
-      roles: roleNames,
-    };
+      // ✅ roles API se role names
+      const allRoles = await rolesAPI.getAll();
+      const roleNames = allRoles.data?.data
+        .filter((r) => values.roles.includes(r.id))
+        .map((r) => r.name);
 
-    if (editingRecord) {
-      setAssignments((prev) =>
-        prev.map((item) => (item.id === editingRecord.id ? newRecord : item))
-      );
-      message.success("Role updated successfully!");
-    } else {
-      setAssignments((prev) => [...prev, newRecord]);
-      message.success("Role assigned successfully!");
+      const newRecord = {
+        id: editingRecord ? editingRecord.id : assignments.length + 1,
+        adminName,
+        roles: roleNames,
+      };
+      console.log("newRecord" , newRecord.roles);
+      
+
+      if (editingRecord) {
+        setAssignments((prev) =>
+          prev.map((item) => (item.id === editingRecord.id ? newRecord : item))
+        );
+        message.success("Role updated successfully!");
+      } else {
+        setAssignments((prev) => [...prev, newRecord]);
+        message.success("Role assigned successfully!");
+      }
+
+      setModalVisible(false);
+      setEditingRecord(null);
+    } catch (error) {
+      console.error("Error saving role assignment:", error);
+      message.error("Failed to save role assignment!");
+    } finally {
+      setLoading(false);
     }
-
-    setModalVisible(false);
-    setEditingRecord(null);
-  } catch (error) {
-    console.error("Error saving role assignment:", error);
-    message.error("Failed to save role assignment!");
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   const handleEdit = (record) => {
     setEditingRecord(record);
@@ -120,7 +112,7 @@ const AssignRole = () => {
 
       {/* Table */}
       <AssignList
-        data={assignments} // ✅ send merged data
+        data={assignments} // ✅ now properly coming from API
         onEdit={handleEdit}
         onDelete={handleDelete}
       />

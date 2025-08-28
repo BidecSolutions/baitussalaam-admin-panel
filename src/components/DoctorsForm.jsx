@@ -3,24 +3,39 @@ import { UploadOutlined } from "@ant-design/icons";
 import { useEffect } from "react";
 import dayjs from "dayjs";
 
-const DoctorsForm = ({ initialValues, onSubmit, loading, codes }) => {
+const DoctorsForm = ({ initialValues, onSubmit, loading, codes, visible }) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
     if (initialValues) {
       form.setFieldsValue({
         ...initialValues,
+
+        // 🕒 Agar backend se string aa raha hai → convert to dayjs
         start_time: initialValues.start_time
           ? dayjs(initialValues.start_time, "HH:mm")
           : null,
+
         end_time: initialValues.end_time
           ? dayjs(initialValues.end_time, "HH:mm")
           : null,
+
+        // 🕒 Agar backend se schedule array aa raha ho (optional)
+        // doctor_schedules: initialValues.doctor_schedules?.map((s) => ({
+        //   ...s,
+        //   start_time: s.start_time ? dayjs(s.start_time, "HH:mm") : null,
+        //   end_time: s.end_time ? dayjs(s.end_time, "HH:mm") : null,
+        // })),
       });
     } else {
       form.resetFields();
     }
   }, [initialValues, form]);
+
+  useEffect(() => {
+    console.log('initialValues', initialValues);
+  }, [initialValues])
+
 
   const handleFinish = (values) => {
     const formData = {};

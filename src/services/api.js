@@ -46,10 +46,7 @@ export const authAPI = {
   loginAdmin: (data) => api.post("/admin/login", data),
   loginUser: (data) => api.post("/user/login", data),
   updateProfile : (data) => api.post(`admin/${id}/update` ,data),
-  changePassword: (data, token) =>
-    api.post("/admin/change-password", data, {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
+  changePassword: (data) => api.post("/admin/change-password", data),
 };
 
 // Doctors API
@@ -127,23 +124,23 @@ export const usersAPI = {
 
 export const rolesAPI = {
   getAll: () =>  api.get('/admin/roles'),
+  create: (data) =>  api.post('/admin/create-role', data),
+  update: (id, data) => USE_MOCK_DATA ? mockAPI.roles.update(id, data) : api.put(`/roles/${id}`, data),
+  delete: (id) => USE_MOCK_DATA ? mockAPI.roles.delete(id) : api.delete(`/roles/${id}`),
+};
+
+export const AssignRoleAdmins = {
+  getAll: () =>  api.get('/admin/list-admin-roles'),
   create: (data) =>  api.post('/admin/assign-role-admin', data),
   update: (id, data) => USE_MOCK_DATA ? mockAPI.roles.update(id, data) : api.put(`/roles/${id}`, data),
   delete: (id) => USE_MOCK_DATA ? mockAPI.roles.delete(id) : api.delete(`/roles/${id}`),
 };
 
-export const AssignRole = {
-  getAll: () =>  api.get('/admin/list-admin-roles'),
-  create: (data) => USE_MOCK_DATA ? mockAPI.roles.create(data) : api.post('/roles', data),
-  update: (id, data) => USE_MOCK_DATA ? mockAPI.roles.update(id, data) : api.put(`/roles/${id}`, data),
-  delete: (id) => USE_MOCK_DATA ? mockAPI.roles.delete(id) : api.delete(`/roles/${id}`),
-};
-
 export const permissionsAPI = {
-  getAll: () => api.get('/admin/permissions'),
+  getAll: () => api.get('/admin/permissions/list'),
   getById: (id) => USE_MOCK_DATA ? mockAPI.permissions.getById(id) : api.get(`/permissions/${id}`),
   create: (data) =>  api.post('/admin/create-permission', data),
-  update: (id, data) =>  api.put(`/admin/update-permission/${id}`, data),
+  update: (id, data) =>  api.post(`/admin/update-permission/${id}`, data),
   // delete: (id) => USE_MOCK_DATA ? mockAPI.permissions.delete(id) : api.delete(`/permissions/${id}`),
 };
 export const customersAPI = {

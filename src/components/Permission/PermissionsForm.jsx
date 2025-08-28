@@ -24,7 +24,7 @@ const PermissionsForm = ({ visible, onCancel, onSubmit, initialValues = {}, load
     >
       {/* Module Name */}
       <Form.Item
-        name="module"
+        name="module_name"
         label="module Name"
         rules={[{ required: true, message: 'Please enter permission name!' }]}
       >
@@ -33,7 +33,7 @@ const PermissionsForm = ({ visible, onCancel, onSubmit, initialValues = {}, load
 
       {/* Permission Name */}
       <Form.Item
-        name="permissionName"
+        name="permission_name"
         label="Permission Name"
         rules={[{ required: true, message: 'Please enter permission name!' }]}
       >

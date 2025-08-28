@@ -69,14 +69,14 @@ const PermissionsList = ({
             cancelText="No"
             placement="topRight"
           >
-            {/* <Button
+             <Button
               type="primary"
               danger
               icon={<DeleteOutlined />}
               size="small"
             >
               Delete
-            </Button> */}
+            </Button> 
           </Popconfirm>
         </Space>
       ),

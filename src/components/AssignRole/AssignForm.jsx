@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Form, Select, Button, message } from "antd";
-import { rolesAPI, usersAPI } from "../../services/api"; // ✅ Users API bhi import kiya
-import { RoleContext } from "../../Context/RolesContext";
+import { rolesAPI, usersAPI , AssignRoleAdmins} from "../../services/api"; // ✅ Users API bhi import kiya
+// import { RoleContext } from "../../Context/RolesContext";
 
 // import { RoleContext } from "../../Context/RolesContext"; // ✅ Context
 
@@ -20,7 +20,7 @@ const AssignForm = ({
   const [users, setUsers] = useState([]);
   const [fetchingRoles, setFetchingRoles] = useState(false);
   const [fetchingUsers, setFetchingUsers] = useState(false);
-  const { AssignsRole, updateRole} = useContext(RoleContext);
+  
   useEffect(() => {
     fetchRoles();
     fetchUsers();
@@ -77,17 +77,20 @@ const AssignForm = ({
   const handleFinish = async (values) => {
    try {
          const payLoad = {
-           adminId: values.admin_id,
+           admin_id: values.admin_id,
            role: values.role,
          };
-            const res = await AssignsRole(payLoad);
+            const res = await AssignRoleAdmins.create(payLoad);
+            console.log("admin id" , payLoad.admin_id);
+            console.log("admin id" , payLoad.values.role);
+            
         
-         console.log(values);
+         console.log("res " , res.data);
          form.resetFields();
-        //  toast.success("Role Asssigned");
+      
          set(false)
        } catch (e) {
-        //  toast.success("Role Failed To Assigned");
+       
          console.log(e);
        }
   };
@@ -105,7 +108,7 @@ const AssignForm = ({
         label="Select Admin"
         rules={[{ required: true, message: "Please select a admin" }]}
       >
-        <Select placeholder="Choose a user" loading={fetchingUsers}>
+        <Select placeholder="Choose a user" loading={fetchingUsers} >
           {users?.map((user) => (
             <Option key={user.id} value={user.id}>
               {user.name}
@@ -121,6 +124,7 @@ const AssignForm = ({
         rules={[{ required: true, message: "Please select at least one role" }]}
       >
         <Select
+          mode="multiple"
           placeholder="Choose roles"
           allowClear
           loading={fetchingRoles}

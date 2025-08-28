@@ -1,22 +1,47 @@
-import React, { useEffect } from "react";
-import { Form, Input, Button, Checkbox, Row, Col, Divider } from "antd";
+import React, { useEffect, useState } from "react";
+import { Form, Input, Button, Checkbox, Row, Col, Divider, message } from "antd";
+import { permissionsAPI } from "../../services/api";
 
-const permissionModules = [
-  { group: "Patients", modules: ["Patient Registration", "Patient History"] },
-  { group: "Tests", modules: ["Test Category", "Test Master", "Test Booking", "Sample Collection"] },
-  { group: "Reports", modules: ["Generate Report", "View Report", "Print Report"] },
-  { group: "Billing", modules: ["Invoices", "Payments", "Discounts", "Refunds"] },
-  { group: "Inventory", modules: ["Reagents", "Equipments", "Stock Management"] },
-  { group: "Staff", modules: ["Doctors", "Technicians", "Receptionists", "Roles & Permissions"] },
-];
-
-const permissionActions = ["Create", "List", "Edit", "Delete", "Print"];
+const actions = ["Create", "List", "Edit", "Delete"]; // ✅ Actions list
 
 const RolesForm = ({ visible, onCancel, onSubmit, initialValues = null, loading }) => {
   const [form] = Form.useForm();
+  const [permissionsData, setPermissionsData] = useState([]);
+  const [fetching, setFetching] = useState(false);
+
+  // ✅ Group data by module
+  const groupData = (data) => {
+    const grouped = {};
+    data.forEach((item) => {
+      if (!grouped[item.module_name]) grouped[item.module_name] = [];
+      grouped[item.module_name].push(item);
+    });
+    return grouped;
+  };
+
+  const fetchPermissions = async () => {
+    try {
+      setFetching(true);
+      const response = await permissionsAPI.getAll();
+
+      const data = Array.isArray(response.data)
+        ? response.data
+        : response.data?.data || [];
+
+      console.log("Fetched permissions:", data);
+      setPermissionsData(data);
+    } catch (error) {
+      console.error("Error fetching permissions:", error);
+      message.error("Failed to fetch permissions. Please try again.");
+      setPermissionsData([]);
+    } finally {
+      setFetching(false);
+    }
+  };
 
   useEffect(() => {
     if (visible) {
+      fetchPermissions();
       if (initialValues) {
         form.setFieldsValue(initialValues);
       } else {
@@ -25,30 +50,49 @@ const RolesForm = ({ visible, onCancel, onSubmit, initialValues = null, loading 
     }
   }, [visible, initialValues, form]);
 
-  const handleSubmit = (values) => {
-    const payload = {
-      name: values.name,
-      permissions: values.permissions || {},
-    };
-    onSubmit(payload);
-    form.resetFields();
-    onCancel();
+ const handleSubmit = (values) => {
+  const selectedPermissions = [];
+
+  Object.keys(values.permissions || {}).forEach((module) => {
+    Object.keys(values.permissions[module] || {}).forEach((action) => {
+      if (values.permissions[module][action]) {
+        // lowercase kar ke bhejenge
+        selectedPermissions.push(`${module.toLowerCase()}.${action.toLowerCase()}`);
+      }
+    });
+  });
+
+  const payload = {
+    name: values.name,
+    permissions: selectedPermissions,
   };
+
+  console.log("Final Payload:", payload);
+  onSubmit(payload);
+  form.resetFields();
+  onCancel();
+};
+
+
 
   const handleSelectAll = (module, checked) => {
     const currentValues = form.getFieldsValue();
     const newPermissions = { ...currentValues.permissions };
+
     if (!newPermissions[module]) newPermissions[module] = {};
-    permissionActions.forEach((action) => {
+
+    actions.forEach((action) => {
       newPermissions[module][action] = checked;
     });
+
     form.setFieldsValue({ permissions: newPermissions });
   };
 
+  const groupedModules = groupData(permissionsData);
+
   return (
-    <div className="flex justify-center items-start min-h-screen  pt-0 ">
-      {/* Horizontal wide container but vertically compact */}
-      <div className="bg-white  rounded-xl w-full max-w-7xl">
+    <div className="flex justify-center items-start min-h-screen pt-0">
+      <div className="bg-white rounded-xl w-full max-w-7xl">
         <Form
           form={form}
           layout="horizontal"
@@ -76,7 +120,7 @@ const RolesForm = ({ visible, onCancel, onSubmit, initialValues = null, loading 
 
           <Divider>Permissions</Divider>
 
-          {/* Scrollable container for permissions */}
+          {/* Scrollable container */}
           <div
             style={{
               maxHeight: "400px",
@@ -87,11 +131,11 @@ const RolesForm = ({ visible, onCancel, onSubmit, initialValues = null, loading 
           >
             {/* Table Header */}
             <Row style={{ fontWeight: "bold", paddingBottom: 8 }}>
-              <Col span={6}>Module</Col>
-              <Col span={3} style={{ textAlign: "center" }}>
+              <Col span={4}>Permission</Col>
+              <Col span={2} style={{ textAlign: "center" }}>
                 Select All
               </Col>
-              {permissionActions.map((action) => (
+              {actions.map((action) => (
                 <Col key={action} span={3} style={{ textAlign: "center" }}>
                   {action}
                 </Col>
@@ -99,8 +143,9 @@ const RolesForm = ({ visible, onCancel, onSubmit, initialValues = null, loading 
             </Row>
 
             {/* Table Rows */}
-            {permissionModules.map((group) => (
-              <React.Fragment key={group.group}>
+            {Object.keys(groupedModules).map((module) => (
+              <React.Fragment key={module}>
+                {/* Module Header */}
                 <Row
                   style={{
                     fontWeight: "bold",
@@ -109,30 +154,31 @@ const RolesForm = ({ visible, onCancel, onSubmit, initialValues = null, loading 
                     fontSize: "16px",
                   }}
                 >
-                  <Col span={24}>{group.group}</Col>
+                  <Col span={24}>{module}</Col>
                 </Row>
-                {group.modules.map((module) => (
-                  <Row key={module} style={{ padding: "10px 0", fontSize: "15px" }}>
-                    <Col span={6}>{module}</Col>
-                    <Col span={3} style={{ textAlign: "center" }}>
-                      <Checkbox
-                        onChange={(e) => handleSelectAll(module, e.target.checked)}
-                        className="scale-125"
-                      />
+
+                {/* Permissions */}
+                <Row style={{ padding: "10px 0", fontSize: "15px" }}>
+                  <Col span={4}>{module} Permissions</Col>
+                  <Col span={2} style={{ textAlign: "center" }}>
+                    <Checkbox
+                      onChange={(e) => handleSelectAll(module, e.target.checked)}
+                      className="scale-125"
+                    />
+                  </Col>
+
+                  {actions.map((action) => (
+                    <Col key={action} span={3} style={{ textAlign: "center" }}>
+                      <Form.Item
+                        name={["permissions", module, action]}
+                        valuePropName="checked"
+                        noStyle
+                      >
+                        <Checkbox className="scale-125" />
+                      </Form.Item>
                     </Col>
-                    {permissionActions.map((action) => (
-                      <Col key={action} span={3} style={{ textAlign: "center" }}>
-                        <Form.Item
-                          name={["permissions", module, action]}
-                          valuePropName="checked"
-                          noStyle
-                        >
-                          <Checkbox className="scale-125" />
-                        </Form.Item>
-                      </Col>
-                    ))}
-                  </Row>
-                ))}
+                  ))}
+                </Row>
               </React.Fragment>
             ))}
           </div>

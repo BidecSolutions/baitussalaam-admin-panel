@@ -1,3 +1,4 @@
+// Doctors.jsx
 import React, { useState, useEffect } from "react";
 import { Button, Modal, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
@@ -18,6 +19,7 @@ const Doctors = () => {
   const [formLoading, setFormLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingDoctor, setEditingDoctor] = useState(null);
+
   const [pagination, setPagination] = useState({
     current: DEFAULT_CURRENT_PAGE,
     pageSize: DEFAULT_PAGE_SIZE,
@@ -29,7 +31,6 @@ const Doctors = () => {
     fetchCodes();
   }, [pagination.current, pagination.pageSize]);
 
-  // 🔹 Doctors fetch
   const fetchDoctors = async () => {
     try {
       setLoading(true);
@@ -44,7 +45,6 @@ const Doctors = () => {
         total: doctorsData?.data?.total || 0,
       }));
     } catch (error) {
-      console.error("Error fetching doctors:", error);
       message.error("Failed to fetch doctors.");
       setDoctors([]);
     } finally {
@@ -52,23 +52,17 @@ const Doctors = () => {
     }
   };
 
-  // 🔹 Codes fetch (specialization, qualification, etc.)
   const fetchCodes = async () => {
     try {
       const res = await codesAPI.getAll();
       const allCodes = res?.data?.data || [];
-
-      console.log('allCodes', allCodes);
-      
-
       setCodes({
         doctor_specialization: allCodes.filter((c) => c.type === "doctor_specialization"),
         doctor_qualification: allCodes.filter((c) => c.type === "doctor_qualification"),
         working_day: allCodes.filter((c) => c.type === "working_day"),
         timing_slot: allCodes.filter((c) => c.type === "timing_slot"),
       });
-    } catch (err) {
-      console.error("Error fetching codes:", err);
+    } catch {
       message.error("Failed to fetch codes.");
     }
   };
@@ -88,8 +82,7 @@ const Doctors = () => {
       await doctorsAPI.delete(id);
       await fetchDoctors();
       message.success("Doctor deleted successfully");
-    } catch (error) {
-      console.error("Error deleting doctor:", error);
+    } catch {
       message.error("Delete failed!");
     }
   };
@@ -97,45 +90,11 @@ const Doctors = () => {
   const handleFormSubmit = async (values) => {
     try {
       setFormLoading(true);
-
       const formData = new FormData();
-
-      // Basic fields
       formData.append("name", values.name);
       formData.append("email", values.email);
       formData.append("phone", values.phone);
-      formData.append("bio", values.bio);
-      formData.append("experience_years", values.experience_years);
-      formData.append(`start_time`, values.start_time);
-      formData.append(`end_time`, values.end_time);
 
-      // 🔹 Qualifications
-      if (values.qualifications && values.qualifications.length > 0) {
-        values.qualifications.forEach((q, i) => {
-          formData.append(`qualifications[${i}]`, q);
-        });
-      }
-
-      // 🔹 Specializations (sirf code_id bhejna hoga)
-      if (values.specializations && values.specializations.length > 0) {
-        values.specializations.forEach((s, i) => {
-          formData.append(`specializations[${i}][code_id]`, s.code_id || s);
-        });
-      }
-
-      
-      if (values.working_days && values.working_days.length > 0) {
-        values.working_days.forEach((day, i) => {
-          formData.append(`working_days[${i}]`, day);
-        });
-      }
-
-      // 🔹 Image Upload
-      if (values.image && values.image.file) {
-        formData.append("image", values.image_path);
-      }
-
-      // 🔹 Create or Update
       if (editingDoctor) {
         await doctorsAPI.update(editingDoctor.id, formData);
         message.success("Doctor updated successfully");
@@ -146,16 +105,12 @@ const Doctors = () => {
 
       setModalVisible(false);
       await fetchDoctors();
-    } catch (error) {
-      console.error("Error saving doctor:", error);
+    } catch {
       message.error("Save failed!");
     } finally {
       setFormLoading(false);
     }
   };
-
-  console.log('codes', codes);
-
 
   return (
     <div>
@@ -166,27 +121,14 @@ const Doctors = () => {
         </Button>
       </div>
 
-      <DoctorsList
-        doctors={doctors}
-        loading={loading}
-        onEdit={handleEditDoctor}
-        onDelete={handleDeleteDoctor}
-        pagination={pagination}
-        onTableChange={(info) =>
-          setPagination((prev) => ({
-            ...prev,
-            current: info.current,
-            pageSize: info.pageSize,
-          }))
-        }
-      />
+      <DoctorsList doctors={doctors} loading={loading} onEdit={handleEditDoctor} onDelete={handleDeleteDoctor} />
 
       <Modal
         title={editingDoctor ? "Edit Doctor" : "Add New Doctor"}
         open={modalVisible}
         onCancel={() => setModalVisible(false)}
         footer={null}
-        width={800} // 🔹 thoda wide rakha for horizontal form
+        width={800}
         destroyOnClose
       >
         <DoctorsForm

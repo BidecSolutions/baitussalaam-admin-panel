@@ -83,9 +83,9 @@ const Roles = () => {
   try {
     setFormLoading(true);
     if (editingRole) {
-      await rolesAPI.update(editingRole.id, values); // PUT
+      await rolesAPI.update(editingRole.id, {...values, guard: "admin-api"}); // PUT
     } else {
-      await rolesAPI.create(values); // POST
+      await rolesAPI.create({...values, guard: "admin-api"}); // POST
     }
     setModalVisible(false);
     await fetchRoles();
