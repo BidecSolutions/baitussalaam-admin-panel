@@ -26,15 +26,17 @@ const DoctorsList = ({ doctors, loading, onEdit, onDelete }) => {
       key: "image",
       render: (_, doctor) => (
         <Image
-          width={80}
+          width={50}
+          height={40}
           src={
             doctor.image_path
-              ? `${import.meta.env.VITE_BASE_IMAGE_URL_LIVE}${doctor.image_path}`
+              ? `https://baitussalam.datainovate.com/backend/storage/app/public/${doctor.image_path}`
               : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSExbOmh2VFMws-98GmjgBD0RTlPf39LwFf-Q&s"
           }
-          alt={doctor.image_alt || "Doctor Image"}
-          style={{ objectFit: "cover", borderRadius: "8px" }}
+          alt={doctor.image_alt || "doctor image"}
+          style={{ objectFit: "cover" }}
         />
+
       ),
     },
     {
@@ -76,16 +78,24 @@ const DoctorsList = ({ doctors, loading, onEdit, onDelete }) => {
             <Descriptions.Item label="Experience">
               {selectedDoctor.experience_years} years
             </Descriptions.Item>
+            {/* example */}
+            <Descriptions.Item label="Working days">
+              {selectedDoctor?.working_days?.join(", ") || "-"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Start Time">
+              {selectedDoctor.start_time}
+            </Descriptions.Item>
+            <Descriptions.Item label="End Time">
+              {selectedDoctor.end_time}
+            </Descriptions.Item>
+
+
+
             <Descriptions.Item label="Qualifications">
               {selectedDoctor.qualifications?.map((q) => q.value).join(", ") || "-"}
             </Descriptions.Item>
             <Descriptions.Item label="Specializations">
               {selectedDoctor.specializations?.map((s) => s.value).join(", ") || "-"}
-            </Descriptions.Item>
-            <Descriptions.Item label="Schedule">
-              {selectedDoctor.doctor_schedules
-                ?.map((s) => `${s.day_of_week} (${s.start_time} - ${s.end_time})`)
-                .join(", ") || "-"}
             </Descriptions.Item>
           </Descriptions>
         )}

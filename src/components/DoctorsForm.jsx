@@ -1,87 +1,67 @@
-import { Form, Input, Button, Row, Col, Select, Upload, TimePicker, InputNumber } from "antd";
+// DoctorsForm.jsx
+import { 
+  Form, Input, Button, Row, Col, Select, Upload, TimePicker, InputNumber, message 
+} from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useEffect } from "react";
 import dayjs from "dayjs";
 
-const DoctorsForm = ({ initialValues, onSubmit, loading, codes, visible }) => {
+const DoctorsForm = ({ initialValues, onSubmit, loading, codes }) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
     if (initialValues) {
       form.setFieldsValue({
         ...initialValues,
-
-        // 🕒 Agar backend se string aa raha hai → convert to dayjs
-        start_time: initialValues.start_time
-          ? dayjs(initialValues.start_time, "HH:mm")
-          : null,
-
-        end_time: initialValues.end_time
-          ? dayjs(initialValues.end_time, "HH:mm")
-          : null,
-
-        // 🕒 Agar backend se schedule array aa raha ho (optional)
-        // doctor_schedules: initialValues.doctor_schedules?.map((s) => ({
-        //   ...s,
-        //   start_time: s.start_time ? dayjs(s.start_time, "HH:mm") : null,
-        //   end_time: s.end_time ? dayjs(s.end_time, "HH:mm") : null,
-        // })),
+        specializations: initialValues.specializations.map((spec)=> spec.id),
+        qualifications: initialValues.qualifications.map((qual)=> qual.id),
+        start_time: initialValues.start_time ? dayjs(initialValues.start_time, "HH:mm") : null,
+        end_time: initialValues.end_time ? dayjs(initialValues.end_time, "HH:mm") : null,
       });
     } else {
       form.resetFields();
     }
   }, [initialValues, form]);
 
-  useEffect(() => {
-    console.log('initialValues', initialValues);
-  }, [initialValues])
+  const handleFinish = async (values) => {
+    try {
+      const formData = {};
 
+      // Basic fields
+      formData.name = values.name;
+      formData.email = values.email;
+      formData.phone = values.phone;
+      formData.bio = values.bio;
+      formData.experience_years = values.experience_years;
 
-  const handleFinish = (values) => {
-    const formData = {};
+      // Time values
+      formData.start_time = values.start_time ? values.start_time.format("HH:mm") : null;
+      formData.end_time = values.end_time ? values.end_time.format("HH:mm") : null;
 
-    // Basic fields
-    formData.name = values.name;
-    formData.email = values.email;
-    formData.phone = values.phone;
-    formData.bio = values.bio;
-    formData.experience_years = values.experience_years;
+      formData.qualifications = values.qualifications?.map((id) => Number(id));
+      formData.specializations = values.specializations?.map((id) => Number(id));
+      formData.working_days = values.working_days;
 
-    // Time values
-    formData.start_time = values.start_time
-      ? values.start_time.format("HH:mm")
-      : null;
-    formData.end_time = values.end_time
-      ? values.end_time.format("HH:mm")
-      : null;
+      if (values.image?.[0]?.originFileObj) {
+        formData.image = values.image[0].originFileObj;
+      }
 
-    // Qualifications → array of ids
-    formData.qualifications = values.qualifications?.map((id) => Number(id));
+      // Submit callback
+      await onSubmit(formData);
 
-    // Specializations → array of ids
-    formData.specializations = values.specializations?.map((id) => Number(id));
+      message.success(initialValues ? "Doctor updated successfully!" : "Doctor added successfully!");
+      form.resetFields();
 
-    // Working days → array of values
-    formData.working_days = values.working_days;
-
-    // Image
-    if (values.image?.[0]?.originFileObj) {
-      formData.image = values.image[0].originFileObj;
+    } catch (error) {
+      console.error("Form submit failed:", error);
+      message.error("Failed to save doctor. Please try again!");
     }
-
-    console.log("🚀 Final Payload:", formData);
-    onSubmit(formData);
   };
 
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      onFinish={handleFinish}
-      initialValues={initialValues}
-    >
+    <Form form={form} layout="vertical" onFinish={handleFinish}>
       <Row gutter={16}>
-        {/* Name */}
+        
         <Col span={8}>
           <Form.Item
             name="name"
@@ -103,7 +83,7 @@ const DoctorsForm = ({ initialValues, onSubmit, loading, codes, visible }) => {
           </Form.Item>
         </Col>
 
-        {/* Phone */}
+        
         <Col span={8}>
           <Form.Item
             name="phone"
@@ -136,7 +116,7 @@ const DoctorsForm = ({ initialValues, onSubmit, loading, codes, visible }) => {
           </Form.Item>
         </Col>
 
-        {/* Qualifications Multi Select */}
+        {/* Qualifications */}
         <Col span={8}>
           <Form.Item
             name="qualifications"
@@ -153,7 +133,7 @@ const DoctorsForm = ({ initialValues, onSubmit, loading, codes, visible }) => {
           </Form.Item>
         </Col>
 
-        {/* Specializations Multi Select */}
+        {/* Specializations */}
         <Col span={8}>
           <Form.Item
             name="specializations"
@@ -170,7 +150,7 @@ const DoctorsForm = ({ initialValues, onSubmit, loading, codes, visible }) => {
           </Form.Item>
         </Col>
 
-        {/* Working Days Multi Select */}
+        {/* Working Days */}
         <Col span={8}>
           <Form.Item
             name="working_days"
@@ -213,19 +193,19 @@ const DoctorsForm = ({ initialValues, onSubmit, loading, codes, visible }) => {
         <Col span={8}>
           <Form.Item
             name="image"
-            label="Profile Image"
+            label="Image"
             valuePropName="fileList"
-            getValueFromEvent={(e) => (Array.isArray(e) ? e : e && e.fileList)}
-            rules={[{ required: true, message: "Please upload image" }]}
+            getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
           >
-            <Upload beforeUpload={() => false} maxCount={1}>
-              <Button icon={<UploadOutlined />}>Upload Image</Button>
+            <Upload beforeUpload={() => false} listType="picture" maxCount={1}>
+              <Button size="large" icon={<UploadOutlined />}>
+                Upload Image
+              </Button>
             </Upload>
           </Form.Item>
         </Col>
       </Row>
 
-      {/* Buttons */}
       <Row justify="end">
         <Col>
           <Button onClick={() => form.resetFields()} style={{ marginRight: 8 }}>

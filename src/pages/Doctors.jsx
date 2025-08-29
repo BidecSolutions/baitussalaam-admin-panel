@@ -15,6 +15,7 @@ const Doctors = () => {
     working_day: [],
     timing_slot: [],
   });
+
   const [loading, setLoading] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -31,82 +32,124 @@ const Doctors = () => {
     fetchCodes();
   }, [pagination.current, pagination.pageSize]);
 
+  // ✅ Fetch Doctors
   const fetchDoctors = async () => {
     try {
       setLoading(true);
-      const doctorsData = await doctorsAPI.getAll({
+      const res = await doctorsAPI.getAll({
         page: pagination.current,
         pageSize: pagination.pageSize,
       });
 
-      setDoctors(doctorsData?.data?.data || []);
+      setDoctors(res?.data?.data || []);
       setPagination((prev) => ({
         ...prev,
-        total: doctorsData?.data?.total || 0,
+        total: res?.data?.total || 0,
       }));
     } catch (error) {
-      message.error("Failed to fetch doctors.");
+      console.error("Fetch Doctors Error:", error);
+      message.error("Failed to fetch doctors!");
       setDoctors([]);
     } finally {
       setLoading(false);
     }
   };
 
+  // ✅ Fetch Codes
   const fetchCodes = async () => {
     try {
       const res = await codesAPI.getAll();
       const allCodes = res?.data?.data || [];
+
       setCodes({
         doctor_specialization: allCodes.filter((c) => c.type === "doctor_specialization"),
         doctor_qualification: allCodes.filter((c) => c.type === "doctor_qualification"),
         working_day: allCodes.filter((c) => c.type === "working_day"),
         timing_slot: allCodes.filter((c) => c.type === "timing_slot"),
       });
-    } catch {
-      message.error("Failed to fetch codes.");
+    } catch (error) {
+      console.error("Fetch Codes Error:", error);
+      message.error("Failed to fetch codes!");
     }
   };
 
+  // ✅ Add Doctor
   const handleAddDoctor = () => {
     setEditingDoctor(null);
     setModalVisible(true);
   };
 
+  // ✅ Edit Doctor
   const handleEditDoctor = (doctor) => {
     setEditingDoctor(doctor);
     setModalVisible(true);
   };
 
+  // ✅ Delete Doctor
   const handleDeleteDoctor = async (id) => {
     try {
       await doctorsAPI.delete(id);
-      await fetchDoctors();
       message.success("Doctor deleted successfully");
-    } catch {
-      message.error("Delete failed!");
+      await fetchDoctors();
+    } catch (error) {
+      console.error("Delete Error:", error);
+      message.error("Failed to delete doctor!");
     }
   };
 
+  // ✅ Submit (Add / Edit)
   const handleFormSubmit = async (values) => {
     try {
       setFormLoading(true);
+
       const formData = new FormData();
       formData.append("name", values.name);
       formData.append("email", values.email);
       formData.append("phone", values.phone);
+      formData.append("bio", values.bio);
+      formData.append("experience_years", values.experience_years);
+      formData.append("start_time", values.start_time);
+      formData.append("end_time", values.end_time);
+
+      // qualifications
+      if (Array.isArray(values.qualifications)) {
+        values.qualifications.forEach((q, i) =>
+          formData.append(`qualifications[${i}][code_id]`, q)
+        );
+      }
+
+      // specializations
+      if (Array.isArray(values.specializations)) {
+        values.specializations.forEach((s, i) =>
+          formData.append(`specializations[${i}][code_id]`, s)
+        );
+      }
+
+      // working days
+      if (Array.isArray(values.working_days)) {
+        values.working_days.forEach((day, i) =>
+          formData.append(`working_days[${i}]`, day)
+        );
+      }
+
+      // image
+      if (values.image) {
+        formData.append("image", values.image);
+      }
 
       if (editingDoctor) {
         await doctorsAPI.update(editingDoctor.id, formData);
-        message.success("Doctor updated successfully");
+        message.success("Doctor updated successfully!");
       } else {
         await doctorsAPI.create(formData);
-        message.success("Doctor added successfully");
+        message.success("Doctor added successfully!");
       }
 
       setModalVisible(false);
       await fetchDoctors();
-    } catch {
-      message.error("Save failed!");
+    } catch (error) {
+      console.error("Save Error:", error);
+      message.error("Failed to save doctor!");
     } finally {
       setFormLoading(false);
     }
@@ -121,7 +164,12 @@ const Doctors = () => {
         </Button>
       </div>
 
-      <DoctorsList doctors={doctors} loading={loading} onEdit={handleEditDoctor} onDelete={handleDeleteDoctor} />
+      <DoctorsList
+        doctors={doctors}
+        loading={loading}
+        onEdit={handleEditDoctor}
+        onDelete={handleDeleteDoctor}
+      />
 
       <Modal
         title={editingDoctor ? "Edit Doctor" : "Add New Doctor"}

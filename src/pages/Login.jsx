@@ -15,7 +15,7 @@ const Login = () => {
     try {
       let response = await authAPI.loginAdmin(values);
       if (response.data.success) {
-        const user = response.data.data;
+        const user = response.data?.data;
         const token = response.data.token;
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("token", token);

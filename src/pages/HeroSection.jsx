@@ -73,11 +73,7 @@ const handleFormSubmit = async (values) => {
   formData.append("image_alt", values.image_alt || "");
 
   if (values.image_path) {
-    // const file = values.image_path[0].originFileObj; // get File object
-    // if (file) {
-      //   formData.append("image_path", file); // append binary
-      // }
-        formData.append("image_path", values.image_path); // append binary
+   formData.append("image_path", values.image_path); // append binary
   }
 
   try {

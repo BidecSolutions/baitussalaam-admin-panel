@@ -6,9 +6,9 @@ import { meta } from '@eslint/js';
 const api = axios.create({
   baseURL: import.meta.env.VITE_BASE_API_BASE_URL,
   timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  // headers: {
+  //   'Content-Type': 'application/json',
+  // },
 });
 
 // Request interceptor for adding auth tokens if needed
@@ -26,7 +26,6 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor for handling common errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -39,7 +38,6 @@ api.interceptors.response.use(
   }
 );
 
-// For development, use mock data. For production, uncomment the real API calls
 const USE_MOCK_DATA = false; // Set to false when real API is available
 
 export const authAPI = {
@@ -53,10 +51,11 @@ export const authAPI = {
 export const doctorsAPI = {
   getAll: () =>  api.get('/doctors'),
   getById: (id) => USE_MOCK_DATA ? mockAPI.doctors.getById(id) : api.get(`/doctors/${id}`),
-  create: (data) =>  api.post('/admin/doctors/store', data),
-
-  update: (id, data) => api.put(`/doctors/${id}`, data),
-  delete: (id) => USE_MOCK_DATA ? mockAPI.doctors.delete(id) : api.delete(`/doctors/${id}`),
+  create: (data) =>  api.post('/admin/doctors/store', data , {
+    headers: { "Content-Type": "multipart/form-data" },
+  }),
+  update: (id, data) => api.post(`/admin/doctors/${id}/update`, data),
+  delete: (id) => api.delete(`/admin/doctors/${id}/delete`),
 };
 
 // Tests API

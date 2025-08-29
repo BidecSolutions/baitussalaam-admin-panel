@@ -51,7 +51,7 @@ const AdminLayout = () => {
       icon: <TeamOutlined />,
       label: "User Management",
       children: [
-        { key: "/users", icon: <UserOutlined />, label: "Users" },
+        { key: "/users", icon: <UserOutlined />, label: "Admin" },
         { key: "/roles", icon: <IdcardOutlined />, label: "Roles" },
         { key: "/permissions", icon: <SafetyCertificateOutlined />, label: "Permissions" },
         { key: "/AssignRole", icon: <SwapOutlined />, label: "Assign-Role" },
