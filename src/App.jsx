@@ -20,6 +20,8 @@ import Codes from './pages/Codes';
 import HeroSection from './pages/HeroSection';
 import Customer from './pages/Customers';
 import { PermissionProvider } from './Context/PermissionsContext';
+import ContactPage from './pages/Contact';
+import Careers from './pages/Career';
 
 const App = () => {
   return (
@@ -62,6 +64,9 @@ const App = () => {
               <Route path="/branches" element={<Branches />} />
               <Route path="/Hero-section" element={<HeroSection />} />
               <Route path="/customer" element={<Customer/>} />
+              <Route path="/contact" element={<ContactPage/>} />
+              <Route path="/career" element={<Careers/>} />
+
             </Route>
           </Routes>
         </Router>

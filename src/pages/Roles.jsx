@@ -9,6 +9,7 @@ import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_CURRENT_PAGE,
 } from "../utils/constants";
+import { useRoles } from "../Context/PermissionsContext";
 
 const Roles = () => {
   const [roles, setRoles] = useState([]);
@@ -23,6 +24,7 @@ const Roles = () => {
     pageSize: DEFAULT_PAGE_SIZE,
     total: 0,
   });
+  const { permissions } = useRoles();
 
   useEffect(() => {
     fetchRoles();
@@ -126,6 +128,8 @@ const Roles = () => {
         }}
       >
         <h1>Roles Management</h1>
+          {permissions.includes("role.create") && (
+
         <Button
           type="primary"
           icon={<PlusOutlined />}
@@ -133,6 +137,7 @@ const Roles = () => {
         >
           Add Role
         </Button>
+           )} 
       </div>
 
       <RolesList

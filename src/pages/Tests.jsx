@@ -6,6 +6,7 @@ import TestsForm from '../components/TestsForm';
 import {testsAPI} from '../services/api'
 
 import { DEFAULT_PAGE_SIZE, DEFAULT_CURRENT_PAGE } from '../utils/constants';
+import { useRoles } from '../Context/PermissionsContext';
 // import { RoleContext } from '../Context/RolesContext';
 
 const Tests = () => {
@@ -19,6 +20,8 @@ const Tests = () => {
     pageSize: DEFAULT_PAGE_SIZE,
     total: 0,
   });
+    const { permissions } = useRoles();
+  
 
   // const { getTests } = useContext(RoleContext);
 
@@ -104,9 +107,12 @@ const Tests = () => {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h1>Tests Management</h1>
+          {permissions.includes("tests.create") && (
+        
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAddTest}>
           Add Test
         </Button>
+          )}
       </div>
 
       <TestsList

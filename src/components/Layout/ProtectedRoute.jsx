@@ -2,10 +2,11 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 
 const ProtectedRoute = ({ permission, children }) => {
-  const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userPermissions = user?.permissions || [];
 
-  if (permission && !permissions.includes(permission)) {
-    return <Navigate to="/unauthorized" />;
+  if (!userPermissions.includes(permission)) {
+    return <h2 style={{ textAlign: "center", marginTop: "50px" }}>🚫 Access Denied</h2>;
   }
 
   return children;

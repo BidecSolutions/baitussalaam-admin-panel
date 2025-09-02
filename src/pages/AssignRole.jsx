@@ -2,97 +2,58 @@ import React, { useState, useEffect } from "react";
 import { Button, Modal, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import AssignList from "../components/AssignRole/AssignList";
-import RolesForm from "../components/AssignRole/AssignForm";
-import { AssignRoleAdmins, rolesAPI } from "../services/api";
+import AssignForm from "../components/AssignRole/AssignForm";
+import { AssignRoleAdmins } from "../services/api";
+import { useRoles } from "../Context/PermissionsContext";
 
 const AssignRole = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [users, setUsers] = useState([]); 
-  const [assignments, setAssignments] = useState([]); // ✅ FIX: added state
+  const [assignments, setAssignments] = useState([]);
+  const { permissions } = useRoles();
 
-  
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await AssignRoleAdmins.getAll(); 
-        const apiUsers = response.data?.data || [];
-        console.log("apiUsers", apiUsers);
-
-        
-        const formatted = apiUsers.map((u) => ({
-          id: u.admin_id,
-          admin_name: u.admin_name,
-          roles: u.roles || [], 
-        }));
-
-        setAssignments(formatted);
-        setUsers(apiUsers);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-        message.error("Failed to fetch users.");
-      }
-    };
-
-    fetchUsers();
-  }, []);
-
-
-  const handleSubmit = async (values) => {
+  const fetchAssignments = async () => {
     try {
-      setLoading(true);
-
-      const selectedUser = users.find((u) => u.id === values.userId);
-      const adminName = selectedUser ? selectedUser.name : "Unknown";
-
-      // ✅ roles API se role names
-      const allRoles = await rolesAPI.getAll();
-      const roleNames = allRoles.data?.data
-        .filter((r) => values.roles.includes(r.id))
-        .map((r) => r.name);
-
-      const newRecord = {
-        id: editingRecord ? editingRecord.id : assignments.length + 1,
-        adminName,
-        roles: roleNames,
-      };
-      console.log("newRecord" , newRecord.roles);
-      
-
-      if (editingRecord) {
-        setAssignments((prev) =>
-          prev.map((item) => (item.id === editingRecord.id ? newRecord : item))
-        );
-        message.success("Role updated successfully!");
-      } else {
-        setAssignments((prev) => [...prev, newRecord]);
-        message.success("Role assigned successfully!");
-      }
-
-      setModalVisible(false);
-      setEditingRecord(null);
-    } catch (error) {
-      console.error("Error saving role assignment:", error);
-      message.error("Failed to save role assignment!");
-    } finally {
-      setLoading(false);
+      const res = await AssignRoleAdmins.getAll();
+      const data = res.data?.data || [];
+      setAssignments(
+        data.map((u) => ({
+          id: u.admin_id,
+          admin_id: u.admin_id,
+          admin_name: u.admin_name,
+          roles: Array.isArray(u.roles)
+            ? u.roles.map((r) => (typeof r === "string" ? r : r.name))
+            : [],
+        }))
+      );
+    } catch (e) {
+      message.error("Failed to fetch assigned roles!");
     }
   };
 
-  const handleEdit = (record) => {
-    setEditingRecord(record);
-    setModalVisible(true);
+  useEffect(() => {
+    fetchAssignments();
+  }, []);
+
+  const handleSuccess = () => {
+    setModalVisible(false);
+    setEditingRecord(null);
+    fetchAssignments();
   };
 
-  const handleDelete = (id) => {
-    setAssignments((prev) => prev.filter((item) => item.id !== id));
-    message.success("Role deleted successfully!");
+  const handleDelete = async (id) => {
+    try {
+      await AssignRoleAdmins.delete(id);
+      message.success("Role deleted successfully!");
+      fetchAssignments();
+    } catch (e) {
+      message.error("Failed to delete role!");
+    }
   };
 
   return (
     <div>
-      {/* Header */}
       <div
         style={{
           display: "flex",
@@ -101,25 +62,28 @@ const AssignRole = () => {
         }}
       >
         <h1>Assign Roles</h1>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => setModalVisible(true)}
-        >
-          Assign Role
-        </Button>
+        {permissions.includes("assignrole.create") && (
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setModalVisible(true)}
+          >
+            Assign Role
+          </Button>
+        )}
       </div>
 
-      {/* Table */}
       <AssignList
-        data={assignments} // ✅ now properly coming from API
-        onEdit={handleEdit}
+        data={assignments}
+        onEdit={(record) => {
+          setEditingRecord(record);
+          setModalVisible(true);
+        }}
         onDelete={handleDelete}
       />
 
-      {/* Modal */}
       <Modal
-        title={editingRecord ? "Edit Assigned Role" : "Assign New Role"}
+        title={editingRecord ? "Edit Role Assignment" : "Assign New Role"}
         open={modalVisible}
         onCancel={() => {
           setModalVisible(false);
@@ -128,14 +92,13 @@ const AssignRole = () => {
         footer={null}
         destroyOnClose
       >
-        <RolesForm
-          visible={modalVisible}
+        <AssignForm
+          initialValues={editingRecord}
+          onSuccess={handleSuccess}
           onCancel={() => {
             setModalVisible(false);
             setEditingRecord(null);
           }}
-          onSubmit={handleSubmit}
-          initialValues={editingRecord}
           loading={loading}
         />
       </Modal>

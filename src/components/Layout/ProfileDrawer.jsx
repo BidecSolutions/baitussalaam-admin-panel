@@ -61,12 +61,12 @@ const ProfileDrawer = ({ open, onClose }) => {
           </div>
 
           <Descriptions column={1} bordered>
-            <Descriptions.Item label="Full Name">{user.name}</Descriptions.Item>
-            <Descriptions.Item label="Email">{user.email}</Descriptions.Item>
-            <Descriptions.Item label="Phone">{user.phone}</Descriptions.Item>
-            <Descriptions.Item label="Role">{user.role ? "" : "Admin"}</Descriptions.Item>
-            {/* <Descriptions.Item label="Joined">{user.created_at}</Descriptions.Item> */}
-          </Descriptions>
+  <Descriptions.Item label="Full Name">{user.name}</Descriptions.Item>
+  <Descriptions.Item label="Email">{user.email}</Descriptions.Item>
+  <Descriptions.Item label="Phone">{user.phone}</Descriptions.Item>
+
+</Descriptions>
+
         </>
       )}
     </Drawer>

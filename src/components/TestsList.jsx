@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { Table, Button, Space, Popconfirm, message, Tag, Drawer, Descriptions } from "antd";
 import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
+import { useRoles } from "../Context/PermissionsContext";
 
 const TestsList = ({ tests = [], loading = false, onEdit, onDelete, pagination, onTableChange }) => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedTest, setSelectedTest] = useState(null);
   const [expandedRows, setExpandedRows] = useState({}); // Track expanded rows for Read More
+  const { permissions } = useRoles();
 
   const showDrawer = (test) => {
     setSelectedTest(test);
@@ -110,12 +112,18 @@ const TestsList = ({ tests = [], loading = false, onEdit, onDelete, pagination, 
       width: 250,
       render: (_, record) => (
         <Space size="middle">
+          {permissions.includes("tests.list") && (
           <Button type="primary" icon={<EyeOutlined />} size="small" onClick={() => showDrawer(record)}>
             View
           </Button>
+          )}
+          {permissions.includes("tests.edit") && (
           <Button type="default" icon={<EditOutlined />} size="small" onClick={() => onEdit(record)}>
             Edit
           </Button>
+          )}
+          {permissions.includes("tests.delete") && (
+
           <Popconfirm
             title="Are you sure you want to delete this test?"
             description="This action cannot be undone."
@@ -124,10 +132,12 @@ const TestsList = ({ tests = [], loading = false, onEdit, onDelete, pagination, 
             cancelText="No"
             placement="topRight"
           >
+            
             <Button type="primary" danger icon={<DeleteOutlined />} size="small">
               Delete
             </Button>
           </Popconfirm>
+          )}
         </Space>
       ),
     },

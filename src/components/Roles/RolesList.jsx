@@ -2,6 +2,7 @@ import React from 'react';
 import { Table, Button, Space, Popconfirm, message, Tag } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import {rolesAPI} from "../../services/api"
+import { useRoles } from '../../Context/PermissionsContext';
 
 const RolesList = ({
   roles = [],
@@ -13,7 +14,7 @@ const RolesList = ({
   onTableChange
 }) => {
 
-
+    const { permissions } = useRoles();
 
   const columns = [
     {
@@ -30,7 +31,7 @@ const RolesList = ({
       key: 'name',
       width: 300,
       sorter: true,
-      render: (text) => <Tag color="blue">{text}</Tag>, // 👈 styled with Tag
+      render: (text) => <Tag color="blue">{text}</Tag>, 
     },
     {
       title: 'Actions',
@@ -38,6 +39,7 @@ const RolesList = ({
       align: 'center',
       render: (_, record) => (
         <Space size="small">
+          {/* {permissions.includes("role.edit") && ( */}
         
           <Button
             type="primary"
@@ -48,6 +50,9 @@ const RolesList = ({
           >
             Edit
           </Button>
+          {/* )} */}
+          {/* {permissions.includes("role.delete") && (  */}
+
           <Popconfirm
             title="Are you sure you want to delete this role?"
             description="This action cannot be undone."
@@ -67,6 +72,7 @@ const RolesList = ({
               Delete
             </Button>
           </Popconfirm>
+          {/* )} */}
         </Space>
       ),
     },

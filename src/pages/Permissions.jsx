@@ -5,9 +5,10 @@ import PermissionsList from "../components/Permission/PermissionList"; // Table 
 import PermissionsForm from "../components/Permission/PermissionsForm"; // Form component
 import { permissionsAPI } from "../services/api"; // API service
 import { DEFAULT_PAGE_SIZE, DEFAULT_CURRENT_PAGE } from "../utils/constants";
+import { useRoles } from "../Context/PermissionsContext";
 
 const Permissions = () => {
-  const [permissions, setPermissions] = useState([]);
+  const [Mypermissions, setPermissions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -17,6 +18,7 @@ const Permissions = () => {
     pageSize: DEFAULT_PAGE_SIZE,
     total: 0,
   });
+  const { permissions } = useRoles();
 
   useEffect(() => {
     fetchPermissions();
@@ -123,6 +125,8 @@ const Permissions = () => {
         }}
       >
         <h1>Permissions Management</h1>
+          {permissions.includes("permission.create") && (
+
         <Button
           type="primary"
           icon={<PlusOutlined />}
@@ -130,11 +134,12 @@ const Permissions = () => {
         >
           Add Permission
         </Button>
+          )}
       </div>
 
       {/* Permissions Table */}
       <PermissionsList
-        permissions={permissions}
+        Rolepermissions={Mypermissions}
         loading={loading}
         onEdit={handleEditPermission}
         onDelete={handleDeletePermission}

@@ -12,7 +12,7 @@ const HeroSection = () => {
   const [formLoading, setFormLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingHero, setEditingHero] = useState(null);
-    const { permissions } = useRoles();
+  const { permissions } = useRoles();
 
   // ✅ Fetch Hero Data on mount
   useEffect(() => {
@@ -61,49 +61,49 @@ const HeroSection = () => {
     }
   };
 
-const handleFormSubmit = async (values) => {
-  const formData = new FormData();
+  const handleFormSubmit = async (values) => {
+    const formData = new FormData();
 
-  formData.append("heading", values.heading);
-  formData.append("sub_heading", values.sub_heading);
-  formData.append("description", values.description);
-  formData.append("is_active", values.is_active ? 1 : 0);
-  formData.append("button1_text", values.button1_text || "");
-  formData.append("button1_link", values.button1_link || "");
-  formData.append("button2_text", values.button2_text || "");
-  formData.append("button2_link", values.button2_link || "");
-  formData.append("image_alt", values.image_alt || "");
+    formData.append("heading", values.heading);
+    formData.append("sub_heading", values.sub_heading);
+    formData.append("description", values.description);
+    formData.append("is_active", values.is_active ? 1 : 0);
+    formData.append("button1_text", values.button1_text || "");
+    formData.append("button1_link", values.button1_link || "");
+    formData.append("button2_text", values.button2_text || "");
+    formData.append("button2_link", values.button2_link || "");
+    formData.append("image_alt", values.image_alt || "");
 
-  if (values.image_path) {
-   formData.append("image_path", values.image_path); // append binary
-  }
-
-  try {
-    setFormLoading(true);
-
-    if (editingHero) {
-      // Update existing hero
-      await heroAPI.update(editingHero.id, formData);
-      message.success("Hero updated successfully!");
-    } else {
-      // Add new hero
-      await heroAPI.create(formData);
-      message.success("Hero added successfully!");
+    if (values.image_path) {
+      formData.append("image_path", values.image_path); // append binary
     }
 
-    // Refresh list
-    await fetchHeroItems();
+    try {
+      setFormLoading(true);
 
-    // Close modal
-    setModalVisible(false);
-    setEditingHero(null);
-  } catch (error) {
-    console.error("Error submitting hero form:", error);
-    message.error("Failed to save hero data.");
-  } finally {
-    setFormLoading(false);
-  }
-};
+      if (editingHero) {
+        // Update existing hero
+        await heroAPI.update(editingHero.id, formData);
+        message.success("Hero updated successfully!");
+      } else {
+        // Add new hero
+        await heroAPI.create(formData);
+        message.success("Hero added successfully!");
+      }
+
+      // Refresh list
+      await fetchHeroItems();
+
+      // Close modal
+      setModalVisible(false);
+      setEditingHero(null);
+    } catch (error) {
+      console.error("Error submitting hero form:", error);
+      message.error("Failed to save hero data.");
+    } finally {
+      setFormLoading(false);
+    }
+  };
 
 
   const handleModalCancel = () => {
@@ -123,12 +123,12 @@ const handleFormSubmit = async (values) => {
         }}
       >
         <h1>Hero Section Management</h1>
-          {permissions.includes("hero.create") && (
+        {permissions.includes("hero.create") && (
 
-        <Button type="primary" icon={<PlusOutlined />} onClick={handleAddHero}>
-          Add Hero Content
-        </Button>
-          )}
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleAddHero}>
+            Add Hero Content
+          </Button>
+        )}
       </div>
 
       {/* Hero List */}
@@ -145,11 +145,11 @@ const handleFormSubmit = async (values) => {
         onCancel={handleModalCancel}
         footer={null}
         // width={600}
-        destroyOnClose
+        destroyOnHidden
         title={editingHero ? "Edit Hero Content" : "Add Hero Content"}
         width={window.innerWidth < 768 ? "90%" : 900}
         style={{ top: 20 }}
-        bodyStyle={{ paddingTop: 10 }}
+        styles={{ body: { paddingTop: 10 } }}
       >
         <HeroForm
           visible={modalVisible}

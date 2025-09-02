@@ -61,7 +61,7 @@ const TestCategoriesList = ({
       width: 250,
       render: (_, record) => (
         <Space size="middle">
-          {permissions.includes("testCategory.edit") && (
+          {permissions.includes("test category.edit") && (
           <Button
             type="primary"
             icon={<EditOutlined />}
@@ -71,7 +71,7 @@ const TestCategoriesList = ({
             Edit
           </Button>
           )}
-          {permissions.includes("testCategory.delete") && (
+          {permissions.includes("category.delete") && (
 
           <Popconfirm
             title="Are you sure you want to delete this test?"

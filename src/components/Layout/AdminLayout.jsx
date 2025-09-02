@@ -32,7 +32,8 @@ const AdminLayout = () => {
 
   // Sidebar Menu Items
   const menuItems = [
-    { key: "/", icon: <DashboardOutlined />, label: "Dashboard" },
+    
+    { key: "/", icon:  <DashboardOutlined />, label: "Dashboard" },
     { key: "/doctors", icon: <UserOutlined />, label: "Doctors" },
     { key: "/tests", icon: <ExperimentOutlined />, label: "Tests" },
     {
@@ -58,6 +59,9 @@ const AdminLayout = () => {
         { key: "/customer", icon: <UserOutlined />, label: "Customer" },
       ],
     },
+    { key: "/career", icon: <UserOutlined />, label: "Career Form" },
+    { key: "/contact", icon: <UserOutlined />, label: "Contact" },
+
   ];
 
   const handleMenuClick = ({ key }) => {
@@ -140,14 +144,13 @@ const AdminLayout = () => {
             <h2 style={{ margin: 0, marginLeft: 16 }}>{getPageTitle()}</h2>
           </div>
 
-          {/* 🔹 Right Side Buttons */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            {/* Profile Button */}
+            
             <Button
               type="default"
               shape="round"
               icon={<Avatar size="small" icon={<UserOutlined />} />}
-              onClick={() => setIsProfileOpen(true)} // ✅ Drawer open
+              onClick={() => setIsProfileOpen(true)} 
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -184,8 +187,6 @@ const AdminLayout = () => {
         >
           <Outlet />
         </Content>
-
-        {/* 🔹 Drawer for Profile */}
         <ProfileDrawer open={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
       </Layout>
     </Layout>

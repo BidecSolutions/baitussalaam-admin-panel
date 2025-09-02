@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table, Button, Space, Tag, Popconfirm, message } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { useRoles } from '../../Context/PermissionsContext';
 
 const UsersList = ({
   users = [],
@@ -19,6 +20,7 @@ const UsersList = ({
       console.error('Error deleting user:', error);
     }
   };
+  const { permissions } = useRoles();
 
   const columns = [
     {
@@ -51,6 +53,8 @@ const UsersList = ({
       key: 'actions',
       render: (_, record) => (
         <Space size="middle">
+          {permissions.includes("admin.edit") && (
+
           <Button
             type="primary"
             icon={<EditOutlined />}
@@ -59,6 +63,9 @@ const UsersList = ({
           >
             Edit
           </Button>
+          )}
+          {permissions.includes("admin.delete") && (
+
           <Popconfirm
             title="Are you sure you want to delete this user?"
             description="This action cannot be undone."
@@ -76,6 +83,7 @@ const UsersList = ({
               Delete
             </Button>
           </Popconfirm>
+          )}
         </Space>
       ),
     },

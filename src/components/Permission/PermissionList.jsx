@@ -1,16 +1,17 @@
 import React from 'react';
 import { Table, Button, Space, Popconfirm, message } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { useRoles } from '../../Context/PermissionsContext';
 
 const PermissionsList = ({
-  permissions = [],
+  Rolepermissions = [],
   loading = false,
   onEdit,
   onDelete,
   pagination,
   onTableChange
 }) => {
-
+   const { permissions } = useRoles();
   const handleDelete = async (id) => {
     try {
       await onDelete(id);
@@ -21,7 +22,7 @@ const PermissionsList = ({
     }
   };
 
-  console.log('permissions list ', permissions);
+  console.log('permissions list ', Rolepermissions);
 
   const columns = [
     {
@@ -53,6 +54,8 @@ const PermissionsList = ({
       key: 'actions',
       render: (_, record) => (
         <Space size="middle">
+          {permissions.includes("permission.edit") && (
+
           <Button
             type="primary"
             icon={<EditOutlined />}
@@ -61,6 +64,9 @@ const PermissionsList = ({
           >
             Edit
           </Button>
+          )}
+          {permissions.includes("permission.delete") && (
+
           <Popconfirm
             title="Are you sure you want to delete this permission?"
             description="This action cannot be undone."
@@ -78,6 +84,7 @@ const PermissionsList = ({
               Delete
             </Button> 
           </Popconfirm>
+          )}
         </Space>
       ),
     },
@@ -86,7 +93,7 @@ const PermissionsList = ({
   return (
     <Table
       columns={columns}
-      dataSource={permissions || []}
+      dataSource={Rolepermissions || []}
       rowKey="id"
       loading={loading}
       pagination={{

@@ -125,68 +125,9 @@ const Login = () => {
           </Button>
         </Form.Item>
 
-        <p
-          style={{ color: "blue", cursor: "pointer", textAlign: "center" }}
-          onClick={() => setShowChangePassword(true)}
-        >
-          Change Password
-        </p>
       </Form>
 
-      {/* Change Password Modal */}
-      <Modal
-        title="Change Password"
-        open={showChangePassword}
-        onCancel={() => setShowChangePassword(false)}
-        footer={null}
-      >
-        <Form
-          form={passwordForm}
-          layout="vertical"
-          onFinish={handleChangePassword}
-        >
-          <Form.Item
-            name="current_Password"
-            label="Current Password"
-            rules={[{ required: true, message: "Please enter current password" }]}
-          >
-            <Input.Password />
-          </Form.Item>
-
-          <Form.Item
-            name="new_Password"
-            label="New Password"
-            rules={[{ required: true, message: "Please enter new password" }]}
-          >
-            <Input.Password />
-          </Form.Item>
-
-          <Form.Item
-            name="confirm_Password"
-            label="Confirm Password"
-            dependencies={["new_Password"]}
-            rules={[
-              { required: true, message: "Please confirm password" },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (!value || getFieldValue("new_Password") === value) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error("Passwords do not match!"));
-                },
-              }),
-            ]}
-          >
-            <Input.Password />
-          </Form.Item>
-
-          <Form.Item>
-            <Button type="primary" htmlType="submit" block loading={loading}>
-              Update Password
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
+   
     </div>
   );
 };

@@ -131,7 +131,7 @@ export const rolesAPI = {
 export const AssignRoleAdmins = {
   getAll: () =>  api.get('/admin/list-admin-roles'),
   create: (data) =>  api.post('/admin/assign-role-admin', data),
-  update: (id, data) => USE_MOCK_DATA ? mockAPI.roles.update(id, data) : api.put(`/roles/${id}`, data),
+  update: (id, data) => api.post(`/admin/update-role/${id}`, data),
   delete: (id) => USE_MOCK_DATA ? mockAPI.roles.delete(id) : api.delete(`/roles/${id}`),
 };
 
@@ -140,7 +140,7 @@ export const permissionsAPI = {
   getById: (id) => USE_MOCK_DATA ? mockAPI.permissions.getById(id) : api.get(`/permissions/${id}`),
   create: (data) =>  api.post('/admin/create-permission', data),
   update: (id, data) =>  api.post(`/admin/update-permission/${id}`, data),
-  // delete: (id) => USE_MOCK_DATA ? mockAPI.permissions.delete(id) : api.delete(`/permissions/${id}`),
+  delete: (id) =>api.delete(`/admin/permissions/destroy/${id}`),
 };
 export const customersAPI = {
   getAll: () => USE_MOCK_DATA ? mockAPI.users.getAll() : api.get('admin/user'),
@@ -150,6 +150,13 @@ export const customersAPI = {
   delete: (id) => USE_MOCK_DATA ? mockAPI.users.delete(id) : api.delete(`admin/user/${id}/changeactiveInactive`),
 };
 
+export const contactApi = {
+  getAll: () => api.get('/admin/contacts'),
+};
+export const CareerApi = {
+  getAll: () => api.get('/admin/careers'),
+  delete: (id) => api.delete(`/admin/careers/${id}/delete`),
+};
 
 
 export default api; 

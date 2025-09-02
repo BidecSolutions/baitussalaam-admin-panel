@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Form, Input, Button, Checkbox, Row, Col, Divider, message } from "antd";
 import { permissionsAPI } from "../../services/api";
 
-const actions = ["Create", "List", "Edit", "Delete"]; // ✅ Actions list
+const actions = ["create", "list", "edit", "delete"]; // ✅ Actions list
 
 const RolesForm = ({ visible, onCancel, onSubmit, initialValues = null, loading }) => {
   const [form] = Form.useForm();
@@ -53,7 +53,7 @@ const RolesForm = ({ visible, onCancel, onSubmit, initialValues = null, loading 
         const [module, action] = p.name.split(".");
         const moduleName = p.module_name || module;
         if (!permMap[moduleName]) permMap[moduleName] = {};
-        permMap[moduleName][action.charAt(0).toUpperCase() + action.slice(1)] = true;
+        permMap[moduleName][action.toLowerCase()] = true;
       });
 
       form.setFieldsValue({
@@ -189,9 +189,9 @@ const RolesForm = ({ visible, onCancel, onSubmit, initialValues = null, loading 
                   </Col>
 
                   {actions.map((action) => (
-                    <Col key={action} span={3} style={{ textAlign: "center" }}>
+                    <Col key={action.trim()} span={3} style={{ textAlign: "center" }}>
                       <Form.Item
-                        name={["permissions", module, action]}
+                        name={["permissions", module, action.trim().toLowerCase()]}
                         valuePropName="checked"
                         noStyle
                       >

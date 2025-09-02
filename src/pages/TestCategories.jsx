@@ -102,7 +102,7 @@ const TestCategories = () => {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h1>Test Categories</h1>
-          {permissions.includes("testCategory.create") && (
+          {permissions.includes("test category.create") && (
 
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAddTestCategory}>
           Add Category

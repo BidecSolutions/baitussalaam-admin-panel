@@ -8,6 +8,8 @@ import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_CURRENT_PAGE,
 } from "../utils/constants";
+import { useRoles } from "../Context/PermissionsContext";
+
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -20,6 +22,7 @@ const Users = () => {
     pageSize: DEFAULT_PAGE_SIZE,
     total: 0,
   });
+  const { permissions } = useRoles();
 
   useEffect(() => {
     fetchUsers();
@@ -127,6 +130,7 @@ const Users = () => {
         }}
       >
         <h1>Users Management</h1>
+          {permissions?.includes("admin.create") && (
         <Button
           type="primary"
           icon={<PlusOutlined />}
@@ -134,6 +138,7 @@ const Users = () => {
         >
           Add User
         </Button>
+          )}
       </div>
 
       {/* Users Table */}

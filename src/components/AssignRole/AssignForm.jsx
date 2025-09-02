@@ -1,26 +1,14 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Select, Button, message } from "antd";
-import { rolesAPI, usersAPI , AssignRoleAdmins} from "../../services/api"; // ✅ Users API bhi import kiya
-// import { RoleContext } from "../../Context/RolesContext";
-
-// import { RoleContext } from "../../Context/RolesContext"; // ✅ Context
+import { rolesAPI, usersAPI, AssignRoleAdmins } from "../../services/api";
 
 const { Option } = Select;
 
-const AssignForm = ({
-  onSubmit,
-  onCancel,
-  initialValues = null,
-  loading = false,
-  set
-}) => {
- 
+const AssignForm = ({ onSuccess, onCancel, initialValues = null, loading }) => {
   const [form] = Form.useForm();
   const [roles, setRoles] = useState([]);
   const [users, setUsers] = useState([]);
-  const [fetchingRoles, setFetchingRoles] = useState(false);
-  const [fetchingUsers, setFetchingUsers] = useState(false);
-  
+
   useEffect(() => {
     fetchRoles();
     fetchUsers();
@@ -28,126 +16,99 @@ const AssignForm = ({
 
   const fetchRoles = async () => {
     try {
-      setFetchingRoles(true);
-      const response = await rolesAPI.getAll(); 
+      const response = await rolesAPI.getAll();
       const data = Array.isArray(response.data)
         ? response.data
         : response.data?.data || [];
-      const filteredUsers = data.filter((data) => {
-        return data.guard_name === "admin-api"
-      });
-      console.log(filteredUsers)
-      setRoles(filteredUsers);
+      setRoles(data.filter((r) => r.guard_name === "admin-api"));
     } catch (error) {
-      console.error("Error fetching roles:", error);
-      message.error("Failed to fetch roles. Please try again.");
-      setRoles([]);
-    } finally {
-      setFetchingRoles(false);
+      message.error("Failed to fetch roles!");
     }
   };
 
-  
   const fetchUsers = async () => {
     try {
-      setFetchingUsers(true);
-      const response = await usersAPI.getAll(); // GET /users
+      const response = await usersAPI.getAll();
       const data = Array.isArray(response.data)
-      ? response.data
-      : response.data?.data || [];
+        ? response.data
+        : response.data?.data || [];
       setUsers(data);
     } catch (error) {
-      console.error("Error fetching users:", error);
-      message.error("Failed to fetch users. Please try again.");
-      setUsers([]);
-    } finally {
-      setFetchingUsers(false);
+      message.error("Failed to fetch users!");
     }
   };
 
+  // Populate edit values
   useEffect(() => {
     if (initialValues) {
-      form.setFieldsValue(initialValues);
+      form.setFieldsValue({
+        admin_id: initialValues.admin_id,
+        role: initialValues.roles || [],
+      });
     } else {
       form.resetFields();
     }
   }, [initialValues, form]);
 
   const handleFinish = async (values) => {
-   try {
-         const payLoad = {
-           admin_id: values.admin_id,
-           role: values.role,
-         };
-            const res = await AssignRoleAdmins.create(payLoad);
-            console.log("admin id" , payLoad.admin_id);
-            console.log("admin id" , payLoad.values.role);
-         console.log("res " , res.data);
-         form.resetFields();
-         set(false)
-       } catch (e) {
-       
-         console.log(e);
-       }
+    try {
+      const payload = {
+        admin_id: values.admin_id,
+        roles: values.role, // array of role names
+      };
+
+      if (initialValues) {
+        await AssignRoleAdmins.update(values.admin_id, payload);
+        message.success("Role updated successfully!");
+      } else {
+        await AssignRoleAdmins.create(payload);
+        message.success("Role assigned successfully!");
+      }
+
+      form.resetFields();
+      onSuccess();
+    } catch (e) {
+      console.error("Assign role error:", e);
+      message.error("Failed to save role!");
+    }
   };
 
   return (
-    <Form
-      layout="vertical"
-      form={form}
-      onFinish={handleFinish}
-      style={{ marginTop: 10 }}
-    >
-     
+    <Form form={form} layout="vertical" onFinish={handleFinish}>
       <Form.Item
         name="admin_id"
         label="Select Admin"
-        rules={[{ required: true, message: "Please select a admin" }]}
+        rules={[{ required: true, message: "Please select an admin" }]}
       >
-        <Select placeholder="Choose a user" loading={fetchingUsers} >
-          {users?.map((user) => (
-            <Option key={user.id} value={user.id}>
-              {user.name}
+        <Select placeholder="Choose admin">
+          {users.map((u) => (
+            <Option key={u.id} value={u.id}>
+              {u.name}
             </Option>
           ))}
         </Select>
       </Form.Item>
 
-      
       <Form.Item
         name="role"
         label="Select Roles"
         rules={[{ required: true, message: "Please select at least one role" }]}
       >
-        <Select
-          mode="multiple"
-          placeholder="Choose roles"
-          allowClear
-          loading={fetchingRoles}
-        >
-          {roles.map((role) => (
-            <Option key={role.id} value={role.name}>
-              {role.name}
+        <Select mode="multiple" placeholder="Choose roles" allowClear>
+          {roles.map((r) => (
+            <Option key={r.id} value={r.name}>
+              {r.name}
             </Option>
           ))}
         </Select>
       </Form.Item>
 
-      
-      <Form.Item>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: "8px",
-          }}
-        >
-          <Button onClick={onCancel}>Cancel</Button>
-          <Button type="primary" htmlType="submit" loading={loading} >
-            Assign
-          </Button>
-        </div>
-      </Form.Item>
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}>
+        <Button onClick={onCancel}>Cancel</Button>
+        <Button type="primary" htmlType="submit" loading={loading}>
+          {initialValues ? "Update" : "Assign"}
+        </Button>
+      </div>
     </Form>
   );
 };
