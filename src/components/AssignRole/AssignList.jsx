@@ -13,13 +13,11 @@ const AssignList = ({ onEdit, onDelete, data, loading = false }) => {
       dataIndex: "roles",
       key: "roles",
       render: (roles) =>
-        Array.isArray(roles) && roles.length > 0
-          ? roles.map((r, idx) => (
-              <Tag key={idx} color="blue">
-                {typeof r === "string" ? r : r.name}
-              </Tag>
-            ))
-          : "-",
+        roles?.map((r, idx) => (
+          <Tag key={idx} color="blue">
+            {r}
+          </Tag>
+        )),
     },
     {
       title: "Action",

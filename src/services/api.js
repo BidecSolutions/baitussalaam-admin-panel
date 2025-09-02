@@ -131,7 +131,7 @@ export const rolesAPI = {
 export const AssignRoleAdmins = {
   getAll: () =>  api.get('/admin/list-admin-roles'),
   create: (data) =>  api.post('/admin/assign-role-admin', data),
-  update: (id, data) => api.post(`/admin/update-role/${id}`, data),
+  update: (id, data) => api.post(`/admin/update-roles/${id}`, data),
   delete: (id) => USE_MOCK_DATA ? mockAPI.roles.delete(id) : api.delete(`/roles/${id}`),
 };
 

@@ -39,7 +39,7 @@ const RolesList = ({
       align: 'center',
       render: (_, record) => (
         <Space size="small">
-          {/* {permissions.includes("role.edit") && ( */}
+          {permissions.includes("role.edit") && (
         
           <Button
             type="primary"
@@ -50,8 +50,8 @@ const RolesList = ({
           >
             Edit
           </Button>
-          {/* )} */}
-          {/* {permissions.includes("role.delete") && (  */}
+          )} 
+          {permissions.includes("role.delete") && ( 
 
           <Popconfirm
             title="Are you sure you want to delete this role?"
@@ -72,7 +72,7 @@ const RolesList = ({
               Delete
             </Button>
           </Popconfirm>
-          {/* )} */}
+          )} 
         </Space>
       ),
     },

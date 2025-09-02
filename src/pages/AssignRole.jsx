@@ -22,9 +22,7 @@ const AssignRole = () => {
           id: u.admin_id,
           admin_id: u.admin_id,
           admin_name: u.admin_name,
-          roles: Array.isArray(u.roles)
-            ? u.roles.map((r) => (typeof r === "string" ? r : r.name))
-            : [],
+          roles: u.roles || [],
         }))
       );
     } catch (e) {
@@ -39,7 +37,7 @@ const AssignRole = () => {
   const handleSuccess = () => {
     setModalVisible(false);
     setEditingRecord(null);
-    fetchAssignments();
+    fetchAssignments(); // reload after success
   };
 
   const handleDelete = async (id) => {

@@ -1,14 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Form, Select, Button, message } from "antd";
-import { rolesAPI, usersAPI, AssignRoleAdmins } from "../../services/api";
+import { rolesAPI, usersAPI , AssignRoleAdmins} from "../../services/api"; // ✅ Users API bhi import kiya
+// import { RoleContext } from "../../Context/RolesContext";
+
+// import { RoleContext } from "../../Context/RolesContext"; // ✅ Context
 
 const { Option } = Select;
 
-const AssignForm = ({ onSuccess, onCancel, initialValues = null, loading }) => {
+const AssignForm = ({
+  onSubmit,
+  onCancel,
+  initialValues = null,
+  loading = false,
+  set
+}) => {
+ 
   const [form] = Form.useForm();
   const [roles, setRoles] = useState([]);
   const [users, setUsers] = useState([]);
-
+  const [fetchingRoles, setFetchingRoles] = useState(false);
+  const [fetchingUsers, setFetchingUsers] = useState(false);
+  
   useEffect(() => {
     fetchRoles();
     fetchUsers();
@@ -16,99 +28,147 @@ const AssignForm = ({ onSuccess, onCancel, initialValues = null, loading }) => {
 
   const fetchRoles = async () => {
     try {
-      const response = await rolesAPI.getAll();
+      setFetchingRoles(true);
+      const response = await rolesAPI.getAll(); 
       const data = Array.isArray(response.data)
         ? response.data
         : response.data?.data || [];
-      setRoles(data.filter((r) => r.guard_name === "admin-api"));
+      const filteredUsers = data.filter((data) => {
+        return data.guard_name === "admin-api"
+      });
+      console.log(filteredUsers)
+      setRoles(filteredUsers);
     } catch (error) {
-      message.error("Failed to fetch roles!");
+      console.error("Error fetching roles:", error);
+      message.error("Failed to fetch roles. Please try again.");
+      setRoles([]);
+    } finally {
+      setFetchingRoles(false);
     }
   };
 
+  
   const fetchUsers = async () => {
     try {
-      const response = await usersAPI.getAll();
+      setFetchingUsers(true);
+      const response = await usersAPI.getAll(); // GET /users
       const data = Array.isArray(response.data)
-        ? response.data
-        : response.data?.data || [];
+      ? response.data
+      : response.data?.data || [];
       setUsers(data);
     } catch (error) {
-      message.error("Failed to fetch users!");
+      console.error("Error fetching users:", error);
+      message.error("Failed to fetch users. Please try again.");
+      setUsers([]);
+    } finally {
+      setFetchingUsers(false);
     }
   };
 
-  // Populate edit values
   useEffect(() => {
     if (initialValues) {
-      form.setFieldsValue({
-        admin_id: initialValues.admin_id,
-        role: initialValues.roles || [],
-      });
+      form.setFieldsValue(initialValues);
     } else {
       form.resetFields();
     }
   }, [initialValues, form]);
 
   const handleFinish = async (values) => {
-    try {
-      const payload = {
-        admin_id: values.admin_id,
-        roles: values.role, // array of role names
-      };
+  try {
+    setFormLoading(true); // Loading state start
 
-      if (initialValues) {
-        await AssignRoleAdmins.update(values.admin_id, payload);
-        message.success("Role updated successfully!");
-      } else {
-        await AssignRoleAdmins.create(payload);
-        message.success("Role assigned successfully!");
-      }
+    const payLoad = {
+      admin_id: values.admin_id,
+      role: values.role,
+    };
 
-      form.resetFields();
-      onSuccess();
-    } catch (e) {
-      console.error("Assign role error:", e);
-      message.error("Failed to save role!");
+    if (editingAssignment) {
+      // Update existing assignment
+      const res = await AssignRoleAdmins.update(editingAssignment.id, payLoad);
+      console.log("Updated Admin ID:", payLoad.admin_id);
+      console.log("Updated Role:", payLoad.role);
+      console.log("Response:", res.data);
+      message.success("Role updated successfully!");
+    } else {
+      // Create new assignment
+      const res = await AssignRoleAdmins.create(payLoad);
+      console.log("Created Admin ID:", payLoad.admin_id);
+      console.log("Created Role:", payLoad.role);
+      console.log("Response:", res.data);
+      message.success("Role assigned successfully!");
     }
-  };
+
+    // Reset form & close modal
+    form.resetFields();
+    set(false); // Close modal
+
+  } catch (error) {
+    console.error("Error creating/updating role:", error);
+    message.error("Failed to save role!");
+    throw error;
+  } finally {
+    setFormLoading(false); // Loading state end
+  }
+};
+
 
   return (
-    <Form form={form} layout="vertical" onFinish={handleFinish}>
+    <Form
+      layout="vertical"
+      form={form}
+      onFinish={handleFinish}
+      style={{ marginTop: 10 }}
+    >
+     
       <Form.Item
         name="admin_id"
         label="Select Admin"
-        rules={[{ required: true, message: "Please select an admin" }]}
+        rules={[{ required: true, message: "Please select a admin" }]}
       >
-        <Select placeholder="Choose admin">
-          {users.map((u) => (
-            <Option key={u.id} value={u.id}>
-              {u.name}
+        <Select placeholder="Choose a user" loading={fetchingUsers} >
+          {users?.map((user) => (
+            <Option key={user.id} value={user.id}>
+              {user.name}
             </Option>
           ))}
         </Select>
       </Form.Item>
 
+      
       <Form.Item
         name="role"
         label="Select Roles"
         rules={[{ required: true, message: "Please select at least one role" }]}
       >
-        <Select mode="multiple" placeholder="Choose roles" allowClear>
-          {roles.map((r) => (
-            <Option key={r.id} value={r.name}>
-              {r.name}
+        <Select
+          mode="multiple"
+          placeholder="Choose roles"
+          allowClear
+          loading={fetchingRoles}
+        >
+          {roles.map((role) => (
+            <Option key={role.id} value={role.name}>
+              {role.name}
             </Option>
           ))}
         </Select>
       </Form.Item>
 
-      <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}>
-        <Button onClick={onCancel}>Cancel</Button>
-        <Button type="primary" htmlType="submit" loading={loading}>
-          {initialValues ? "Update" : "Assign"}
-        </Button>
-      </div>
+      
+      <Form.Item>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "8px",
+          }}
+        >
+          <Button onClick={onCancel}>Cancel</Button>
+          <Button type="primary" htmlType="submit" loading={loading} >
+            Assign
+          </Button>
+        </div>
+      </Form.Item>
     </Form>
   );
 };
