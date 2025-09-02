@@ -184,8 +184,16 @@ export const RoleProvider = ({ children }) => {
 
   // ✅ Logout
   const logout = () => {
-    localStorage.removeItem("token"); 
-    setRoles([]); 
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setRoles([]);
+    
+    // Trigger permission reset
+    const event = new CustomEvent('userChange', {
+      detail: { type: 'logout' }
+    });
+    window.dispatchEvent(event);
+    
     message.success("Logged out successfully", 2);
     window.location.href = "/login";
   };
