@@ -5,6 +5,7 @@ import { DEFAULT_PAGE_SIZE, DEFAULT_CURRENT_PAGE } from '../utils/constants';
 import { codesAPI } from '../services/api';
 import CodesList from '../components/Codes/CodesList';
 import CodeForm from '../components/Codes/CodeForm';
+import { useRoles } from '../Context/PermissionsContext';
 
 const Codes = () => {
   const [codes, setCodes] = useState([]);
@@ -17,6 +18,7 @@ const Codes = () => {
     pageSize: DEFAULT_PAGE_SIZE,
     total: 0,
   });
+    const { permissions } = useRoles();
 
   // const { getCodes } = useContext(RoleContext);
 
@@ -100,9 +102,12 @@ const Codes = () => {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h1>Codes</h1>
+          {permissions.includes("codes.create") && (
+
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAddCodes}>
           Add Code
         </Button>
+          )}
       </div>
 
       <CodesList

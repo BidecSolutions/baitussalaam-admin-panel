@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table, Button, Space, Popconfirm, message, Tag } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import {rolesAPI} from "../../services/api"
 
 const RolesList = ({
   roles = [],
@@ -12,15 +13,7 @@ const RolesList = ({
   onTableChange
 }) => {
 
-  const handleDelete = async (id) => {
-    try {
-      await onDelete(id);
-      message.success('Role deleted successfully!');
-    } catch (error) {
-      message.error('Failed to delete role. Please try again.');
-      console.error('Error deleting role:', error);
-    }
-  };
+
 
   const columns = [
     {
@@ -69,6 +62,7 @@ const RolesList = ({
               icon={<DeleteOutlined />}
               size="middle"
               style={{ borderRadius: 6 }}
+              onClick={()=> onDelete(record.id)}
             >
               Delete
             </Button>

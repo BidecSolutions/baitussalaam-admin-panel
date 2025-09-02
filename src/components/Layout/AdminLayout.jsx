@@ -82,6 +82,7 @@ const AdminLayout = () => {
   // ✅ Logout function
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     navigate("/login");
   };
 

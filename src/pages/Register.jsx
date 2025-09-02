@@ -1,18 +1,41 @@
-import React, { useContext } from "react";
-import { Form, Input, Button, Checkbox } from "antd";
-import { RoleContext } from "../Context/RolesContext";
+import React from "react";
+import { Form, Input, Button, Checkbox, message } from "antd";
 import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [form] = Form.useForm();
-  const { register } = useContext(RoleContext);
   const navigate = useNavigate();
 
   const onFinish = async (values) => {
-    const data = await register(values);
-    if (data) {
-      navigate("/");
-      form.resetFields();
+    try {
+      const response = await fetch(
+        "https://baitussalam.datainovate.com/backend/api/user/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            name: values.name,
+            email: values.email,
+            password: values.password,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        message.success("User registered successfully!");
+        form.resetFields();
+        navigate("/"); // ✅ registration ke baad redirect
+      } else {
+        message.error(data.message || "Registration failed!");
+      }
+    } catch (error) {
+      console.error("Error registering user:", error);
+      message.error("Something went wrong. Please try again.");
     }
   };
 
@@ -33,7 +56,7 @@ const Register = () => {
         form={form}
         layout="vertical"
         name="registerForm"
-        onFinish={onFinish} // ✅ connect submit to context
+        onFinish={onFinish}
         autoComplete="off"
       >
         <Form.Item
@@ -53,6 +76,17 @@ const Register = () => {
           ]}
         >
           <Input placeholder="Enter your email" />
+        </Form.Item>
+
+        <Form.Item
+          label="Addresse"
+          name="address"
+          rules={[
+            { required: true, message: "Please enter your Addresse!" },
+            // { type: "email", message: "Please enter a valid email!" },
+          ]}
+        >
+          <Input placeholder="Enter your Addresse" />
         </Form.Item>
 
         <Form.Item
@@ -91,7 +125,9 @@ const Register = () => {
           rules={[
             {
               validator: (_, value) =>
-                value ? Promise.resolve() : Promise.reject("You must accept the terms"),
+                value
+                  ? Promise.resolve()
+                  : Promise.reject("You must accept the terms"),
             },
           ]}
         >

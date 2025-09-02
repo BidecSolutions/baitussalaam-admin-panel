@@ -70,7 +70,7 @@ const Roles = () => {
 
   const handleDeleteRole = async (id) => {
     try {
-      await rolesAPI.delete(id); // DELETE /roles/:id
+      await rolesAPI.delete(id); 
       await fetchRoles();
       return Promise.resolve();
     } catch (error) {
@@ -83,9 +83,10 @@ const Roles = () => {
   try {
     setFormLoading(true);
     if (editingRole) {
-      await rolesAPI.update(editingRole.id, {...values, guard: "admin-api"}); // PUT
+     await rolesAPI.update(editingRole.id, {...values, guard: "admin-api"}); 
+      
     } else {
-      await rolesAPI.create({...values, guard: "admin-api"}); // POST
+      await rolesAPI.create({...values, guard: "admin-api"}); 
     }
     setModalVisible(false);
     await fetchRoles();
@@ -134,13 +135,12 @@ const Roles = () => {
         </Button>
       </div>
 
-      {/* Roles Table */}
       <RolesList
         roles={roles}
         loading={loading}
         onEdit={handleEditRole}
         onDelete={handleDeleteRole}
-        onView={handleViewRole} // 👈 new handler
+        onView={handleViewRole} 
         pagination={pagination}
         onTableChange={handleTableChange}
       />

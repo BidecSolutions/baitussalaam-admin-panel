@@ -11,6 +11,8 @@ const RolesForm = ({ visible, onCancel, onSubmit, initialValues = null, loading 
 
   // ✅ Group data by module
   const groupData = (data) => {
+      console.log("Fetched initialValues:", initialValues);
+
     const grouped = {};
     data.forEach((item) => {
       if (!grouped[item.module_name]) grouped[item.module_name] = [];
@@ -39,16 +41,33 @@ const RolesForm = ({ visible, onCancel, onSubmit, initialValues = null, loading 
     }
   };
 
-  useEffect(() => {
-    if (visible) {
-      fetchPermissions();
-      if (initialValues) {
-        form.setFieldsValue(initialValues);
-      } else {
-        form.resetFields();
-      }
+ useEffect(() => {
+  if (visible) {
+    fetchPermissions();
+
+    if (initialValues) {
+      const permMap = {};
+
+      (initialValues.permissions || []).forEach((p) => {
+        
+        const [module, action] = p.name.split(".");
+        const moduleName = p.module_name || module;
+        if (!permMap[moduleName]) permMap[moduleName] = {};
+        permMap[moduleName][action.charAt(0).toUpperCase() + action.slice(1)] = true;
+      });
+
+      form.setFieldsValue({
+        name: initialValues.name,
+        permissions: permMap,
+      });
+
+      console.log("Mapped Permissions for Form:", permMap);
+    } else {
+      form.resetFields();
     }
-  }, [visible, initialValues, form]);
+  }
+}, [visible, initialValues, form]);
+
 
  const handleSubmit = (values) => {
   const selectedPermissions = [];
@@ -56,7 +75,7 @@ const RolesForm = ({ visible, onCancel, onSubmit, initialValues = null, loading 
   Object.keys(values.permissions || {}).forEach((module) => {
     Object.keys(values.permissions[module] || {}).forEach((action) => {
       if (values.permissions[module][action]) {
-        // lowercase kar ke bhejenge
+        
         selectedPermissions.push(`${module.toLowerCase()}.${action.toLowerCase()}`);
       }
     });
@@ -84,6 +103,8 @@ const RolesForm = ({ visible, onCancel, onSubmit, initialValues = null, loading 
     actions.forEach((action) => {
       newPermissions[module][action] = checked;
     });
+    console.log("newPermissions" , newPermissions);
+    
 
     form.setFieldsValue({ permissions: newPermissions });
   };
@@ -129,7 +150,7 @@ const RolesForm = ({ visible, onCancel, onSubmit, initialValues = null, loading 
               padding: "8px",
             }}
           >
-            {/* Table Header */}
+            
             <Row style={{ fontWeight: "bold", paddingBottom: 8 }}>
               <Col span={4}>Permission</Col>
               <Col span={2} style={{ textAlign: "center" }}>
@@ -142,7 +163,7 @@ const RolesForm = ({ visible, onCancel, onSubmit, initialValues = null, loading 
               ))}
             </Row>
 
-            {/* Table Rows */}
+            
             {Object.keys(groupedModules).map((module) => (
               <React.Fragment key={module}>
                 {/* Module Header */}

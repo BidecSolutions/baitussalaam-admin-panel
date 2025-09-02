@@ -1,6 +1,7 @@
 import React from "react";
 import { Table, Button, Space, Popconfirm, message, Tag } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { useRoles } from "../Context/PermissionsContext";
 
 const TestCategoriesList = ({
   tests = [],
@@ -19,6 +20,8 @@ const TestCategoriesList = ({
       console.error("Error deleting test:", error);
     }
   };
+    const { permissions } = useRoles();
+  
 
   const columns = [ 
     {
@@ -58,6 +61,7 @@ const TestCategoriesList = ({
       width: 250,
       render: (_, record) => (
         <Space size="middle">
+          {permissions.includes("testCategory.edit") && (
           <Button
             type="primary"
             icon={<EditOutlined />}
@@ -66,6 +70,9 @@ const TestCategoriesList = ({
           >
             Edit
           </Button>
+          )}
+          {permissions.includes("testCategory.delete") && (
+
           <Popconfirm
             title="Are you sure you want to delete this test?"
             description="This action cannot be undone."
@@ -83,6 +90,7 @@ const TestCategoriesList = ({
               Delete
             </Button>
           </Popconfirm>
+          )}
         </Space>
       ),
     },

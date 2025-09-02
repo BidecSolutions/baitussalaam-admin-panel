@@ -2,10 +2,12 @@
 import React, { useState } from "react";
 import { Table, Button, Space, Drawer, Descriptions, Image } from "antd";
 import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { useRoles } from "../Context/PermissionsContext";
 
 const DoctorsList = ({ doctors, loading, onEdit, onDelete }) => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const { permissions } = useRoles();
 
   const showDrawer = (doctor) => {
     setSelectedDoctor(doctor);
@@ -44,15 +46,23 @@ const DoctorsList = ({ doctors, loading, onEdit, onDelete }) => {
       key: "actions",
       render: (_, doctor) => (
         <Space>
+          {permissions.includes("doctor.list") && (
           <Button type="link" icon={<EyeOutlined />} onClick={() => showDrawer(doctor)}>
             View
           </Button>
+          )}
+          {permissions.includes("doctor.edit") && (
           <Button type="link" icon={<EditOutlined />} onClick={() => onEdit(doctor)}>
             Edit
           </Button>
+          )}
+          {permissions.includes("doctor.delete") && (
+        
           <Button danger type="link" icon={<DeleteOutlined />} onClick={() => onDelete(doctor.id)}>
             Delete
           </Button>
+          )}
+
         </Space>
       ),
     },

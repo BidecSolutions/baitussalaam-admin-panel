@@ -1,6 +1,7 @@
 import React from "react";
 import { Table, Button, Space, Popconfirm, message, Tag } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { useRoles } from "../../Context/PermissionsContext";
 
 const CodesList = ({
   codes = [],
@@ -19,6 +20,7 @@ const CodesList = ({
       console.error("Error deleting code:", error);
     }
   };
+    const { permissions } = useRoles();
 
   const columns = [ 
     {
@@ -55,6 +57,8 @@ const CodesList = ({
       width: 250,
       render: (_, record) => (
         <Space size="middle">
+          {permissions.includes("codes.edit") && (
+
           <Button
             type="primary"
             icon={<EditOutlined />}
@@ -63,6 +67,9 @@ const CodesList = ({
           >
             Edit
           </Button>
+          )}
+          {permissions.includes("codes.delete") && (
+
           <Popconfirm
             title="Are you sure you want to delete this code?"
             description="This action cannot be undone."
@@ -80,6 +87,7 @@ const CodesList = ({
               Delete
             </Button>
           </Popconfirm>
+          )}
         </Space>
       ),
     },

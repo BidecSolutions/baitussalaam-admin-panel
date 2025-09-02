@@ -14,7 +14,7 @@ const Login = () => {
   const handleLogin = async (values) => {
     try {
       let response = await authAPI.loginAdmin(values);
-      if (response.data.success) {
+      if (response.data.success){
         const user = response.data?.data;
         const token = response.data.token;
         localStorage.setItem("user", JSON.stringify(user));

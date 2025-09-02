@@ -14,6 +14,8 @@ import {
 import { EyeOutlined, EditOutlined } from "@ant-design/icons";
 import BranchesForm from "./BranchesForm";
 
+import { useRoles } from "../Context/PermissionsContext";
+
 const BranchesList = ({
   branches,
   loading = false,
@@ -25,6 +27,11 @@ const BranchesList = ({
   const [formVisible, setFormVisible] = useState(false);
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [loadingIds, setLoadingIds] = useState([]); // switch loader
+
+  //  const permissions = useRoles();
+  const { permissions } = useRoles();
+
+  console.log('permissions', permissions);
 
   const showDrawer = (branch) => {
     setSelectedBranch(branch);
@@ -87,6 +94,7 @@ const BranchesList = ({
       key: "actions",
       render: (_, record) => (
         <Space size="middle">
+          {permissions.includes("branches.list") && (
           <Button
             type="primary"
             icon={<EyeOutlined />}
@@ -95,25 +103,31 @@ const BranchesList = ({
           >
             View
           </Button>
-          <Button
-            type="default"
-            icon={<EditOutlined />}
-            size="small"
-            onClick={() => showEditForm(record)}
-          >
-            Edit
-          </Button>
-          <Popconfirm
-            title="Are you sure you want to delete this branch?"
-            onConfirm={() => onDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
-            placement="topRight"
-          >
-            <Button type="primary" danger size="small">
-              Delete
+          )}
+
+          {permissions.includes("branches.edit") && (
+            <Button
+              type="default"
+              icon={<EditOutlined />}
+              size="small"
+              onClick={() => showEditForm(record)}
+            >
+              Edit
             </Button>
-          </Popconfirm>
+          )}
+          {permissions.includes("branches.delete") && (
+            <Popconfirm
+              title="Are you sure you want to delete this branch?"
+              onConfirm={() => onDelete(record.id)}
+              okText="Yes"
+              cancelText="No"
+              placement="topRight"
+            >
+              <Button type="primary" danger size="small">
+                Delete
+              </Button>
+            </Popconfirm>
+          )}
         </Space>
       ),
     },

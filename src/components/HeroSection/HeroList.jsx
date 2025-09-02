@@ -1,8 +1,11 @@
 import React from "react";
 import { Row, Col, Tag, Descriptions, Button, Image, Card, Spin } from "antd";
 import { EditOutlined } from "@ant-design/icons";
+import { useRoles } from "../../Context/PermissionsContext";
 
 const HeroList = ({ items = [], onEdit, loading = false }) => {
+      const { permissions } = useRoles();
+  
   return (
     <Spin
       spinning={loading}
@@ -15,7 +18,7 @@ const HeroList = ({ items = [], onEdit, loading = false }) => {
           <Col xs={24} sm={24} md={24} lg={24} key={item.id}>
             <Card
               hoverable
-              actions={[
+              actions={permissions.includes("hero.edit") &&  [
                 <Button
                   type="primary"
                   icon={<EditOutlined />}

@@ -6,6 +6,7 @@ import DoctorsList from "../components/DoctorsList";
 import DoctorsForm from "../components/DoctorsForm";
 import { doctorsAPI, codesAPI } from "../services/api";
 import { DEFAULT_PAGE_SIZE, DEFAULT_CURRENT_PAGE } from "../utils/constants";
+import { useRoles } from "../Context/PermissionsContext";
 
 const Doctors = () => {
   const [doctors, setDoctors] = useState([]);
@@ -26,6 +27,8 @@ const Doctors = () => {
     pageSize: DEFAULT_PAGE_SIZE,
     total: 0,
   });
+  const { permissions } = useRoles();
+  
 
   useEffect(() => {
     fetchDoctors();
@@ -159,9 +162,12 @@ const Doctors = () => {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
         <h1>Doctors Management</h1>
+          {permissions.includes("doctor.create") && (
+
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAddDoctor}>
           Add Doctor
         </Button>
+          )}
       </div>
 
       <DoctorsList

@@ -5,6 +5,7 @@ import BranchesList from "../components/BranchesList"; // Table component
 import BranchesForm from "../components/BranchesForm"; // Form component
 import { BranchesAPI } from "../services/api"; // API service
 import { DEFAULT_PAGE_SIZE, DEFAULT_CURRENT_PAGE } from "../utils/constants";
+import { useRoles } from "../Context/PermissionsContext";
 
 const Branches = () => {
   const [branches, setBranches] = useState([]);
@@ -17,6 +18,7 @@ const Branches = () => {
     pageSize: DEFAULT_PAGE_SIZE,
     total: 0,
   });
+  const { permissions } = useRoles();
 
   useEffect(() => {
     fetchBranches();
@@ -121,9 +123,12 @@ const Branches = () => {
         }}
       >
         <h1>Branches Management</h1>
+          {permissions.includes("branches.create") && (
+
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAddBranch}>
           Add Branch
         </Button>
+          )}
       </div>
 
       <BranchesList

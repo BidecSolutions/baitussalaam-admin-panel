@@ -26,11 +26,10 @@ const AssignForm = ({
     fetchUsers();
   }, []);
 
-  // ✅ Roles Fetch
   const fetchRoles = async () => {
     try {
       setFetchingRoles(true);
-      const response = await rolesAPI.getAll(); // GET /roles
+      const response = await rolesAPI.getAll(); 
       const data = Array.isArray(response.data)
         ? response.data
         : response.data?.data || [];
@@ -48,14 +47,14 @@ const AssignForm = ({
     }
   };
 
-  // ✅ Users Fetch
+  
   const fetchUsers = async () => {
     try {
       setFetchingUsers(true);
       const response = await usersAPI.getAll(); // GET /users
       const data = Array.isArray(response.data)
-        ? response.data
-        : response.data?.data || [];
+      ? response.data
+      : response.data?.data || [];
       setUsers(data);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -83,11 +82,8 @@ const AssignForm = ({
             const res = await AssignRoleAdmins.create(payLoad);
             console.log("admin id" , payLoad.admin_id);
             console.log("admin id" , payLoad.values.role);
-            
-        
          console.log("res " , res.data);
          form.resetFields();
-      
          set(false)
        } catch (e) {
        
@@ -102,7 +98,7 @@ const AssignForm = ({
       onFinish={handleFinish}
       style={{ marginTop: 10 }}
     >
-      {/* ✅ Select User */}
+     
       <Form.Item
         name="admin_id"
         label="Select Admin"
@@ -117,7 +113,7 @@ const AssignForm = ({
         </Select>
       </Form.Item>
 
-      {/* ✅ Select Roles */}
+      
       <Form.Item
         name="role"
         label="Select Roles"
@@ -137,7 +133,7 @@ const AssignForm = ({
         </Select>
       </Form.Item>
 
-      {/* Buttons */}
+      
       <Form.Item>
         <div
           style={{
@@ -147,7 +143,7 @@ const AssignForm = ({
           }}
         >
           <Button onClick={onCancel}>Cancel</Button>
-          <Button type="primary" htmlType="submit" loading={loading}>
+          <Button type="primary" htmlType="submit" loading={loading} >
             Assign
           </Button>
         </div>

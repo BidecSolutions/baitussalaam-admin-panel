@@ -4,6 +4,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import HeroForm from "../components/HeroSection/HeroForm";
 import HeroList from "../components/HeroSection/HeroList";
 import { heroAPI } from "../services/api";
+import { useRoles } from "../Context/PermissionsContext";
 
 const HeroSection = () => {
   const [heroItems, setHeroItems] = useState([]);
@@ -11,6 +12,7 @@ const HeroSection = () => {
   const [formLoading, setFormLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingHero, setEditingHero] = useState(null);
+    const { permissions } = useRoles();
 
   // ✅ Fetch Hero Data on mount
   useEffect(() => {
@@ -121,9 +123,12 @@ const handleFormSubmit = async (values) => {
         }}
       >
         <h1>Hero Section Management</h1>
+          {permissions.includes("hero.create") && (
+
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAddHero}>
           Add Hero Content
         </Button>
+          )}
       </div>
 
       {/* Hero List */}

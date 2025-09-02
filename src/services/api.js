@@ -117,15 +117,15 @@ export const usersAPI = {
   getById: (id) => USE_MOCK_DATA ? mockAPI.users.getById(id) : api.get(`/users/${id}`),
   create: (data) =>  api.post('/admin/store', data),
   update: (id, data) =>  api.post(`/admin/${id}/update`, data),
-  delete: (id) => USE_MOCK_DATA ? mockAPI.users.delete(id) : api.delete(`/users/${id}`),
+  delete: (id) =>  api.delete(`/admin/${id}/delete`),
 };
 
 
 export const rolesAPI = {
   getAll: () =>  api.get('/admin/roles'),
   create: (data) =>  api.post('/admin/create-role', data),
-  update: (id, data) => USE_MOCK_DATA ? mockAPI.roles.update(id, data) : api.put(`/roles/${id}`, data),
-  delete: (id) => USE_MOCK_DATA ? mockAPI.roles.delete(id) : api.delete(`/roles/${id}`),
+  update: (id, data) => api.post(`/admin/update-role/${id}`, data),
+  delete: (id) =>  api.delete(`/admin/delete-role/${id}`),
 };
 
 export const AssignRoleAdmins = {

@@ -10,15 +10,16 @@ import Roles from './pages/Roles';
 import Permissions from './pages/Permissions';
 import AssignRole from './pages/AssignRole';
 import ViewList from './components/Roles/ViewList';
-import { RoleProvider } from './Context/RolesContext';
+import { RoleProvider } from './Context/RolesContext'; // ✅ import
 import Register from './pages/Register';
-import PrivateRoute from './PrivateRoute'; // ✅ import
+import PrivateRoute from './PrivateRoute';
 import Login from './pages/Login';
 import TestCategories from './pages/TestCategories';
 import Branches from './pages/Branches';
 import Codes from './pages/Codes';
 import HeroSection from './pages/HeroSection';
 import Customer from './pages/Customers';
+import { PermissionProvider } from './Context/PermissionsContext';
 
 const App = () => {
   return (
@@ -30,6 +31,8 @@ const App = () => {
         },
       }}
     >
+     <PermissionProvider>
+
       <RoleProvider>
         <Router>
           <Routes>
@@ -59,12 +62,12 @@ const App = () => {
               <Route path="/branches" element={<Branches />} />
               <Route path="/Hero-section" element={<HeroSection />} />
               <Route path="/customer" element={<Customer/>} />
-
-              
             </Route>
           </Routes>
         </Router>
       </RoleProvider>
+     </PermissionProvider>
+
     </ConfigProvider>
   );
 };

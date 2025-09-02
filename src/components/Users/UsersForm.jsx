@@ -105,16 +105,16 @@ const UsersForm = ({
         </Form.Item>
       )}
 
-      {/* Status - Toggle */}
+      
       <Form.Item
         name="status"
         label="Status"
-        valuePropName="checked" // Switch ke liye required
+        valuePropName="checked" 
       >
         <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
       </Form.Item>
 
-      {/* Action Buttons */}
+      
       <Form.Item style={{ marginBottom: 0, textAlign: "right" }}>
         <Button onClick={onCancel} style={{ marginRight: 8 }}>
           Cancel

@@ -5,6 +5,7 @@ import { DEFAULT_PAGE_SIZE, DEFAULT_CURRENT_PAGE } from '../utils/constants';
 import TestCategoriesList from '../components/TestCategoriesList';
 import { testCategoriesAPI } from '../services/api';
 import TestCategoryForm from '../components/TestCategoryForm';
+import { useRoles } from '../Context/PermissionsContext';
 
 const TestCategories = () => {
   const [tests, setTestCategories] = useState([]);
@@ -17,6 +18,7 @@ const TestCategories = () => {
     pageSize: DEFAULT_PAGE_SIZE,
     total: 0,
   });
+  const { permissions } = useRoles();
 
   // const { getTestCategories } = useContext(RoleContext);
 
@@ -100,9 +102,12 @@ const TestCategories = () => {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h1>Test Categories</h1>
+          {permissions.includes("testCategory.create") && (
+
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAddTestCategory}>
           Add Category
         </Button>
+          )}
       </div>
 
       <TestCategoriesList
