@@ -10,6 +10,15 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Helper function to trigger permission update
+  const triggerPermissionUpdate = (userData) => {
+    // Dispatch custom event to notify PermissionsContext
+    const event = new CustomEvent('userChange', {
+      detail: { type: 'login', userData }
+    });
+    window.dispatchEvent(event);
+  };
+
   // 🔹 Handle Login
   const handleLogin = async (values) => {
     try {
@@ -19,6 +28,10 @@ const Login = () => {
         const token = response.data.token;
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("token", token);
+        
+        // Trigger permission update
+        triggerPermissionUpdate(user);
+        
         message.success("Admin Login successful!");
         navigate("/"); // Admin dashboard
         return;
@@ -33,6 +46,10 @@ const Login = () => {
           const token = response.data.token;
           localStorage.setItem("user", JSON.stringify(user));
           localStorage.setItem("token", token);
+          
+          // Trigger permission update
+          triggerPermissionUpdate(user);
+          
           message.success("User Login successful!");
           navigate("/user-dashboard");
           return;

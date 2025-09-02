@@ -15,7 +15,9 @@ import {
 } from "@ant-design/icons";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { RoleContext } from "../../Context/RolesContext";
+import { useRoles } from "../../Context/PermissionsContext";
 import ProfileDrawer from "./ProfileDrawer"; // ✅ apna component import
+// import PermissionDebugger from "./PermissionDebugger"; // 🔐 Permission debugger for development
 
 const { Header, Sider, Content } = Layout;
 
@@ -25,44 +27,141 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout } = useContext(RoleContext);
+  const { permissions } = useRoles(); // Get user permissions
 
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  // Sidebar Menu Items
-  const menuItems = [
-    
-    { key: "/", icon:  <DashboardOutlined />, label: "Dashboard" },
-    { key: "/doctors", icon: <UserOutlined />, label: "Doctors" },
-    { key: "/tests", icon: <ExperimentOutlined />, label: "Tests" },
+  // Helper function to check if user has any permission for a module
+  const hasAnyPermission = (permissionPrefixes) => {
+    if (!permissions || !Array.isArray(permissions)) return false;
+    return permissionPrefixes.some(prefix => 
+      permissions.some(permission => permission.startsWith(prefix))
+    );
+  };
+
+  // Sidebar Menu Items with permission checks
+  const getAllMenuItems = () => [
+    { 
+      key: "/", 
+      icon: <DashboardOutlined />, 
+      label: "Dashboard",
+      show: true // Dashboard is always visible
+    },
+    { 
+      key: "/doctors", 
+      icon: <UserOutlined />, 
+      label: "Doctors",
+      show: hasAnyPermission(["doctor."])
+    },
+    { 
+      key: "/tests", 
+      icon: <ExperimentOutlined />, 
+      label: "Tests",
+      show: hasAnyPermission(["tests."])
+    },
     {
       key: "settings",
       icon: <SettingOutlined />,
       label: "Settings",
+      show: hasAnyPermission(["test category.", "branches.", "codes.", "hero."]),
       children: [
-        { key: "/test-categories", label: "Test Category" },
-        { key: "/branches", label: "Branches" },
-        { key: "/codes", label: "Codes" },
-        { key: "/Hero-section", label: "Hero Section" },
+        { 
+          key: "/test-categories", 
+          label: "Test Category",
+          show: hasAnyPermission(["test category."])
+        },
+        { 
+          key: "/branches", 
+          label: "Branches",
+          show: hasAnyPermission(["branches."])
+        },
+        { 
+          key: "/codes", 
+          label: "Codes",
+          show: hasAnyPermission(["codes."])
+        },
+        { 
+          key: "/Hero-section", 
+          label: "Hero Section",
+          show: hasAnyPermission(["hero."])
+        },
       ],
     },
     {
       key: "user-management",
       icon: <TeamOutlined />,
       label: "User Management",
+      show: hasAnyPermission(["admin.", "role.", "permission.", "assignrole.", "customer."]),
       children: [
-        { key: "/users", icon: <UserOutlined />, label: "Admin" },
-        { key: "/roles", icon: <IdcardOutlined />, label: "Roles" },
-        { key: "/permissions", icon: <SafetyCertificateOutlined />, label: "Permissions" },
-        { key: "/AssignRole", icon: <SwapOutlined />, label: "Assign-Role" },
-        { key: "/customer", icon: <UserOutlined />, label: "Customer" },
+        { 
+          key: "/users", 
+          icon: <UserOutlined />, 
+          label: "Admin",
+          show: hasAnyPermission(["admin."])
+        },
+        { 
+          key: "/roles", 
+          icon: <IdcardOutlined />, 
+          label: "Roles",
+          show: hasAnyPermission(["role."])
+        },
+        { 
+          key: "/permissions", 
+          icon: <SafetyCertificateOutlined />, 
+          label: "Permissions",
+          show: hasAnyPermission(["permission."])
+        },
+        { 
+          key: "/AssignRole", 
+          icon: <SwapOutlined />, 
+          label: "Assign-Role",
+          show: hasAnyPermission(["assignrole."])
+        },
+        { 
+          key: "/customer", 
+          icon: <UserOutlined />, 
+          label: "Customer",
+          show: hasAnyPermission(["customer."])
+        },
       ],
     },
-    { key: "/career", icon: <UserOutlined />, label: "Career Form" },
-    { key: "/contact", icon: <UserOutlined />, label: "Contact" },
-
+    { 
+      key: "/career", 
+      icon: <UserOutlined />, 
+      label: "Career Form",
+      show: hasAnyPermission(["career."])
+    },
+    { 
+      key: "/contact", 
+      icon: <UserOutlined />, 
+      label: "Contact",
+      show: hasAnyPermission(["contact."])
+    },
   ];
+
+  // Filter menu items based on permissions
+  const filterMenuItems = (items) => {
+    return items
+      .filter(item => item.show)
+      .map(item => {
+        if (item.children) {
+          const filteredChildren = item.children.filter(child => child.show);
+          if (filteredChildren.length > 0) {
+            return {
+              ...item,
+              children: filteredChildren
+            };
+          }
+          return null;
+        }
+        return item;
+      })
+      .filter(Boolean);
+  };
+
+  const menuItems = filterMenuItems(getAllMenuItems());
 
   const handleMenuClick = ({ key }) => {
     if (!key.startsWith("/")) return;
@@ -80,13 +179,20 @@ const AdminLayout = () => {
       }
       return null;
     };
-    return findLabel(menuItems) || "Dashboard";
+    return findLabel(getAllMenuItems()) || "Dashboard";
   };
 
   // ✅ Logout function
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    
+    // Trigger permission reset
+    const event = new CustomEvent('userChange', {
+      detail: { type: 'logout' }
+    });
+    window.dispatchEvent(event);
+    
     navigate("/login");
   };
 
@@ -188,6 +294,7 @@ const AdminLayout = () => {
           <Outlet />
         </Content>
         <ProfileDrawer open={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
+        {/* <PermissionDebugger /> */}
       </Layout>
     </Layout>
   );

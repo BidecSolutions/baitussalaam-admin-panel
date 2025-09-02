@@ -13,6 +13,7 @@ import ViewList from './components/Roles/ViewList';
 import { RoleProvider } from './Context/RolesContext'; // ✅ import
 import Register from './pages/Register';
 import PrivateRoute from './PrivateRoute';
+import ProtectedRoute from './components/Layout/ProtectedRoute';
 import Login from './pages/Login';
 import TestCategories from './pages/TestCategories';
 import Branches from './pages/Branches';
@@ -51,21 +52,148 @@ const App = () => {
                 </PrivateRoute>
               }
             >
+              {/* Dashboard - accessible to all authenticated users */}
               <Route index element={<Dashboard />} />
-              <Route path="doctors" element={<Doctors />} />
-              <Route path="codes" element={<Codes />} />
-              <Route path="test-categories" element={<TestCategories />} />
-              <Route path="tests" element={<Tests />} />
-              <Route path="users" element={<Users />} />
-              <Route path="roles" element={<Roles />} />
-              <Route path="permissions" element={<Permissions />} />
-              <Route path="assignRole" element={<AssignRole />} />
-              <Route path="viewList" element={<ViewList />} />
-              <Route path="/branches" element={<Branches />} />
-              <Route path="/Hero-section" element={<HeroSection />} />
-              <Route path="/customer" element={<Customer/>} />
-              <Route path="/contact" element={<ContactPage/>} />
-              <Route path="/career" element={<Careers/>} />
+              
+              {/* Doctors routes - require doctor permissions */}
+              <Route 
+                path="doctors" 
+                element={
+                  <ProtectedRoute permissions={["doctor."]}>
+                    <Doctors />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Codes routes - require codes permissions */}
+              <Route 
+                path="codes" 
+                element={
+                  <ProtectedRoute permissions={["codes."]}>
+                    <Codes />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Test Categories routes - require test category permissions */}
+              <Route 
+                path="test-categories" 
+                element={
+                  <ProtectedRoute permissions={["test category."]}>
+                    <TestCategories />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Tests routes - require tests permissions */}
+              <Route 
+                path="tests" 
+                element={
+                  <ProtectedRoute permissions={["tests."]}>
+                    <Tests />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Users routes - require admin permissions */}
+              <Route 
+                path="users" 
+                element={
+                  <ProtectedRoute permissions={["admin."]}>
+                    <Users />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Roles routes - require role permissions */}
+              <Route 
+                path="roles" 
+                element={
+                  <ProtectedRoute permissions={["role."]}>
+                    <Roles />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Permissions routes - require permission permissions */}
+              <Route 
+                path="permissions" 
+                element={
+                  <ProtectedRoute permissions={["permission."]}>
+                    <Permissions />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Assign Role routes - require assignrole permissions */}
+              <Route 
+                path="assignRole" 
+                element={
+                  <ProtectedRoute permissions={["assignrole."]}>
+                    <AssignRole />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* View List - accessible if user has role permissions */}
+              <Route 
+                path="viewList" 
+                element={
+                  <ProtectedRoute permissions={["role."]}>
+                    <ViewList />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Branches routes - require branches permissions */}
+              <Route 
+                path="/branches" 
+                element={
+                  <ProtectedRoute permissions={["branches."]}>
+                    <Branches />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Hero Section routes - require hero permissions */}
+              <Route 
+                path="/Hero-section" 
+                element={
+                  <ProtectedRoute permissions={["hero."]}>
+                    <HeroSection />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Customer routes - require customer permissions */}
+              <Route 
+                path="/customer" 
+                element={
+                  <ProtectedRoute permissions={["customer."]}>
+                    <Customer />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Contact routes - require contact permissions */}
+              <Route 
+                path="/contact" 
+                element={
+                  <ProtectedRoute permissions={["contact."]}>
+                    <ContactPage />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Career routes - require career permissions */}
+              <Route 
+                path="/career" 
+                element={
+                  <ProtectedRoute permissions={["career."]}>
+                    <Careers />
+                  </ProtectedRoute>
+                } 
+              />
 
             </Route>
           </Routes>
