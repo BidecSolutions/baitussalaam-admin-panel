@@ -68,7 +68,7 @@ export default function Careers() {
         // ✅ Agar text already full URL hai toh direct use karo
         const fileUrl = text.startsWith("http")
           ? text
-          : `${import.meta.env.VITE_BASE_CV_URL_LIVE}`;
+          : `${import.meta.env.VITE_BASE_CV_URL_LIVE}${text}`;
 
         return (
           <a href={fileUrl} target="_blank" rel="noopener noreferrer">
