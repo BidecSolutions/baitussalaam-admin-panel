@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Card, Statistic, Spin } from 'antd';
 import { UserOutlined, ExperimentOutlined, CalendarOutlined } from '@ant-design/icons';
-import { doctorsAPI, testsAPI } from '../services/api';
+import { doctorsAPI, testsAPI, usersAPI } from '../services/api';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
     totalDoctors: 0,
     totalTests: 0,
-    todayAppointments: 0,
+    totalAdmins: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -16,15 +16,16 @@ const Dashboard = () => {
       try {
         setLoading(true);
         // Fetch doctors and tests data
-        const [doctorsResponse, testsResponse] = await Promise.all([
+        const [doctorsResponse, testsResponse , totalAdmins] = await Promise.all([
           doctorsAPI.getAll(),
           testsAPI.getAll(),
+          usersAPI.getAll()
         ]);
 
         setStats({
-          totalDoctors: doctorsResponse.data?.length || 0,
+          totalDoctors: doctorsResponse.data?.data?.length || 0,
           totalTests: testsResponse.data?.data?.length || 0,
-          todayAppointments: 0, // Placeholder for now
+          totalAdmins: totalAdmins.data?.data?.length || 0, // Placeholder for now
         });
         // console.log(stats.totalTests);
         
@@ -34,7 +35,7 @@ const Dashboard = () => {
         setStats({
           totalDoctors: 0,
           totalTests: 0,
-          todayAppointments: 0,
+          totalAdmins: 0,
         });
       } finally {
         setLoading(false);
@@ -82,8 +83,8 @@ const Dashboard = () => {
         <Col xs={24} sm={12} lg={8}>
           <Card>
             <Statistic
-              title="Today's Appointments"
-              value={stats.todayAppointments}
+              title="Users"
+              value={stats.totalAdmins}
               prefix={<CalendarOutlined />}
               valueStyle={{ color: '#722ed1' }}
             />
@@ -91,14 +92,30 @@ const Dashboard = () => {
         </Col>
       </Row>
 
-      <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
-        <Col span={24}>
-          <Card title="Quick Actions" size="small">
-            <p>Welcome to Baitussalam Laboratory Admin Panel</p>
-            <p>Use the sidebar navigation to manage doctors and laboratory tests.</p>
-          </Card>
-        </Col>
-      </Row>
+     <Row
+      justify="center" // ✅ Center horizontally
+      style={{ marginTop: 40 }}
+    >
+      <Col xs={24} sm={20} md={16} lg={12} xl={10}> 
+        <Card
+          title="Quick Actions"
+          size="small"
+          bordered={false}
+          style={{
+            textAlign: "center",
+            borderRadius: "12px",
+            boxShadow: "0 2px 12px rgba(0,0,0,0.08)", // ✅ Professional shadow
+          }}
+        >
+          <p style={{ fontSize: "15px", marginBottom: "8px" }}>
+            Welcome to <b>Baitussalam Laboratory Admin Panel</b>
+          </p>
+          <p style={{ fontSize: "14px", color: "rgba(0,0,0,0.65)" }}>
+            Use the sidebar navigation to manage doctors and laboratory tests.
+          </p>
+        </Card>
+      </Col>
+    </Row>
     </div>
   );
 };

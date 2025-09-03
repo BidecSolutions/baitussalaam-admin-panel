@@ -20,26 +20,29 @@ const TestCategoriesList = ({
       console.error("Error deleting test:", error);
     }
   };
-    const { permissions } = useRoles();
-  
 
-  const columns = [ 
+  const { permissions } = useRoles();
+
+  const columns = [
     {
       title: "Category Name",
       dataIndex: "name",
       key: "name",
       sorter: true,
-      width: 250,
+      width: 200,
+      fixed: "left", 
       render: (text) => <strong>{text}</strong>,
+      responsive: ["xs", "sm", "md", "lg"], 
     },
     {
       title: "Description",
       dataIndex: "description",
       key: "description",
+      responsive: ["sm", "md", "lg"], 
       render: (description) => {
         if (!description) return "-";
         return (
-          <div style={{ maxWidth: 300 }}>
+          <div style={{ maxWidth: 300, whiteSpace: "normal" }}>
             {description.length > 100
               ? `${description.substring(0, 100)}...`
               : description}
@@ -51,45 +54,45 @@ const TestCategoriesList = ({
       title: "Active",
       dataIndex: "is_active",
       key: "is_active",
-      render: (is_active) => (
-        is_active ? <Tag color="green">Active</Tag> : <Tag color="red">Inactive</Tag>
-      ),
+      width: 120,
+      render: (is_active) =>
+        is_active ? (
+          <Tag color="green">Active</Tag>
+        ) : (
+          <Tag color="red">Inactive</Tag>
+        ),
+      responsive: ["sm", "md", "lg"], 
     },
     {
       title: "Actions",
       key: "actions",
-      width: 250,
+      width: 220,
+      fixed: "right", 
       render: (_, record) => (
-        <Space size="middle">
+        <Space size="middle" wrap>
           {permissions.includes("test category.edit") && (
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            size="small"
-            onClick={() => onEdit(record)}
-          >
-            Edit
-          </Button>
-          )}
-          {permissions.includes("category.delete") && (
-
-          <Popconfirm
-            title="Are you sure you want to delete this test?"
-            description="This action cannot be undone."
-            onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
-            placement="topRight"
-          >
             <Button
               type="primary"
-              danger
-              icon={<DeleteOutlined />}
+              icon={<EditOutlined />}
               size="small"
+              onClick={() => onEdit(record)}
             >
-              Delete
+              Edit
             </Button>
-          </Popconfirm>
+          )}
+          {permissions.includes("category.delete") && (
+            <Popconfirm
+              title="Are you sure you want to delete this test?"
+              description="This action cannot be undone."
+              onConfirm={() => handleDelete(record.id)}
+              okText="Yes"
+              cancelText="No"
+              placement="topRight"
+            >
+              <Button type="primary" danger icon={<DeleteOutlined />} size="small">
+                Delete
+              </Button>
+            </Popconfirm>
           )}
         </Space>
       ),
@@ -97,21 +100,23 @@ const TestCategoriesList = ({
   ];
 
   return (
-    <Table
-      columns={columns}
-      dataSource={tests}
-      rowKey="id"
-      loading={loading}
-      pagination={{
-        ...pagination,
-        showSizeChanger: true,
-        showQuickJumper: true,
-        showTotal: (total, range) =>
-          `${range[0]}-${range[1]} of ${total} tests`,
-      }}
-      onChange={onTableChange}
-      scroll={{ x: 800 }}
-    />
+   <Table
+  columns={columns}
+  dataSource={tests}
+  rowKey="id"
+  loading={loading}
+  pagination={{
+    ...pagination,
+    showSizeChanger: true,
+    showQuickJumper: true,
+    showTotal: (total, range) =>
+      `${range[0]}-${range[1]} of ${total} tests`,
+  }}
+  onChange={onTableChange}
+  scroll={{ x: "max-content" }} 
+  style={{ whiteSpace: "nowrap" }} 
+/>
+
   );
 };
 

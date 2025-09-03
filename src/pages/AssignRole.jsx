@@ -76,6 +76,7 @@ const AssignRole = () => {
         onEdit={(record) => {
           setEditingRecord(record);
           setModalVisible(true);
+          fetchAssignments : fetchAssignments
         }}
         onDelete={handleDelete}
       />

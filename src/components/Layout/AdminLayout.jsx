@@ -17,6 +17,7 @@ import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { RoleContext } from "../../Context/RolesContext";
 import { useRoles } from "../../Context/PermissionsContext";
 import ProfileDrawer from "./ProfileDrawer"; // ✅ apna component import
+import { Footer } from "antd/es/layout/layout";
 // import PermissionDebugger from "./PermissionDebugger"; // 🔐 Permission debugger for development
 
 const { Header, Sider, Content } = Layout;
@@ -293,6 +294,49 @@ const AdminLayout = () => {
         >
           <Outlet />
         </Content>
+      <Footer
+      style={{
+        background: colorBgContainer,
+        borderRadius: borderRadiusLG,
+        margin: "16px",
+        padding: "12px 24px",
+        fontSize: "14px",
+        color: "rgba(0,0,0,0.65)",
+        boxShadow: "0 -1px 4px rgba(0,0,0,0.06)",
+        textAlign: "center", 
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "8px",
+        }}
+      >
+        {/* Left side */}
+        <div style={{ flex: 1, textAlign: "left" }}>
+          © {new Date().getFullYear()} Baitussalam.
+        </div>
+
+        {/* Center full width (desktop pe center, mobile pe neeche aa jaye) */}
+        <div style={{ flex: 1, textAlign: "right" }}>
+          Powered by{" "}
+          <a
+            href="https://bidecsol.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "#1890ff", fontWeight: "500" }}
+          >
+            BidecSol
+          </a>
+        </div>
+      </div>
+    </Footer>
+
+
+
         <ProfileDrawer open={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
         {/* <PermissionDebugger /> */}
       </Layout>

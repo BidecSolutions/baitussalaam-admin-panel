@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Form, Select, Button, message } from "antd";
-import { rolesAPI, usersAPI , AssignRoleAdmins} from "../../services/api"; // ✅ Users API bhi import kiya
+import { rolesAPI, usersAPI, AssignRoleAdmins } from "../../services/api"; // ✅ Users API bhi import kiya
 // import { RoleContext } from "../../Context/RolesContext";
 
 // import { RoleContext } from "../../Context/RolesContext"; // ✅ Context
@@ -10,26 +10,37 @@ const { Option } = Select;
 const AssignForm = ({
   onSubmit,
   onCancel,
-  initialValues = null,
+  initialValues ,
   loading = false,
-  set
+  fetchAssignments
+  // set
 }) => {
- 
+
   const [form] = Form.useForm();
   const [roles, setRoles] = useState([]);
   const [users, setUsers] = useState([]);
   const [fetchingRoles, setFetchingRoles] = useState(false);
   const [fetchingUsers, setFetchingUsers] = useState(false);
-  
+  const [FormLoading, setFormLoading] = useState(false);
+
   useEffect(() => {
     fetchRoles();
     fetchUsers();
   }, []);
 
+  useEffect(() => {
+    if (initialValues) {
+      form.setFieldsValue({
+        ...initialValues,
+        role: roles
+      });
+    }
+  }, [initialValues]);
+
   const fetchRoles = async () => {
     try {
       setFetchingRoles(true);
-      const response = await rolesAPI.getAll(); 
+      const response = await rolesAPI.getAll();
       const data = Array.isArray(response.data)
         ? response.data
         : response.data?.data || [];
@@ -47,14 +58,14 @@ const AssignForm = ({
     }
   };
 
-  
+
   const fetchUsers = async () => {
     try {
       setFetchingUsers(true);
       const response = await usersAPI.getAll(); // GET /users
       const data = Array.isArray(response.data)
-      ? response.data
-      : response.data?.data || [];
+        ? response.data
+        : response.data?.data || [];
       setUsers(data);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -76,19 +87,21 @@ const AssignForm = ({
   const handleFinish = async (values) => {
   try {
     setFormLoading(true); // Loading state start
+    console.log("values", values);
 
     const payLoad = {
       admin_id: values.admin_id,
       role: values.role,
     };
 
-    if (editingAssignment) {
+    if (initialValues) {
       // Update existing assignment
-      const res = await AssignRoleAdmins.update(editingAssignment.id, payLoad);
+      const res = await AssignRoleAdmins.update(initialValues.id, payLoad);
       console.log("Updated Admin ID:", payLoad.admin_id);
       console.log("Updated Role:", payLoad.role);
       console.log("Response:", res.data);
       message.success("Role updated successfully!");
+      await fetchUsers();
     } else {
       // Create new assignment
       const res = await AssignRoleAdmins.create(payLoad);
@@ -96,11 +109,13 @@ const AssignForm = ({
       console.log("Created Role:", payLoad.role);
       console.log("Response:", res.data);
       message.success("Role assigned successfully!");
+      await fetchRoles();
     }
 
-    // Reset form & close modal
+    
     form.resetFields();
-    set(false); // Close modal
+    if (fetchAssignments) await fetchAssignments(); 
+    if (onCancel) onCancel(); 
 
   } catch (error) {
     console.error("Error creating/updating role:", error);
@@ -119,7 +134,7 @@ const AssignForm = ({
       onFinish={handleFinish}
       style={{ marginTop: 10 }}
     >
-     
+
       <Form.Item
         name="admin_id"
         label="Select Admin"
@@ -134,7 +149,7 @@ const AssignForm = ({
         </Select>
       </Form.Item>
 
-      
+
       <Form.Item
         name="role"
         label="Select Roles"
@@ -154,7 +169,7 @@ const AssignForm = ({
         </Select>
       </Form.Item>
 
-      
+
       <Form.Item>
         <div
           style={{

@@ -29,11 +29,11 @@ const AssignList = ({ onEdit, onDelete, data, loading = false }) => {
               Edit
             </Button>
           )}
-          {permissions.includes("assignrole.delete") && (
+          {/* {permissions.includes("assignrole.delete") && (
             <Button danger type="link" onClick={() => onDelete(record.id)}>
               Delete
             </Button>
-          )}
+          )} */}
         </Space>
       ),
     },

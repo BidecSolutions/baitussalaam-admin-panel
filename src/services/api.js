@@ -85,7 +85,7 @@ export const testCategoriesAPI = {
   delete: (id) => api.delete(`/test-category/${id}`),
 };
 
-// Codes API
+
 export const codesAPI = {
   getAll: () => api.get('/admin/codes'),
   getById: (id) => api.get(`/admin/codes/${id}`),
@@ -95,7 +95,6 @@ export const codesAPI = {
   delete: (id) => api.delete(`/test-category/${id}`),
 };
 
-// Hero Section
 
 export const heroAPI = {
   getAll: () => api.get('/admin/hero'),
@@ -111,7 +110,6 @@ export const heroAPI = {
   delete: (id) => api.delete(`/test-category/${id}`),
 };
 
-// Users API
 export const usersAPI = {
   getAll: () =>  api.get('/admin/list'),
   getById: (id) => USE_MOCK_DATA ? mockAPI.users.getById(id) : api.get(`/users/${id}`),
@@ -119,7 +117,6 @@ export const usersAPI = {
   update: (id, data) =>  api.post(`/admin/${id}/update`, data),
   delete: (id) =>  api.delete(`/admin/${id}/delete`),
 };
-
 
 export const rolesAPI = {
   getAll: () =>  api.get('/admin/roles'),
