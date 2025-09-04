@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Form, Input, Button, message, Modal } from "antd";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { authAPI } from "../services/api";
 
 const Login = () => {
@@ -12,9 +12,8 @@ const Login = () => {
 
   // Helper function to trigger permission update
   const triggerPermissionUpdate = (userData) => {
-    // Dispatch custom event to notify PermissionsContext
-    const event = new CustomEvent('userChange', {
-      detail: { type: 'login', userData }
+    const event = new CustomEvent("userChange", {
+      detail: { type: "login", userData },
     });
     window.dispatchEvent(event);
   };
@@ -23,15 +22,14 @@ const Login = () => {
   const handleLogin = async (values) => {
     try {
       let response = await authAPI.loginAdmin(values);
-      if (response.data.success){
+      if (response.data.success) {
         const user = response.data?.data;
         const token = response.data.token;
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("token", token);
-        
-        // Trigger permission update
+
         triggerPermissionUpdate(user);
-        
+
         message.success("Admin Login successful!");
         navigate("/"); // Admin dashboard
         return;
@@ -46,10 +44,9 @@ const Login = () => {
           const token = response.data.token;
           localStorage.setItem("user", JSON.stringify(user));
           localStorage.setItem("token", token);
-          
-          // Trigger permission update
+
           triggerPermissionUpdate(user);
-          
+
           message.success("User Login successful!");
           navigate("/user-dashboard");
           return;
@@ -65,34 +62,6 @@ const Login = () => {
           content: "Something went wrong. Please try again later.",
         });
       }
-    }
-  };
-
-  // 🔹 Change Password
-  const handleChangePassword = async (values) => {
-    try {
-      setLoading(true);
-      const payload = {
-        current_password: values.currentPassword,
-        new_password: values.newPassword,
-        new_password_confirmation: values.confirmPassword,
-      };
-
-      // 🔹 Token is already added via axios interceptor
-      const response = await authAPI.changePassword(payload);
-
-      if (response.data.success) {
-        message.success("Password changed successfully!");
-        setShowChangePassword(false);
-        passwordForm.resetFields();
-      } else {
-        message.error(response.data.message || "Password change failed!");
-      }
-    } catch (error) {
-      console.log(error.response);
-      message.error(error.response?.data?.message || "Something went wrong!");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -141,10 +110,22 @@ const Login = () => {
             Login
           </Button>
         </Form.Item>
-
       </Form>
 
-   
+      {/* Styled Register link */}
+      <div style={{ textAlign: "center", marginTop: 16 }}>
+        <span style={{ marginRight: 8 }}>Don’t have an account?</span>
+        <Link
+          to="/register"
+          style={{
+            color: "#1890ff",
+            fontWeight: 500,
+            textDecoration: "underline",
+          }}
+        >
+          Register here
+        </Link>
+      </div>
     </div>
   );
 };

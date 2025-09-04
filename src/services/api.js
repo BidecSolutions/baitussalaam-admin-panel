@@ -81,8 +81,8 @@ export const testCategoriesAPI = {
   getAll: () => api.get('/test-category'),
   getById: (id) => api.get(`/test-category/${id}`),
   create: (data) => api.post('admin/test-category/store', data),
-  update: (id, data) => api.post(`/test-category/${id}/update`, data),
-  delete: (id) => api.delete(`/test-category/${id}`),
+  update: (id, data) => api.post(`admin/test-category/${id}/update`, data),
+  delete: (id) => api.delete(`admin/test-category/${id}/delete`),
 };
 
 

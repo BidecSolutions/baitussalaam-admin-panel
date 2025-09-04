@@ -130,7 +130,7 @@ const Tests = () => {
   onCancel={handleModalCancel}
   footer={null}
   width={600}
-  destroyOnClose  
+  // destroyOnClose  
 >
   <TestsForm
     visible={modalVisible}

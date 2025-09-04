@@ -1,19 +1,18 @@
 import { Form, Input, InputNumber, Button, Card, Space, Select, Row, Col } from "antd";
-import React, { useContext, useEffect, useState } from "react";
-import { RoleContext } from "../Context/RolesContext";
+import React, { useEffect, useState } from "react";
 import api from "../services/api";
 
 const { TextArea } = Input;
 const { Option } = Select;
 
 const TestForm = ({ initialValues, loading, onCancel, visible, onSubmit }) => {
-  // const { createTest } = useContext(RoleContext);
   const [form] = Form.useForm();
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     if (visible) {
-      api.get("/test-category")
+      api
+        .get("/test-category")
         .then((res) => setCategories(res.data?.data || []))
         .catch((err) => console.error("Failed to fetch categories", err));
 
@@ -33,11 +32,12 @@ const TestForm = ({ initialValues, loading, onCancel, visible, onSubmit }) => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50">
+    <div className="flex justify-center items-start py-6">
       <Card
-        title={initialValues ? "Edit Test" : " Create New Test"}
-        className="w-full max-w-5xl shadow-xl rounded-2xl"
-        bordered={false} 
+        title={initialValues ? "Edit Test" : "Create New Test"}
+        className="w-full max-w-5xl shadow-md rounded-lg"
+        bordered={false}
+        bodyStyle={{ padding: "16px" }} // yaha padding kam kar di
       >
         <Form
           layout="vertical"
@@ -45,7 +45,7 @@ const TestForm = ({ initialValues, loading, onCancel, visible, onSubmit }) => {
           initialValues={initialValues}
           onFinish={onFinish}
         >
-          <Row gutter={16}>
+          <Row gutter={12}>
             <Col span={8}>
               <Form.Item
                 name="name"
@@ -83,7 +83,7 @@ const TestForm = ({ initialValues, loading, onCancel, visible, onSubmit }) => {
             </Col>
           </Row>
 
-          <Row gutter={16}>
+          <Row gutter={12}>
             <Col span={8}>
               <Form.Item
                 name="price"
@@ -111,7 +111,7 @@ const TestForm = ({ initialValues, loading, onCancel, visible, onSubmit }) => {
             </Col>
           </Row>
 
-          <Row gutter={16}>
+          <Row gutter={12}>
             <Col span={24}>
               <Form.Item name="description" label="Description">
                 <TextArea rows={3} placeholder="Enter description" />
