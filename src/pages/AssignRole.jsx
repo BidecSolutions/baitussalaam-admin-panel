@@ -76,7 +76,7 @@ const AssignRole = () => {
         onEdit={(record) => {
           setEditingRecord(record);
           setModalVisible(true);
-          fetchAssignments : fetchAssignments
+          fetchAssignments
         }}
         onDelete={handleDelete}
       />
@@ -99,6 +99,7 @@ const AssignRole = () => {
             setEditingRecord(null);
           }}
           loading={loading}
+          fetchAssignments={fetchAssignments}
         />
       </Modal>
     </div>

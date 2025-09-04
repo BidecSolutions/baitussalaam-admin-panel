@@ -1,16 +1,15 @@
 import React, { useState } from "react";
-import { Form, Input, Button, message, Modal } from "antd";
+import { Form, Input, Button } from "antd";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { authAPI } from "../services/api";
 
 const Login = () => {
   const [form] = Form.useForm();
-  const [passwordForm] = Form.useForm();
-  const [showChangePassword, setShowChangePassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Helper function to trigger permission update
+  // 🔹 Trigger permission update
   const triggerPermissionUpdate = (userData) => {
     const event = new CustomEvent("userChange", {
       detail: { type: "login", userData },
@@ -19,51 +18,64 @@ const Login = () => {
   };
 
   // 🔹 Handle Login
-  const handleLogin = async (values) => {
+// 🔹 Handle Login
+const handleLogin = async (values) => {
+  setLoading(true);
+  try {
+    // Try Admin Login
+    let response = await authAPI.loginAdmin(values);
+    if (response.data.success) {
+      const user = response.data?.data;
+      const token = response.data.token;
+
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("token", token);
+
+      triggerPermissionUpdate(user);
+
+      toast.success(response.data.message || "Admin login successful!");
+      navigate("/"); // Admin dashboard
+      return;
+    } else {
+      toast.error(response.data.message || "Invalid admin credentials!");
+      setLoading(false); // ❌ stop loader immediately
+      return;
+    }
+  } catch (adminError) {
     try {
-      let response = await authAPI.loginAdmin(values);
+      // Try User Login
+      let response = await authAPI.loginUser(values);
       if (response.data.success) {
-        const user = response.data?.data;
+        const user = response.data.data;
         const token = response.data.token;
+
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("token", token);
 
         triggerPermissionUpdate(user);
 
-        message.success("Admin Login successful!");
-        navigate("/"); // Admin dashboard
+        toast.success(response.data.message || "User login successful!");
+        navigate("/user-dashboard");
         return;
       } else {
-        message.error("Invalid admin credentials!");
+        toast.error(response.data.message || "Invalid user credentials!");
+        setLoading(false); // ❌ stop loader immediately
+        return;
       }
-    } catch (adminError) {
-      try {
-        let response = await authAPI.loginUser(values);
-        if (response.data.success) {
-          const user = response.data.data;
-          const token = response.data.token;
-          localStorage.setItem("user", JSON.stringify(user));
-          localStorage.setItem("token", token);
-
-          triggerPermissionUpdate(user);
-
-          message.success("User Login successful!");
-          navigate("/user-dashboard");
-          return;
-        } else {
-          Modal.error({
-            title: "User Login Failed",
-            content: "Invalid user credentials!",
-          });
-        }
-      } catch (userError) {
-        Modal.error({
-          title: "Login Failed",
-          content: "Something went wrong. Please try again later.",
-        });
-      }
+    } catch (userError) {
+      toast.error(
+        userError?.response?.data?.message ||
+          "Something went wrong. Please try again later."
+      );
+      setLoading(false); // ❌ stop loader immediately
+      return;
     }
-  };
+  } finally {
+    // only close loading if still true (for success flow)
+    setLoading(false);
+  }
+};
+
 
   return (
     <div
@@ -106,13 +118,13 @@ const Login = () => {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" block>
+          <Button type="primary" htmlType="submit" block loading={loading}>
             Login
           </Button>
         </Form.Item>
       </Form>
 
-      {/* Styled Register link */}
+      {/* Register Link */}
       <div style={{ textAlign: "center", marginTop: 16 }}>
         <span style={{ marginRight: 8 }}>Don’t have an account?</span>
         <Link

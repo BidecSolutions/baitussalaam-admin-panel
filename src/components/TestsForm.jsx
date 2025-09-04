@@ -35,9 +35,9 @@ const TestForm = ({ initialValues, loading, onCancel, visible, onSubmit }) => {
     <div className="flex justify-center items-start py-6">
       <Card
         title={initialValues ? "Edit Test" : "Create New Test"}
-        className="w-full max-w-5xl shadow-md rounded-lg"
+        className="w-full max-w-6xl shadow-lg rounded-xl"
         bordered={false}
-        bodyStyle={{ padding: "16px" }} // yaha padding kam kar di
+        bodyStyle={{ padding: "24px" }}
       >
         <Form
           layout="vertical"
@@ -45,7 +45,8 @@ const TestForm = ({ initialValues, loading, onCancel, visible, onSubmit }) => {
           initialValues={initialValues}
           onFinish={onFinish}
         >
-          <Row gutter={12}>
+          {/* 🔹 First Row */}
+          <Row gutter={16}>
             <Col span={8}>
               <Form.Item
                 name="name"
@@ -83,7 +84,18 @@ const TestForm = ({ initialValues, loading, onCancel, visible, onSubmit }) => {
             </Col>
           </Row>
 
-          <Row gutter={12}>
+          {/* 🔹 Second Row */}
+          <Row gutter={16}>
+            <Col span={8}>
+              <Form.Item
+                name="preparation_instructions"
+                label="Preparation Instructions"
+                rules={[{ required: true, message: "Please enter preparation instructions" }]}
+              >
+                <Input placeholder="Enter preparation instructions" />
+              </Form.Item>
+            </Col>
+
             <Col span={8}>
               <Form.Item
                 name="price"
@@ -99,7 +111,10 @@ const TestForm = ({ initialValues, loading, onCancel, visible, onSubmit }) => {
                 <InputNumber className="w-full" min={0} placeholder="Enter discounted price" />
               </Form.Item>
             </Col>
+          </Row>
 
+          {/* 🔹 Third Row */}
+          <Row gutter={16}>
             <Col span={8}>
               <Form.Item
                 name="duration"
@@ -109,16 +124,15 @@ const TestForm = ({ initialValues, loading, onCancel, visible, onSubmit }) => {
                 <Input placeholder="e.g. 2 hours, 30 min" />
               </Form.Item>
             </Col>
-          </Row>
 
-          <Row gutter={12}>
-            <Col span={24}>
+            <Col span={16}>
               <Form.Item name="description" label="Description">
                 <TextArea rows={3} placeholder="Enter description" />
               </Form.Item>
             </Col>
           </Row>
 
+          {/* 🔹 Buttons */}
           <Form.Item>
             <Space className="w-full flex justify-end">
               <Button onClick={onCancel}>Cancel</Button>

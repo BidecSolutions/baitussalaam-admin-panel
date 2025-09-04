@@ -80,7 +80,7 @@ const TestCategoriesList = ({
               Edit
             </Button>
           )}
-          {permissions.includes("category.delete") && (
+          {permissions.includes("test category.delete") && (
             <Popconfirm
               title="Are you sure you want to delete this test?"
               description="This action cannot be undone."

@@ -83,11 +83,11 @@ const AdminLayout = () => {
           label: "Codes",
           show: hasAnyPermission(["codes."])
         },
-        { 
-          key: "/Hero-section", 
-          label: "Hero Section",
-          show: hasAnyPermission(["hero."])
-        },
+        // { 
+        //   key: "/Hero-section", 
+        //   label: "Hero Section",
+        //   show: hasAnyPermission(["hero."])
+        // },
       ],
     },
     {
@@ -99,7 +99,7 @@ const AdminLayout = () => {
         { 
           key: "/users", 
           icon: <UserOutlined />, 
-          label: "Admin",
+          label: "Users",
           show: hasAnyPermission(["admin."])
         },
         { 

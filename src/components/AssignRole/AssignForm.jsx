@@ -10,7 +10,7 @@ const { Option } = Select;
 const AssignForm = ({
   onSubmit,
   onCancel,
-  initialValues ,
+  initialValues,
   loading = false,
   fetchAssignments
   // set
@@ -76,55 +76,72 @@ const AssignForm = ({
     }
   };
 
+  //   useEffect(() => {
+  //   if (initialValues && users.length > 0 && roles.length > 0) {
+  //     form.setFieldsValue({
+  //       admin_id: initialValues.admin_id,
+  //       role: Array.isArray(initialValues.role)
+  //         ? initialValues.role.map((r) => r.admin_name) 
+  //         : [initialValues.admin_name], 
+  //     });
+  //   }
+  //   console.log(initialValues  ,"initialValues");
+
+  // }, [initialValues, users, roles, form]);
   useEffect(() => {
-    if (initialValues) {
-      form.setFieldsValue(initialValues);
-    } else {
-      form.resetFields();
+    if (initialValues && users.length > 0 && roles.length > 0) {
+      form.setFieldsValue({
+        admin_id: initialValues.admin_id, // direct admin id
+        role: initialValues.roles || [],  // roles array as it is (["Doctor"])
+      });
     }
-  }, [initialValues, form]);
+    console.log(initialValues, "initialValues");
+  }, [initialValues, users, roles, form]);
+
 
   const handleFinish = async (values) => {
-  try {
-    setFormLoading(true); // Loading state start
-    console.log("values", values);
+    try {
+      setFormLoading(true); // Loading state start
+      console.log("values", values);
 
-    const payLoad = {
-      admin_id: values.admin_id,
-      role: values.role,
-    };
+      const payLoad = {
+        admin_id: values.admin_id,
+        role: values.role,
+      };
 
-    if (initialValues) {
-      // Update existing assignment
-      const res = await AssignRoleAdmins.update(initialValues.id, payLoad);
-      console.log("Updated Admin ID:", payLoad.admin_id);
-      console.log("Updated Role:", payLoad.role);
-      console.log("Response:", res.data);
-      message.success("Role updated successfully!");
-      await fetchUsers();
-    } else {
-      // Create new assignment
-      const res = await AssignRoleAdmins.create(payLoad);
-      console.log("Created Admin ID:", payLoad.admin_id);
-      console.log("Created Role:", payLoad.role);
-      console.log("Response:", res.data);
-      message.success("Role assigned successfully!");
-      await fetchRoles();
+
+
+      if (initialValues) {
+        // Update existing assignment
+        const res = await AssignRoleAdmins.update(initialValues.id, payLoad);
+        console.log("Updated Admin ID:", payLoad.admin_id);
+        console.log("Updated Role:", payLoad.role);
+        console.log("Response:", res.data);
+        message.success("Role updated successfully!");
+        await fetchUsers();
+      } else {
+        // Create new assignment
+        const res = await AssignRoleAdmins.create(payLoad);
+        console.log("Created Admin ID:", payLoad.admin_id);
+        console.log("Created Role:", payLoad.role);
+        console.log("Response:", res.data);
+        message.success("Role assigned successfully!");
+        await fetchRoles();
+      }
+
+
+      form.resetFields();
+      if (fetchAssignments) await fetchAssignments();
+      if (onCancel) onCancel();
+
+    } catch (error) {
+      console.error("Error creating/updating role:", error);
+      message.error("Failed to save role!");
+      throw error;
+    } finally {
+      setFormLoading(false); // Loading state end
     }
-
-    
-    form.resetFields();
-    if (fetchAssignments) await fetchAssignments(); 
-    if (onCancel) onCancel(); 
-
-  } catch (error) {
-    console.error("Error creating/updating role:", error);
-    message.error("Failed to save role!");
-    throw error;
-  } finally {
-    setFormLoading(false); // Loading state end
-  }
-};
+  };
 
 
   return (
